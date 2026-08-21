@@ -926,8 +926,8 @@ do
             pcall(function() ok = _G.SXEFireGrapple2(destino) and true or false end)
         end
         if _G.__LMARK then _G.__LMARK("hook na direcao da base: " .. tostring(ok)) end
-        local ESPERA_HOOK_TP = 0.04
-        task.wait(ESPERA_HOOK_TP)
+        local ESPERA_HOOK_TP = 0
+        if ESPERA_HOOK_TP > 0 then task.wait(ESPERA_HOOK_TP) end
         if _G.SXEStartSideTP then
             task.spawn(_G.SXEStartSideTP)
         elseif _G.SXE_ExecuteManualTP then
@@ -1248,7 +1248,7 @@ Themes = {
         Background=Color3.fromRGB(14,14,18), MainBackground=Color3.fromRGB(8,8,12),
         Panel=Color3.fromRGB(20,20,26), Row=Color3.fromRGB(26,26,34), RowHover=Color3.fromRGB(38,38,48),
         Accent=Color3.fromRGB(255,255,255), AccentLight=Color3.fromRGB(190,195,210),
-        Green=Color3.fromRGB(90,220,140), Red=Color3.fromRGB(230,90,90), Red2=Color3.fromRGB(180,70,70),
+        Green=Color3.fromRGB(255,255,255), Red=Color3.fromRGB(255,255,255), Red2=Color3.fromRGB(220,220,220),
         Text=Color3.fromRGB(245,246,250), Dim=Color3.fromRGB(130,135,150), Stroke=Color3.fromRGB(50,52,65),
         SoftButton=Color3.fromRGB(28,28,36), SoftButtonHover=Color3.fromRGB(42,42,54),
         SoftAccent=Color3.fromRGB(28,28,36), SoftAccentHover=Color3.fromRGB(42,42,54),
@@ -1661,7 +1661,7 @@ Config = {
     },
     TpSettings = {
         Tool="Flying Carpet", TpKey="T", CloneKey="V", CarpetSpeedKey="Q",
-        InfiniteJump=false, DelayVal=0.25, CloneDelayVal=0.05,
+        InfiniteJump=false, DelayVal=0.15, CloneDelayVal=0,
         RagdollTP=false, FPSWait=false, FlyTP=false, FlyTPSpeed=160, FlyTPCloseSpeed=75,
         GrabbleTP=false, GrabbleTPSpeed=500,
         TpOnLoad=false, MinGenForTp="", MinGenForGrab="",
@@ -1898,11 +1898,104 @@ do
     end
 end
 local function serializePos(pos) return {xs=pos.X.Scale,xo=pos.X.Offset,ys=pos.Y.Scale,yo=pos.Y.Offset} end
-local function rememberPosition(name, frame) if not name or not frame then return end; Config.positions[name]=serializePos(frame.Position); saveConfig() end
+local MAIN_PANEL_NAMES = {["Bunnyirsh Hub"]=true,["Bunnyirsh"]=true}
+local function rememberPosition(name, frame)
+    if not name or not frame then return end
+    if MAIN_PANEL_NAMES[name] then return end
+    Config.positions[name]=serializePos(frame.Position)
+    saveConfig()
+end
 local function applySavedPosition(name, frame)
-    if not name or not frame then return end; local d=Config.positions and Config.positions[name]
+    if not name or not frame then return end
+    if MAIN_PANEL_NAMES[name] then return end
+    local d=Config.positions and Config.positions[name]
     if d then frame.Position=UDim2.new(d.xs or 0,d.xo or 0,d.ys or 0,d.yo or 0) end
 end
+local function resetAllPositions()
+    Config.positions = {}
+    saveConfig()
+    if main then
+        main.Position = UDim2.new(0.5, -187, 0.5, -275)
+    end
+    for _,pair in ipairs({
+        {"Bunnyirsh Hub\nInvisible Steal", panels and panels["Invisible Steal Panel"]},
+        {"Bunnyirsh Hub\nAdmin Command Panel", panels and panels["Admin Command Panel"]},
+        {"Bunnyirsh Hub\nCommand Cooldowns", panels and panels["Command Cooldowns"]},
+        {"Bunnyirsh Hub\nActions", panels and panels["Actions"]},
+        {"Bunnyirsh Hub\nSteal Panel", panels and panels["Steal Panel"]},
+        {"Bunnyirsh Hub\nSteal Target", panels and panels["Steal Target"]},
+        {"Bunnyirsh Hub\nAction Settings", actionSettingsPanel},
+        {"Bunnyirsh Hub\nTP & Clone Settings", tpSpeedSettingsPanel},
+    }) do
+        if pair[2] then
+            pcall(function()
+                if pair[2] == (panels and panels["Invisible Steal Panel"]) then pair[2].Position = UDim2.new(0,80,0.5,-220)
+                elseif pair[2] == (panels and panels["Admin Command Panel"]) then pair[2].Position = UDim2.new(0.5,85,1,-340)
+                elseif pair[2] == (panels and panels["Command Cooldowns"]) then pair[2].Position = UDim2.new(0.5,245,1,-390)
+                elseif pair[2] == (panels and panels["Actions"]) then pair[2].Position = UDim2.new(0.5,505,1,-415)
+                elseif pair[2] == (panels and panels["Steal Panel"]) then pair[2].Position = UDim2.new(1,-300,1,-385)
+                elseif pair[2] == (panels and panels["Steal Target"]) then pair[2].Position = UDim2.new(1,-330,0,85)
+                elseif pair[2] == actionSettingsPanel then pair[2].Position = UDim2.new(0.5,745,1,-440)
+                elseif pair[2] == tpSpeedSettingsPanel then pair[2].Position = UDim2.new(0.5,745,1,-440)
+                end
+            end)
+        end
+    end
+    if ShowNotification then pcall(ShowNotification, "UI", "All positions reset") end
+end
+local function resetAllSettings()
+    local keepPos = Config.positions
+    Config = {
+        positions = keepPos or {},
+        keybinds = {},
+        actions = {},
+        locked = false,
+        DarkMode = true,
+        AntiRagdoll = false, InfiniteJump = false, Float = false,
+        AutoResetBalloon = false, AutoKickOnSteal = false, KickToPrivateServer = false, CleanErrorGUIs = false,
+        LineToBase = false, LineToBrainrot = false, InvisStealAngle = 225, SinkSliderValue = 7,
+        AutoRecoverLagback = true,
+        WalkSpeedEnabled = false, WalkSpeedValue = 16,
+        AutoTPPriority = true, AutoTPHighestGen = false, AutoTPHighestValue = false, AutoTPFloor2FromFloor1 = false,
+        FPSBoost = false, FPSBoostUltra = false, XRay = false, FOV = 70,
+        BrainrotESP = true, TimerESP = false, SubspaceMineESP = false, PlayerESP = true, BaseOwnerESP = false,
+        AutoBuyEnabled = false, AutoBuyRange = 17, AutoGrabSpeed = 17, AutoBuyKey = "K",
+        AutoDestroyTurrets = false, AutoUnlockOnSteal = false, AutoInvisDuringSteal = false,
+        ClickToAP = false, ClickToAPSingleCommand = false, ClickToAPRadius = 8,
+        SpamBaseOwnerCommands = {balloon=true,inverse=true,jail=true,jumpscare=true,morph=true,nightvision=true,ragdoll=true,rocket=true,tiny=true},
+        SpamBaseOwnerOrder = {"balloon","inverse","jail","jumpscare","morph","nightvision","ragdoll","rocket","tiny"},
+        SpamBaseOwnerSingleCommand = false,
+        ProximityAP = false, ShowJobJoiner = true, AntiBeeDisco = false, AntiEffects = false,
+        AutoDestroySentry = false, LaserWebAimbot = false,
+        RemoteSellEnabled = false, AdminPanelUI = false,
+        StealHighest = false, StealPriority = true, StealNearest = false, AutoStealEnabled = true,
+        Unwalk = false,
+        Visibilities = {
+            ["Invisible Steal Panel"] = true, ["Admin Command Panel"] = false,
+            ["Command Cooldowns"] = true, ["Actions"] = true,
+            ["Steal Panel"] = true, ["Steal Target"] = true,
+        },
+        TpSettings = {
+            Tool = "Flying Carpet", TpKey = "T", CloneKey = "V", CarpetSpeedKey = "Q",
+            InfiniteJump = false, DelayVal = 0.25, CloneDelayVal = 0,
+            RagdollTP = false, FPSWait = false, FlyTP = false, FlyTPSpeed = 160, FlyTPCloseSpeed = 75,
+            GrabbleTP = false, GrabbleTPSpeed = 500,
+            TpOnLoad = false, MinGenForTp = "", MinGenForGrab = "",
+            BrainrotCarpet = false,
+        },
+        PriorityList = priorityList,
+        RemovedFromPriority = {},
+    }
+    saveConfig()
+    initToggles()
+    if setFPSBoost then pcall(setFPSBoost, false) end
+    if setFPSBoostUltra then pcall(setFPSBoostUltra, false) end
+    if setXRay then pcall(setXRay, false) end
+    if loadTab then pcall(loadTab, UI.CurrentTab or "Auto TP") end
+    if ShowNotification then pcall(ShowNotification, "CONFIG", "All settings reset") end
+end
+_G.resetAllPositions = resetAllPositions
+_G.resetAllSettings = resetAllSettings
 local function initToggles()
     setToggle("Anti Ragdoll", Config.AntiRagdoll, true)
     setToggle("Auto Reset Balloon", Config.AutoResetBalloon, true)
@@ -6137,7 +6230,7 @@ function runAutoSnipe()
             hrp.AssemblyLinearVelocity = Vector3.zero
             hrp.CFrame = hrp.CFrame * CFrame.new(0, 0, -2.5)
             hrp.AssemblyLinearVelocity = Vector3.zero
-            waitSecondsHeartbeat(Config.TpSettings.CloneDelayVal or 0.05)
+            waitSecondsHeartbeat(Config.TpSettings.CloneDelayVal or 0)
             local miniPos = hrp.Position
             waitSecondsHeartbeat(0.01)
             local stillAtMiniPos = waitUntilHeartbeat(function()
@@ -7000,23 +7093,60 @@ local function setFPSBoost(enabled) Config.FPSBoost=enabled; saveConfig()
         fpsBoostConnection = nil
     end
     if enabled then
-        Lighting.GlobalShadows=false; Lighting.Brightness=2; Lighting.FogEnd=9e9; Lighting.FogStart=0
-        Lighting.EnvironmentDiffuseScale=0; Lighting.EnvironmentSpecularScale=0
+        pcall(function()
+            settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+        end)
+        pcall(function()
+            if setfpscap then setfpscap(tonumber(_G.SXE_FPS_CAP) or 999) end
+        end)
+        Lighting.GlobalShadows=false
+        Lighting.Brightness=2
+        Lighting.FogEnd=9e9
+        Lighting.FogStart=0
+        Lighting.EnvironmentDiffuseScale=0
+        Lighting.EnvironmentSpecularScale=0
+        pcall(function() Lighting.Technology = Enum.Technology.Compatibility end)
         for _,v in pairs(Lighting:GetChildren()) do
-            if v:IsA("BloomEffect") or v:IsA("BlurEffect") or v:IsA("ColorCorrectionEffect") or v:IsA("SunRaysEffect") or v:IsA("DepthOfFieldEffect") then pcall(function() v.Enabled=false end) elseif v:IsA("Atmosphere") then pcall(function() v:Destroy() end) end
+            if v:IsA("BloomEffect") or v:IsA("BlurEffect") or v:IsA("ColorCorrectionEffect")
+                or v:IsA("SunRaysEffect") or v:IsA("DepthOfFieldEffect") or v:IsA("Atmosphere")
+                or v:IsA("Clouds") or v:IsA("Sky") then
+                pcall(function() v:Destroy() end)
+            end
         end
         for _,obj in ipairs(Workspace:GetDescendants()) do
             if not IsProtected(obj) then
-                if obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Beam") or obj:IsA("Smoke") or obj:IsA("Fire") or obj:IsA("Sparkles") then pcall(function() obj.Enabled=false end) end
-                if obj:IsA("BasePart") then pcall(function() obj.Material=Enum.Material.Plastic; obj.CastShadow=false end) end
-                if obj:IsA("SurfaceAppearance") or obj:IsA("Texture") or obj:IsA("Decal") then pcall(function() obj:Destroy() end) end
+                if obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Beam")
+                    or obj:IsA("Smoke") or obj:IsA("Fire") or obj:IsA("Sparkles") then
+                    pcall(function() obj.Enabled=false end)
+                end
+                if obj:IsA("BasePart") then
+                    pcall(function()
+                        obj.Material=Enum.Material.Plastic
+                        obj.CastShadow=false
+                        obj.Reflectance=0
+                    end)
+                end
+                if obj:IsA("SurfaceAppearance") or obj:IsA("Texture") or obj:IsA("Decal") then
+                    pcall(function() obj:Destroy() end)
+                end
+                if obj:IsA("PointLight") or obj:IsA("SpotLight") or obj:IsA("SurfaceLight") then
+                    pcall(function() obj.Enabled=false end)
+                end
             end
         end
         fpsBoostConnection = Workspace.DescendantAdded:Connect(function(obj)
             if not Config.FPSBoost then return end
             if not IsProtected(obj) then
-                if obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Beam") or obj:IsA("Smoke") then pcall(function() obj.Enabled=false end) end
-                if obj:IsA("BasePart") then pcall(function() obj.Material=Enum.Material.Plastic; obj.CastShadow=false end) end
+                if obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Beam") or obj:IsA("Smoke")
+                    or obj:IsA("Fire") or obj:IsA("Sparkles") then
+                    pcall(function() obj.Enabled=false end)
+                end
+                if obj:IsA("BasePart") then
+                    pcall(function() obj.Material=Enum.Material.Plastic; obj.CastShadow=false; obj.Reflectance=0 end)
+                end
+                if obj:IsA("PointLight") or obj:IsA("SpotLight") or obj:IsA("SurfaceLight") then
+                    pcall(function() obj.Enabled=false end)
+                end
             end
         end)
     end
@@ -7692,25 +7822,37 @@ do
         local bp = LocalPlayer:FindFirstChildOfClass("Backpack")
         return (bp and bp:FindFirstChild("Bat")) or char:FindFirstChild("Bat")
     end
+    local function getPart(obj)
+        if not obj then return nil end
+        if obj:IsA("BasePart") then return obj end
+        if obj:IsA("Model") then return obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart") end
+        return nil
+    end
+    local function distTo(obj, rootPos)
+        local part = getPart(obj)
+        if not part then return math.huge end
+        return (rootPos - part.Position).Magnitude
+    end
     local function findTarget()
         local char = getChar()
         local hrp = char and char:FindFirstChild("HumanoidRootPart")
         if not hrp then return nil end
         local rootPos = hrp.Position
+        local best, bestD = nil, ADS.DETECTION_DISTANCE
         for _, obj in ipairs(Workspace:GetChildren()) do
             if type(obj.Name) == "string" and obj.Name:find("Sentry") and not obj.Name:lower():find("bullet") then
                 local ownerId = obj.Name:match("Sentry_(%d+)")
                 if ownerId and tonumber(ownerId) == LocalPlayer.UserId then
                     continue
                 end
-                local part = obj:IsA("BasePart") and obj
-                    or (obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")))
-                if part and (rootPos - part.Position).Magnitude <= ADS.DETECTION_DISTANCE then
-                    return obj
+                local d = distTo(obj, rootPos)
+                if d <= bestD then
+                    bestD = d
+                    best = obj
                 end
             end
         end
-        return nil
+        return best
     end
     local function moveTarget(obj)
         local char = getChar()
@@ -7718,14 +7860,17 @@ do
         if not hrp then return end
         for _, part in ipairs(obj:GetDescendants()) do
             if part:IsA("BasePart") then
-                pcall(function() part.CanCollide = false end)
+                pcall(function()
+                    part.CanCollide = false
+                    part.Anchored = true
+                end)
             end
         end
         local cf = hrp.CFrame * CFrame.new(0, 0, ADS.PULL_DISTANCE)
         if obj:IsA("BasePart") then
             pcall(function() obj.CFrame = cf end)
         elseif obj:IsA("Model") then
-            local main = obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")
+            local main = getPart(obj)
             if main then pcall(function() main.CFrame = cf end) end
         end
     end
@@ -7738,7 +7883,6 @@ do
         if not weapon then return end
         if weapon.Parent ~= char then
             pcall(function() hum:EquipTool(weapon) end)
-            task.wait(0.08)
         end
         local handle = weapon:FindFirstChild("Handle")
         if handle then pcall(function() handle.CanCollide = false end) end
@@ -7756,12 +7900,24 @@ do
             pcall(function() ADS.connection:Disconnect() end)
             ADS.connection = nil
         end
+        local lastScan = 0
         ADS.connection = RunService.Heartbeat:Connect(function()
             if not ADS.running or not Config.AutoDestroySentry then return end
-            if ADS.target and ADS.target.Parent == Workspace then
-                moveTarget(ADS.target)
-                attack()
-            else
+            local hrp = getChar() and getChar():FindFirstChild("HumanoidRootPart")
+            if not hrp then return end
+            local now = os.clock()
+            if ADS.target and ADS.target.Parent then
+                local d = distTo(ADS.target, hrp.Position)
+                if d > ADS.DETECTION_DISTANCE then
+                    ADS.target = nil
+                else
+                    moveTarget(ADS.target)
+                    attack()
+                    return
+                end
+            end
+            if now - lastScan >= 0.12 then
+                lastScan = now
                 ADS.target = findTarget()
             end
         end)
@@ -8719,17 +8875,20 @@ end
 function clearBody(body) for _,c in ipairs(body:GetChildren()) do if not c:IsA("UIListLayout") and not c:IsA("UIPadding") then c:Destroy() end end end
 function openAnim(f)
     if not f then return end
+    if f == main then
+        f.Position = UDim2.new(0.5, -187, 0.5, -275)
+    end
     local us = f:FindFirstChild("SXEScale") or Instance.new("UIScale")
     us.Name = "SXEScale"
     us.Parent = f
     local tgt = f.Position
     local baseTrans = f.BackgroundTransparency
-    if baseTrans > 0.9 then baseTrans = 0.04 end
+    if baseTrans > 0.9 then baseTrans = 0.02 end
     f.Visible = true
     f.BackgroundTransparency = 1
-    us.Scale = 0.88
-    f.Position = UDim2.new(tgt.X.Scale, tgt.X.Offset, tgt.Y.Scale, tgt.Y.Offset + 18)
-    local ti = TweenInfo.new(0.28, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
+    us.Scale = 0.9
+    f.Position = UDim2.new(tgt.X.Scale, tgt.X.Offset, tgt.Y.Scale, tgt.Y.Offset + 14)
+    local ti = TweenInfo.new(0.26, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
     TweenService:Create(us, ti, {Scale = 1}):Play()
     TweenService:Create(f, ti, {Position = tgt, BackgroundTransparency = baseTrans}):Play()
 end
@@ -8832,7 +8991,7 @@ function makeHeader(f,t,isMain)
     makeDraggable(f,h,t)
     return h
 end
-function makeMainPanel(t,size,pos) local f=Instance.new("Frame"); f.Size=size; f.Position=pos; f.BackgroundColor3=Theme.MainBackground; f.BackgroundTransparency=0.06; f.BorderSizePixel=0; f.ClipsDescendants=true; f.Parent=gui; corner(f,12); addOutline(f); makeHeader(f,t,true)
+function makeMainPanel(t,size,pos) local f=Instance.new("Frame"); f.Size=size; f.Position=pos; f.BackgroundColor3=Theme.MainBackground; f.BackgroundTransparency=0.02; f.BorderSizePixel=0; f.ClipsDescendants=true; f.Parent=gui; corner(f,14); addOutline(f); makeHeader(f,t,true)
     local body=Instance.new("ScrollingFrame"); body.Size=UDim2.new(1,-12,1,-82); body.Position=UDim2.new(0,6,0,76); body.BackgroundTransparency=1; body.BorderSizePixel=0; body.ScrollBarThickness=5; body.ScrollBarImageColor3=Theme.Accent; body.CanvasSize=UDim2.new(0,0,0,0); body.Active=true; body.ScrollingEnabled=true; body.ElasticBehavior=Enum.ElasticBehavior.Always; body.ScrollingDirection=Enum.ScrollingDirection.Y; body.AutomaticCanvasSize=Enum.AutomaticSize.Y; body.Parent=f
     local lay=Instance.new("UIListLayout"); lay.Padding=UDim.new(0,6); lay.SortOrder=Enum.SortOrder.LayoutOrder; lay.Parent=body
     local function refreshCanvas()
@@ -8843,7 +9002,7 @@ function makeMainPanel(t,size,pos) local f=Instance.new("Frame"); f.Size=size; f
     body:GetPropertyChangedSignal("AbsoluteSize"):Connect(refreshCanvas)
     if Config.sizes and Config.sizes[t] then f.Size = UDim2.new(0, Config.sizes[t].x, 0, Config.sizes[t].y) end
     makeResizable(f, UDim2.new(0, 200, 0, 150), t); return f,body end
-function makeQuickPanel(t,size,pos) local f=Instance.new("Frame"); f.Size=size; f.Position=pos; f.BackgroundColor3=Theme.Background; f.BackgroundTransparency=0.04; f.BorderSizePixel=0; f.ClipsDescendants=true; f.Parent=gui; corner(f,12); addOutline(f); makeHeader(f,t,false)
+function makeQuickPanel(t,size,pos) local f=Instance.new("Frame"); f.Size=size; f.Position=pos; f.BackgroundColor3=Theme.Background; f.BackgroundTransparency=0.02; f.BorderSizePixel=0; f.ClipsDescendants=true; f.Parent=gui; corner(f,14); addOutline(f); makeHeader(f,t,false)
     local body=Instance.new("ScrollingFrame"); body.Size=UDim2.new(1,-12,1,-50); body.Position=UDim2.new(0,6,0,46); body.BackgroundTransparency=1; body.BorderSizePixel=0; body.ScrollBarThickness=5; body.ScrollBarImageColor3=Theme.Accent; body.CanvasSize=UDim2.new(0,0,0,0); body.Active=true; body.ScrollingEnabled=true; body.ElasticBehavior=Enum.ElasticBehavior.Always; body.ScrollingDirection=Enum.ScrollingDirection.Y; body.AutomaticCanvasSize=Enum.AutomaticSize.Y; body.Parent=f
     local lay=Instance.new("UIListLayout"); lay.Padding=UDim.new(0,6); lay.SortOrder=Enum.SortOrder.LayoutOrder; lay.Parent=body
     local function refreshCanvas()
@@ -9068,7 +9227,8 @@ actionSettingsPanel,actionSettingsBody=makeQuickPanel("Bunnyirsh Hub\nAction Set
 actionSettingsPanel.Visible=false
 tpSpeedSettingsPanel,tpSpeedSettingsBody=makeQuickPanel("Bunnyirsh Hub\nTP & Clone Settings",UDim2.new(0,235,0,325),UDim2.new(0.5,745,1,-440))
 tpSpeedSettingsPanel.Visible=false
-for _,pair in ipairs({{"Bunnyirsh Hub",main},{"Bunnyirsh Hub\nInvisible Steal",panels["Invisible Steal Panel"]},
+if main then main.Position = UDim2.new(0.5, -187, 0.5, -275) end
+for _,pair in ipairs({{"Bunnyirsh Hub\nInvisible Steal",panels["Invisible Steal Panel"]},
     {"Bunnyirsh Hub\nAdmin Command Panel",panels["Admin Command Panel"]},{"Bunnyirsh Hub\nCommand Cooldowns",panels["Command Cooldowns"]},
     {"Bunnyirsh Hub\nActions",panels["Actions"]},{"Bunnyirsh Hub\nSteal Panel",panels["Steal Panel"]},{"Bunnyirsh Hub\nSteal Target",panels["Steal Target"]},
     {"Bunnyirsh Hub\nAction Settings",actionSettingsPanel},{"Bunnyirsh Hub\nTP & Clone Settings",tpSpeedSettingsPanel}}) do applySavedPosition(pair[1],pair[2]) end
@@ -9153,7 +9313,7 @@ function rebuildTpSpeedSettings()
     makeMainSliderWithInput(tpSpeedSettingsBody, "100 Studs Base Speed", 20, 250, Config.TpSettings.FlyTPCloseSpeed or 75, function(v) Config.TpSettings.FlyTPCloseSpeed=v; saveConfig() end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Grabble TP Speed", 50, 600, Config.TpSettings.GrabbleTPSpeed or 500, function(v) Config.TpSettings.GrabbleTPSpeed=v; saveConfig(); if _G.SXESetCarpetSpeed then pcall(_G.SXESetCarpetSpeed, v) end end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Walk To Brainrot Speed", 50, 1000, Config.TpSettings.WalkTPSpeed or 260, function(v) Config.TpSettings.WalkTPSpeed=v; saveConfig() end)
-    makeMainSliderWithInput(tpSpeedSettingsBody, "Clone Delay", 0.05, 2.0, Config.TpSettings.CloneDelayVal or 0.05, function(v) Config.TpSettings.CloneDelayVal=v; saveConfig() end, "s")
+    makeMainSliderWithInput(tpSpeedSettingsBody, "Clone Delay", 0, 2.0, Config.TpSettings.CloneDelayVal or 0, function(v) Config.TpSettings.CloneDelayVal=v; saveConfig() end, "s")
     makeQuickButton(tpSpeedSettingsBody, "Close", function() closeAnim(tpSpeedSettingsPanel) end, Theme.SoftAccentHover)
 end
 do
@@ -9829,9 +9989,31 @@ function makePriorityRestoreRow()
     end)
 end
 function loadTab(tabName)
-    UI.CurrentTab=tabName; clearBody(mainBody)
+    UI.CurrentTab=tabName
+    clearBody(mainBody)
     pcall(function() mainBody:FindFirstChildOfClass("UIListLayout").SortOrder = Enum.SortOrder.LayoutOrder end)
-    for name,btn in pairs(tabButtons) do btn.BackgroundColor3=name==tabName and Theme.Accent or Theme.SoftAccent; btn.TextColor3=name==tabName and Color3.fromRGB(255,255,255) or Theme.Dim end
+    for name,btn in pairs(tabButtons) do
+        local active = name==tabName
+        btn.BackgroundColor3 = active and Theme.Accent or Theme.SoftAccent
+        btn.TextColor3 = active and Color3.fromRGB(255,255,255) or Theme.Dim
+        if active then
+            pcall(function()
+                local us = btn:FindFirstChild("TabScale") or Instance.new("UIScale")
+                us.Name = "TabScale"
+                us.Parent = btn
+                us.Scale = 0.92
+                TweenService:Create(us, TweenInfo.new(0.18, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Scale = 1}):Play()
+            end)
+        end
+    end
+    pcall(function()
+        local us = mainBody:FindFirstChild("TabBodyScale") or Instance.new("UIScale")
+        us.Name = "TabBodyScale"
+        us.Parent = mainBody
+        us.Scale = 0.96
+        mainBody.CanvasPosition = Vector2.new(0, 0)
+        TweenService:Create(us, TweenInfo.new(0.22, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Scale = 1}):Play()
+    end)
     if tabName=="Keybinds" then
         for _,name in ipairs({"Kick","Rejoin Job ID","Clone","Manual TP","Invisible Steal","Job ID","Proximity","Carpet Boost","Open Menu","Ragdoll Self","Drop Brainrot","Float","Reset","Auto Buy","Click to AP","Steal Nearest","Face Nearest"}) do makeKeybindRow(mainBody,name) end
     elseif tabName=="Auto TP" then
@@ -9981,13 +10163,12 @@ function loadTab(tabName)
         impBtn.MouseButton1Click:Connect(function()
             _G.importConfig(shareBox.Text)
         end)
-        local rb=makeMainButton(mainBody,"Reset UI",function()
-            main.Position=UDim2.new(0.5,-187,0.5,-255); panels["Invisible Steal Panel"].Position=UDim2.new(0,80,0.5,-220)
-            panels["Admin Command Panel"].Position=UDim2.new(0.5,85,1,-340); panels["Command Cooldowns"].Position=UDim2.new(0.5,245,1,-390)
-            panels["Actions"].Position=UDim2.new(0.5,505,1,-415); panels["Steal Panel"].Position=UDim2.new(1,-300,1,-385)
-            panels["Steal Target"].Position=UDim2.new(1,-290,0,85); actionSettingsPanel.Position=UDim2.new(0.5,745,1,-400)
-            bottomBar.Position=UDim2.new(0.5,-287,1,-125); Config.positions={}; saveConfig()
-        end)
+        makeMainButton(mainBody,"Reset All Position",function()
+            if _G.resetAllPositions then _G.resetAllPositions() end
+        end, Theme.SoftButton)
+        makeMainButton(mainBody,"Reset All Settings",function()
+            if _G.resetAllSettings then _G.resetAllSettings() end
+        end, Theme.SoftButton)
         local lockBtn; lockBtn=makeMainButton(mainBody,UI.Locked and "Locked" or "Unlocked",function() UI.Locked=not UI.Locked; Config.locked=UI.Locked; saveConfig(); lockBtn.Text=UI.Locked and "Locked" or "Unlocked" end,Theme.SoftButton)
     elseif tabName=="Misc" then
         local function sectionLabel(txt)
@@ -11850,7 +12031,7 @@ local function carpetEngage()
             pet = _pickByMode(semEsteira) or semEsteira[1]
         end
         local _tpSpd = (Config and Config.TpSettings and Config.TpSettings.GrabbleTPSpeed) or 500
-        local _cloneDelay = (Config and Config.TpSettings and Config.TpSettings.CloneDelayVal) or 0.05
+        local _cloneDelay = (Config and Config.TpSettings and tonumber(Config.TpSettings.CloneDelayVal)) or 0
         local petPos = pet.position
         local petName = pet.name
         local adjY = petPos.Y
@@ -12047,11 +12228,11 @@ local function carpetEngage()
         end
         local _charAdded = false
         local _caConn = LP.CharacterAdded:Connect(function() _charAdded = true end)
-        task.wait(_cloneDelay)
+        if _cloneDelay and _cloneDelay > 0 then task.wait(_cloneDelay) end
         local _cloneOk = doClone()
         if _clonePlat then pcall(function() _clonePlat:Destroy() end); _clonePlat = nil end
         if _cloneOk then
-            task.wait(0.12)
+            task.wait(0.05)
             local _cloneSucceeded = false
             do
                 local _c = LP.Character
