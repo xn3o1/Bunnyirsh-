@@ -1643,7 +1643,7 @@ Config = {
     SpamBaseOwnerCommands={balloon=true, inverse=true, jail=true, jumpscare=true, morph=true, nightvision=true, ragdoll=true, rocket=true, tiny=true},
     SpamBaseOwnerOrder={"balloon", "inverse", "jail", "jumpscare", "morph", "nightvision", "ragdoll", "rocket", "tiny"},
     SpamBaseOwnerSingleCommand=false,
-    ProximityAP=false, ShowJobJoiner=true, AntiBeeDisco=false,
+    ProximityAP=false, ShowJobJoiner=true, AntiBeeDisco=false, AntiEffects=false, AutoDestroySentry=false,
     RemoteSellEnabled=false, AdminPanelUI=true,
     StealHighest=false, StealPriority=true, StealNearest=false,
     AutoStealEnabled=true,
@@ -1660,7 +1660,7 @@ Config = {
         Tool="Flying Carpet", TpKey="T", CloneKey="V", CarpetSpeedKey="Q",
         InfiniteJump=false, DelayVal=0.4, CloneDelayVal=0.1,
         RagdollTP=false, FPSWait=false, FlyTP=false, FlyTPSpeed=160, FlyTPCloseSpeed=75,
-        GrabbleTP=false, GrabbleTPSpeed=480,
+        GrabbleTP=false, GrabbleTPSpeed=500,
         TpOnLoad=false, MinGenForTp="", MinGenForGrab="",
         BrainrotCarpet=false,
     },
@@ -1931,6 +1931,10 @@ local function initToggles()
     setToggle("Float", Config.Float, true)
     setToggle("Anti-Bee & Anti-Disco", Config.AntiBeeDisco, true)
     setToggle("AntiBeeDisco", Config.AntiBeeDisco, true)
+    setToggle("Anti Effects", Config.AntiEffects, true)
+    setToggle("AntiEffects", Config.AntiEffects, true)
+    setToggle("Auto Destroy Sentry", Config.AutoDestroySentry, true)
+    setToggle("AutoDestroySentry", Config.AutoDestroySentry, true)
     setToggle("Admin Panel UI", Config.AdminPanelUI, true)
     setToggle("Auto Invis During Steal", Config.AutoInvisDuringSteal, true)
     setToggle("Auto TP Priority Mode", Config.AutoTPPriority, true)
@@ -3558,7 +3562,7 @@ task.spawn(function() local kw="you stole"; local hooked=setmetatable({},{__mode
     for _,g in ipairs(playerGui:GetChildren()) do watchRoot(g) end; playerGui.ChildAdded:Connect(function(g) watchRoot(g) end)
 end)
 task.spawn(function() local GS=pcall(function() return cloneref(game:GetService("GuiService")) end) and cloneref(game:GetService("GuiService")) or game:GetService("GuiService")
-    while true do if Config.CleanErrorGUIs then pcall(function() GS:ClearError() end) end; task.wait(0.1) end end)
+    while true do if Config.CleanErrorGUIs then pcall(function() GS:ClearError() end) end; task.wait(0.35) end end)
 do
 local Packages = ReplicatedStorage:WaitForChild("Packages")
 local Datas = ReplicatedStorage:WaitForChild("Datas")
@@ -4658,7 +4662,7 @@ task.spawn(function()
         plot.ChildAdded:Connect(agora)
         plot.ChildRemoved:Connect(agora)
         if phase and phase > 0 then task.wait(phase) end
-        task.spawn(function() while plot.Parent do task.wait(0.25); scanSinglePlot(plot) end end)
+        task.spawn(function() while plot.Parent do task.wait(0.75); scanSinglePlot(plot) end end)
     end
     local plots=Workspace:WaitForChild("Plots",8)
     if plots then
@@ -5155,7 +5159,7 @@ local LOWER = {
 local UPPER_Y_THRESHOLD = 7
 local TALL_PETS = { ["La Secret Combinasion"]=true, ["La Jolly Grande"]=true }
 local TALL_OFFSET = 3
-local CARPET_SPEED = 480
+local CARPET_SPEED = 500
 local INBASE_SPEED = 340
 local function getCarpetSpeed()
     return Config.TpSettings.FlyTPSpeed or 230
@@ -5673,7 +5677,7 @@ end
 local MAX_CLIMB = 75
 local function velMoveThrough(hrp, waypoints, speedOverride, allowJump, quickStart)
     if not hrp or not hrp.Parent or #waypoints == 0 then return end
-    local _runSpeed = speedOverride or Config.TpSettings.GrabbleTPSpeed or (_G.SXECarpetSpeed or CARPET_SPEED or 480)
+    local _runSpeed = speedOverride or Config.TpSettings.GrabbleTPSpeed or (_G.SXECarpetSpeed or CARPET_SPEED or 500)
     vizPath(hrp.Position, waypoints)
     local _myVizGen = _G.__vizGen
     local wpIdx = 1
@@ -7596,6 +7600,191 @@ if Config.AntiBeeDisco then
         if SharedState.ANTI_BEE_DISCO.Enable then SharedState.ANTI_BEE_DISCO.Enable() end
     end)
 end
+do
+    local AE = {
+        running = false,
+        connections = {},
+        FOV_LOCK = 70,
+        blacklist = {
+            "BlurEffect","ColorCorrectionEffect","BloomEffect","SunRaysEffect","DepthOfFieldEffect",
+            "Atmosphere","Sky","Smoke","ParticleEmitter","Beam","Trail","Highlight","PostEffect",
+            "SurfaceAppearance","Fire","Sparkles","Explosion","PointLight","SpotLight","SurfaceLight",
+            "ColorGradingEffect","ToneMappingEffect","VignetteEffect","GodRays","Glare",
+            "ChromaticAberrationEffect","DistortionEffect","LensFlare","SunFlare","LightInfluence",
+            "AmbientOcclusionEffect","RefractionEffect","HeatDistortion","GlitchEffect",
+            "ScreenSpaceReflection","MotionBlur","VolumetricLight","RainEffect","SnowEffect",
+            "LightningEffect","NeonGlow","ContrastCorrection","ShadowMap","Bloom","Clouds",
+            "FogVolume","WaterEffect","WindEffect","PixelateEffect","FilmGrainEffect","CRTShader",
+            "NightVisionEffect","InfraredEffect","HazeEffect","ColorBalanceEffect","DynamicLight",
+            "AmbientEffect","ScreenDistortion","ScanlineEffect","UnderwaterEffect","ThermalVision",
+            "ShockwaveEffect","FlashEffect","ExplosionLight","VFXPart","GlitchScreen","ScreenFlash",
+            "OverlayEffect","ShadowEffect","GhostEffect","FogEmitter","WindEmitter","HeatWave",
+            "SunGlow","ColorOverlay","VisionDistort","EchoEffect","ScreenOverlay","RenderEffect",
+            "VisualEffect","LightingEffect","CameraEffect","WeatherEffect","SmokeTrail","FireTrail",
+            "NeonEffect","RefractionLayer","PostProcessingEffect","VisualNoise","ScreenNoise",
+        },
+    }
+    local blSet = {}
+    for _, n in ipairs(AE.blacklist) do blSet[n] = true end
+    local function isBlacklisted(obj)
+        return obj and blSet[obj.ClassName] == true
+    end
+    local function clearEffects()
+        for _, v in ipairs(Lighting:GetDescendants()) do
+            if isBlacklisted(v) then pcall(function() v:Destroy() end) end
+        end
+    end
+    local function disconnectAll()
+        for _, c in ipairs(AE.connections) do
+            pcall(function() c:Disconnect() end)
+        end
+        AE.connections = {}
+    end
+    AE.Enable = function()
+        if AE.running then return end
+        AE.running = true
+        clearEffects()
+        table.insert(AE.connections, Lighting.DescendantAdded:Connect(function(obj)
+            if not AE.running or not Config.AntiEffects then return end
+            task.defer(function()
+                if isBlacklisted(obj) then pcall(function() obj:Destroy() end) end
+            end)
+        end))
+        table.insert(AE.connections, RunService.RenderStepped:Connect(function()
+            if not AE.running or not Config.AntiEffects then return end
+            local cam = Workspace.CurrentCamera
+            if cam and cam.FieldOfView ~= AE.FOV_LOCK then
+                cam.FieldOfView = AE.FOV_LOCK
+            end
+        end))
+    end
+    AE.Disable = function()
+        if not AE.running then return end
+        AE.running = false
+        disconnectAll()
+    end
+    _G.ANTI_EFFECTS = AE
+    if Config.AntiEffects then
+        task.delay(1.2, function()
+            if _G.ANTI_EFFECTS and _G.ANTI_EFFECTS.Enable then _G.ANTI_EFFECTS.Enable() end
+        end)
+    end
+end
+do
+    local ADS = {
+        running = false,
+        connection = nil,
+        target = nil,
+        DETECTION_DISTANCE = 60,
+        PULL_DISTANCE = -5,
+    }
+    local function getChar()
+        return LocalPlayer.Character
+    end
+    local function getWeapon()
+        local char = getChar()
+        if not char then return nil end
+        local bp = LocalPlayer:FindFirstChildOfClass("Backpack")
+        return (bp and bp:FindFirstChild("Bat")) or char:FindFirstChild("Bat")
+    end
+    local function findTarget()
+        local char = getChar()
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        if not hrp then return nil end
+        local rootPos = hrp.Position
+        for _, obj in ipairs(Workspace:GetChildren()) do
+            if type(obj.Name) == "string" and obj.Name:find("Sentry") and not obj.Name:lower():find("bullet") then
+                local ownerId = obj.Name:match("Sentry_(%d+)")
+                if ownerId and tonumber(ownerId) == LocalPlayer.UserId then
+                    continue
+                end
+                local part = obj:IsA("BasePart") and obj
+                    or (obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")))
+                if part and (rootPos - part.Position).Magnitude <= ADS.DETECTION_DISTANCE then
+                    return obj
+                end
+            end
+        end
+        return nil
+    end
+    local function moveTarget(obj)
+        local char = getChar()
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        for _, part in ipairs(obj:GetDescendants()) do
+            if part:IsA("BasePart") then
+                pcall(function() part.CanCollide = false end)
+            end
+        end
+        local cf = hrp.CFrame * CFrame.new(0, 0, ADS.PULL_DISTANCE)
+        if obj:IsA("BasePart") then
+            pcall(function() obj.CFrame = cf end)
+        elseif obj:IsA("Model") then
+            local main = obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")
+            if main then pcall(function() main.CFrame = cf end) end
+        end
+    end
+    local function attack()
+        local char = getChar()
+        if not char then return end
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if not hum then return end
+        local weapon = getWeapon()
+        if not weapon then return end
+        if weapon.Parent ~= char then
+            pcall(function() hum:EquipTool(weapon) end)
+            task.wait(0.08)
+        end
+        local handle = weapon:FindFirstChild("Handle")
+        if handle then pcall(function() handle.CanCollide = false end) end
+        pcall(function() weapon:Activate() end)
+        for _, r in ipairs(weapon:GetDescendants()) do
+            if r:IsA("RemoteEvent") then
+                pcall(function() r:FireServer() end)
+            end
+        end
+    end
+    ADS.Enable = function()
+        if ADS.running then return end
+        ADS.running = true
+        if ADS.connection then
+            pcall(function() ADS.connection:Disconnect() end)
+            ADS.connection = nil
+        end
+        ADS.connection = RunService.Heartbeat:Connect(function()
+            if not ADS.running or not Config.AutoDestroySentry then return end
+            if ADS.target and ADS.target.Parent == Workspace then
+                moveTarget(ADS.target)
+                attack()
+            else
+                ADS.target = findTarget()
+            end
+        end)
+    end
+    ADS.Disable = function()
+        if not ADS.running then return end
+        ADS.running = false
+        if ADS.connection then
+            pcall(function() ADS.connection:Disconnect() end)
+            ADS.connection = nil
+        end
+        ADS.target = nil
+    end
+    _G.AUTO_DESTROY_SENTRY = ADS
+    LocalPlayer.CharacterAdded:Connect(function()
+        task.wait(0.5)
+        if Config.AutoDestroySentry and _G.AUTO_DESTROY_SENTRY then
+            _G.AUTO_DESTROY_SENTRY.Enable()
+        end
+    end)
+    if Config.AutoDestroySentry then
+        task.delay(1.5, function()
+            if _G.AUTO_DESTROY_SENTRY and _G.AUTO_DESTROY_SENTRY.Enable then
+                _G.AUTO_DESTROY_SENTRY.Enable()
+            end
+        end)
+    end
+end
 local toggleAutoBuy
 do
 local autoBuyActive = false
@@ -8782,7 +8971,7 @@ function rebuildTpSpeedSettings()
     clearBody(tpSpeedSettingsBody)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Fly TP Speed", 50, 300, Config.TpSettings.FlyTPSpeed or 160, function(v) Config.TpSettings.FlyTPSpeed=v; saveConfig() end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "100 Studs Base Speed", 20, 250, Config.TpSettings.FlyTPCloseSpeed or 75, function(v) Config.TpSettings.FlyTPCloseSpeed=v; saveConfig() end)
-    makeMainSliderWithInput(tpSpeedSettingsBody, "Grabble TP Speed", 50, 600, Config.TpSettings.GrabbleTPSpeed or 480, function(v) Config.TpSettings.GrabbleTPSpeed=v; saveConfig(); if _G.SXESetCarpetSpeed then pcall(_G.SXESetCarpetSpeed, v) end end)
+    makeMainSliderWithInput(tpSpeedSettingsBody, "Grabble TP Speed", 50, 600, Config.TpSettings.GrabbleTPSpeed or 500, function(v) Config.TpSettings.GrabbleTPSpeed=v; saveConfig(); if _G.SXESetCarpetSpeed then pcall(_G.SXESetCarpetSpeed, v) end end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Walk To Brainrot Speed", 50, 1000, Config.TpSettings.WalkTPSpeed or 260, function(v) Config.TpSettings.WalkTPSpeed=v; saveConfig() end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Clone Delay", 0.05, 2.0, Config.TpSettings.CloneDelayVal or 0.1, function(v) Config.TpSettings.CloneDelayVal=v; saveConfig() end, "s")
     makeQuickButton(tpSpeedSettingsBody, "Close", function() closeAnim(tpSpeedSettingsPanel) end, Theme.SoftAccentHover)
@@ -9890,6 +10079,32 @@ function loadTab(tabName)
                 end
             end
         end)
+        makeSyncMainToggle(mainBody,"Anti Effects","AntiEffects",function(on)
+            Config.AntiEffects = on
+            saveConfig()
+            if on then
+                if _G.ANTI_EFFECTS and _G.ANTI_EFFECTS.Enable then
+                    _G.ANTI_EFFECTS.Enable()
+                end
+            else
+                if _G.ANTI_EFFECTS and _G.ANTI_EFFECTS.Disable then
+                    _G.ANTI_EFFECTS.Disable()
+                end
+            end
+        end)
+        makeSyncMainToggle(mainBody,"Auto Destroy Sentry","AutoDestroySentry",function(on)
+            Config.AutoDestroySentry = on
+            saveConfig()
+            if on then
+                if _G.AUTO_DESTROY_SENTRY and _G.AUTO_DESTROY_SENTRY.Enable then
+                    _G.AUTO_DESTROY_SENTRY.Enable()
+                end
+            else
+                if _G.AUTO_DESTROY_SENTRY and _G.AUTO_DESTROY_SENTRY.Disable then
+                    _G.AUTO_DESTROY_SENTRY.Disable()
+                end
+            end
+        end)
         makeMainTextBox(mainBody,"Min Gen for Nearest Grab",Config.TpSettings.MinGenForGrab,"e.g. 10k, 500k, 1m",function(v)
             Config.TpSettings.MinGenForGrab = v
             saveConfig()
@@ -10259,7 +10474,7 @@ do
         end
     end
     _G.SXEFireGrapple = fireGrapple
-    local SXESpeed = { CARPET = 480, INBASE = 340 }
+    local SXESpeed = { CARPET = 500, INBASE = 340 }
     _G.SXESetCarpetSpeed = function(v) v = tonumber(v); if v and v > 0 then SXESpeed.CARPET = v end end
     _G.SXESetInbaseSpeed = function(v) v = tonumber(v); if v and v > 0 then SXESpeed.INBASE = v end end
     _G.SXEGetCarpetSpeed = function() return SXESpeed.CARPET end
@@ -10592,7 +10807,12 @@ local function carpetEngage()
         return { name = nome, index = nome, mps = mps, mutation = mut,
                  position = pos, plot = plotName, slot = tostring(slot) }
     end
+    local _scanCache, _scanCacheT = nil, 0
     local function scanAllPets()
+        local now = os.clock()
+        if _scanCache and (now - _scanCacheT) < 0.35 then
+            return _scanCache
+        end
         local pets = {}
         if not loadModules() then return pets end
         _corrigirGen()
@@ -10642,6 +10862,8 @@ local function carpetEngage()
         table.sort(pets, function(a, b)
             return petOutranks(a.name, b.name, a.mutation, b.mutation, a.mps, b.mps)
         end)
+        _scanCache = pets
+        _scanCacheT = os.clock()
         return pets
     end
     local UPPER = {
@@ -11295,7 +11517,7 @@ local function carpetEngage()
         local now = os.clock()
         if AUTO_STEAL and _started and not LP:GetAttribute("Stealing")
             and not (isTeleporting and _cloneTP)
-            and (now - _autoLastScan) >= 0.25 then
+            and (now - _autoLastScan) >= 0.5 then
             _autoLastScan = now
             local char = LP.Character
             local hrp = char and char:FindFirstChild("HumanoidRootPart")
@@ -11350,7 +11572,7 @@ local function carpetEngage()
         if STEAL_MODE == "Nearest" and now - _stealArmedAt > STEAL_ARM_TIMEOUT then
             disarmSteal(); return
         end
-        if now - _stealLastScan < 0.12 then return end
+        if now - _stealLastScan < 0.22 then return end
         _stealLastScan = now
         local t = timeUntilCanSteal()
         if t == -1 then
@@ -11421,7 +11643,7 @@ local function carpetEngage()
             if #semEsteira == 0 then isTeleporting = false; return end
             pet = _pickByMode(semEsteira) or semEsteira[1]
         end
-        local _tpSpd = (Config and Config.TpSettings and Config.TpSettings.GrabbleTPSpeed) or 480
+        local _tpSpd = (Config and Config.TpSettings and Config.TpSettings.GrabbleTPSpeed) or 500
         local _cloneDelay = (Config and Config.TpSettings and Config.TpSettings.CloneDelayVal) or 0.35
         local petPos = pet.position
         local petName = pet.name
