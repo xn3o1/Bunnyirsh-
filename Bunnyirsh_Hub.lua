@@ -1108,16 +1108,20 @@ do
         img.Image = "rbxassetid://97803827151139"
         img.ScaleType = Enum.ScaleType.Crop
         img.Size = UDim2.new(1, 0, 1, 0)
-        img.ImageTransparency = 0.35
+        img.ImageTransparency = 0.15
         img.ZIndex = 0
+        img.Active = false
+        img.Selectable = false
         img.Parent = barra
         local dc = Instance.new("UICorner"); dc.CornerRadius = UDim.new(0, 9); dc.Parent = img
         local dim = Instance.new("Frame")
         dim.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-        dim.BackgroundTransparency = 0.5
+        dim.BackgroundTransparency = 0.55
         dim.BorderSizePixel = 0
         dim.Size = UDim2.new(1, 0, 1, 0)
         dim.ZIndex = 0
+        dim.Active = false
+        dim.Selectable = false
         dim.Parent = barra
         local dc2 = Instance.new("UICorner"); dc2.CornerRadius = UDim.new(0, 9); dc2.Parent = dim
     end
@@ -1265,16 +1269,16 @@ Themes = {
         BlacklistHover=Color3.fromRGB(180,180,180), BlacklistLeave=Color3.fromRGB(225,225,225),
     },
     Dark = {
-        Background=Color3.fromRGB(0,0,0), MainBackground=Color3.fromRGB(0,0,0),
-        Panel=Color3.fromRGB(16,16,16), Row=Color3.fromRGB(22,22,22), RowHover=Color3.fromRGB(36,36,36),
-        Accent=Color3.fromRGB(255,255,255), AccentLight=Color3.fromRGB(200,200,200),
-        Green=Color3.fromRGB(255,255,255), Red=Color3.fromRGB(255,255,255), Red2=Color3.fromRGB(220,220,220),
-        Text=Color3.fromRGB(255,255,255), Dim=Color3.fromRGB(140,140,140), Stroke=Color3.fromRGB(55,55,55),
-        SoftButton=Color3.fromRGB(24,24,24), SoftButtonHover=Color3.fromRGB(40,40,40),
-        SoftAccent=Color3.fromRGB(24,24,24), SoftAccentHover=Color3.fromRGB(40,40,40),
-        ToggleOff=Color3.fromRGB(32,32,32), ToggleOff2=Color3.fromRGB(32,32,32),
-        InputBg=Color3.fromRGB(12,12,12), SliderBg=Color3.fromRGB(48,48,48),
-        BlacklistHover=Color3.fromRGB(40,40,40), BlacklistLeave=Color3.fromRGB(28,28,28),
+        Background=Color3.fromRGB(8,8,12), MainBackground=Color3.fromRGB(6,6,10),
+        Panel=Color3.fromRGB(18,18,26), Row=Color3.fromRGB(24,24,34), RowHover=Color3.fromRGB(40,40,54),
+        Accent=Color3.fromRGB(255,255,255), AccentLight=Color3.fromRGB(180,190,220),
+        Green=Color3.fromRGB(90,220,140), Red=Color3.fromRGB(230,90,100), Red2=Color3.fromRGB(180,60,70),
+        Text=Color3.fromRGB(250,250,255), Dim=Color3.fromRGB(130,135,155), Stroke=Color3.fromRGB(55,58,75),
+        SoftButton=Color3.fromRGB(28,28,40), SoftButtonHover=Color3.fromRGB(44,44,60),
+        SoftAccent=Color3.fromRGB(28,28,40), SoftAccentHover=Color3.fromRGB(44,44,60),
+        ToggleOff=Color3.fromRGB(40,40,52), ToggleOff2=Color3.fromRGB(40,40,52),
+        InputBg=Color3.fromRGB(14,14,20), SliderBg=Color3.fromRGB(50,52,68),
+        BlacklistHover=Color3.fromRGB(50,40,40), BlacklistLeave=Color3.fromRGB(34,34,46),
     }
 }
 HERESY = { NOME="Bunnyirsh Hub", GRAD_A=Color3.fromRGB(255,255,255), GRAD_B=Color3.fromRGB(180,180,180) }
@@ -1731,7 +1735,7 @@ Config = {
         Tool="Flying Carpet", TpKey="T", CloneKey="V", CarpetSpeedKey="Q",
         InfiniteJump=false, DelayVal=0.15, CloneDelayVal=0,
         RagdollTP=false, FPSWait=false, FlyTP=false, FlyTPSpeed=160, FlyTPCloseSpeed=75,
-        GrabbleTP=false, GrabbleTPSpeed=500,
+        GrabbleTP=false, GrabbleTPSpeed=545,
         TpOnLoad=false, MinGenForTp="", MinGenForGrab="",
         BrainrotCarpet=false,
     },
@@ -2047,7 +2051,7 @@ local function resetAllSettings()
             Tool = "Flying Carpet", TpKey = "T", CloneKey = "V", CarpetSpeedKey = "Q",
             InfiniteJump = false, DelayVal = 0.25, CloneDelayVal = 0,
             RagdollTP = false, FPSWait = false, FlyTP = false, FlyTPSpeed = 160, FlyTPCloseSpeed = 75,
-            GrabbleTP = false, GrabbleTPSpeed = 500,
+            GrabbleTP = false, GrabbleTPSpeed = 545,
             TpOnLoad = false, MinGenForTp = "", MinGenForGrab = "",
             BrainrotCarpet = false,
         },
@@ -5335,7 +5339,7 @@ local LOWER = {
 local UPPER_Y_THRESHOLD = 7
 local TALL_PETS = { ["La Secret Combinasion"]=true, ["La Jolly Grande"]=true }
 local TALL_OFFSET = 3
-local CARPET_SPEED = 500
+local CARPET_SPEED = 545
 local INBASE_SPEED = 340
 local function getCarpetSpeed()
     return Config.TpSettings.FlyTPSpeed or 230
@@ -5846,14 +5850,14 @@ local function getPlotKey(plotName)
     return nil
 end
 local SPEED = 200
-local ARRIVE = 0.9
+local ARRIVE = 2.5
 local function vZero(hrp)
     if hrp then hrp.AssemblyLinearVelocity = Vector3.zero; hrp.AssemblyAngularVelocity = Vector3.zero end
 end
 local MAX_CLIMB = 75
 local function velMoveThrough(hrp, waypoints, speedOverride, allowJump, quickStart)
     if not hrp or not hrp.Parent or #waypoints == 0 then return end
-    local _runSpeed = speedOverride or Config.TpSettings.GrabbleTPSpeed or (_G.SXECarpetSpeed or CARPET_SPEED or 500)
+    local _runSpeed = speedOverride or Config.TpSettings.GrabbleTPSpeed or (_G.SXECarpetSpeed or CARPET_SPEED or 545)
     vizPath(hrp.Position, waypoints)
     local _myVizGen = _G.__vizGen
     local wpIdx = 1
@@ -5908,20 +5912,17 @@ local function velMoveThrough(hrp, waypoints, speedOverride, allowJump, quickSta
         local target = waypoints[wpIdx]
         local diff = target - hrp.Position
         local mag = diff.Magnitude
-        if mag < ARRIVE then
-            local _, y = hrp.CFrame:ToEulerAnglesYXZ()
-            hrp.CFrame = CFrame.new(target) * CFrame.Angles(0, y, 0)
-            hrp.AssemblyLinearVelocity = Vector3.zero
+        while mag < ARRIVE and wpIdx < #waypoints do
             wpIdx = wpIdx + 1
-            if wpIdx > #waypoints then finish() return end
             lastDist, stall = math.huge, 0
             target = waypoints[wpIdx]
             diff = target - hrp.Position
             mag = diff.Magnitude
         end
+        if mag < ARRIVE and wpIdx >= #waypoints then finish() return end
         if mag > lastDist - 0.02 then stall = stall + 1 else stall = 0 end
         lastDist = mag
-        if stall >= 28 then finish() return end
+        if stall >= 40 then finish() return end
         if mag >= 0.05 then
             local dir = diff.Unit
             if allowJump and diff.Y > 5 and wpIdx < #waypoints then
@@ -9085,16 +9086,20 @@ local function addPanelBackground(f)
     img.Size = UDim2.new(1, 0, 1, 0)
     img.Position = UDim2.new(0, 0, 0, 0)
     img.ZIndex = 0
-    img.ImageTransparency = 0.28
+    img.ImageTransparency = 0.12
     img.ImageColor3 = Color3.fromRGB(255, 255, 255)
+    img.Active = false
+    img.Selectable = false
     img.Parent = f
     local dim = Instance.new("Frame")
     dim.Name = "SXEPanelDim"
     dim.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    dim.BackgroundTransparency = 0.42
+    dim.BackgroundTransparency = 0.55
     dim.BorderSizePixel = 0
     dim.Size = UDim2.new(1, 0, 1, 0)
     dim.ZIndex = 0
+    dim.Active = false
+    dim.Selectable = false
     dim.Parent = f
     pcall(function()
         local c1 = Instance.new("UICorner"); c1.CornerRadius = UDim.new(0, 14); c1.Parent = img
@@ -9148,7 +9153,7 @@ function makeSyncStateRow(parent,text,toggleName,callback,bindName)
 end
 function makeSyncMainToggle(parent,text,toggleName,callback,bindName)
     regToggle(toggleName,getToggle(toggleName))
-    local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,31); row.BackgroundColor3=Theme.Panel; row.BackgroundTransparency=0.18; row.Parent=parent; corner(row,6)
+    local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,31); row.BackgroundColor3=Theme.Panel; row.BackgroundTransparency=0.18; row.ZIndex=3; row.Parent=parent; corner(row,6)
     local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,(bindName and -112 or -54),1,0); l.Position=UDim2.new(0,8,0,0); l.BackgroundTransparency=1; l.Text=text; l.TextColor3=Theme.Text; l.Font=Enum.Font.GothamBold; l.TextSize=10; l.TextXAlignment=Enum.TextXAlignment.Left; l.TextTruncate=Enum.TextTruncate.AtEnd; l.Parent=row
     if bindName then
         local kb=Instance.new("TextButton"); kb.Name="HeresyBind"; kb.Size=UDim2.new(0,56,0,21)
@@ -9173,7 +9178,7 @@ function makeSyncMainToggle(parent,text,toggleName,callback,bindName)
     BoundToggles[text]=function(ns,fire) if typeof(ns)=="boolean" then setToggle(toggleName,ns); if fire~=false and callback then callback(ns) end end end
     return BoundToggles[text]
 end
-function makeQuickButton(parent,text,callback,bg) local b=Instance.new("TextButton"); b.Size=UDim2.new(1,-4,0,36); b.BackgroundColor3=bg or Theme.SoftButton; b.BackgroundTransparency=0.02; b.Text=text; b.TextColor3=Theme.Text; b.Font=Enum.Font.GothamBold; b.TextSize=13; b.AutoButtonColor=false; b.Parent=parent; corner(b,6)
+function makeQuickButton(parent,text,callback,bg) local b=Instance.new("TextButton"); b.Size=UDim2.new(1,-4,0,36); b.BackgroundColor3=bg or Theme.SoftButton; b.BackgroundTransparency=0.02; b.Text=text; b.TextColor3=Theme.Text; b.Font=Enum.Font.GothamBold; b.TextSize=13; b.AutoButtonColor=false; b.Active=true; b.ZIndex=3; b.Parent=parent; corner(b,6)
     b.MouseEnter:Connect(function() tw(b,{BackgroundColor3=bg or Theme.SoftButtonHover},0.12) end); b.MouseLeave:Connect(function() tw(b,{BackgroundColor3=bg or Theme.SoftButton},0.12) end)
     b.MouseButton1Click:Connect(function() if callback then callback() end end); return b end
 function makeQuickSlider(parent,text,min,max,default,callback,suffix) local holder=Instance.new("Frame"); holder.Size=UDim2.new(1,-4,0,50); holder.BackgroundTransparency=1; holder.Parent=parent
@@ -9294,7 +9299,7 @@ function makeMainButton(parent,text,callback,color) local b=Instance.new("TextBu
     b.MouseEnter:Connect(function() tw(b,{BackgroundColor3=color or Theme.RowHover},0.12) end); b.MouseLeave:Connect(function() tw(b,{BackgroundColor3=color or Theme.Row},0.12) end)
     b.MouseButton1Click:Connect(function() if callback then callback() end end); return b end
 function makeMainToggle(parent,text,enabled,callback)
-    local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,31); row.BackgroundColor3=Theme.Panel; row.BackgroundTransparency=0.18; row.Parent=parent; corner(row,6)
+    local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,31); row.BackgroundColor3=Theme.Panel; row.BackgroundTransparency=0.18; row.ZIndex=3; row.Parent=parent; corner(row,6)
     local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,-54,1,0); l.Position=UDim2.new(0,8,0,0); l.BackgroundTransparency=1; l.Text=text; l.TextColor3=Theme.Text; l.Font=Enum.Font.GothamBold; l.TextSize=10; l.TextXAlignment=Enum.TextXAlignment.Left; l.TextTruncate=Enum.TextTruncate.AtEnd; l.Parent=row
     local toggle=Instance.new("TextButton"); toggle.Size=UDim2.new(0,38,0,21); toggle.Position=UDim2.new(1,-44,0.5,-10.5); toggle.BackgroundColor3=enabled and Theme.Green or Theme.ToggleOff; toggle.Text=""; toggle.AutoButtonColor=false; toggle.Parent=row; corner(toggle,20)
     local dot=Instance.new("Frame"); dot.Size=UDim2.new(0,16,0,16); dot.Position=enabled and UDim2.new(1,-19,0.5,-8) or UDim2.new(0,3,0.5,-8); dot.BackgroundColor3=Theme.InputBg; dot.Parent=toggle; corner(dot,20)
@@ -9422,7 +9427,7 @@ function rebuildTpSpeedSettings()
     clearBody(tpSpeedSettingsBody)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Fly TP Speed", 50, 300, Config.TpSettings.FlyTPSpeed or 160, function(v) Config.TpSettings.FlyTPSpeed=v; saveConfig() end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "100 Studs Base Speed", 20, 250, Config.TpSettings.FlyTPCloseSpeed or 75, function(v) Config.TpSettings.FlyTPCloseSpeed=v; saveConfig() end)
-    makeMainSliderWithInput(tpSpeedSettingsBody, "Grabble TP Speed", 50, 600, Config.TpSettings.GrabbleTPSpeed or 500, function(v) Config.TpSettings.GrabbleTPSpeed=v; saveConfig(); if _G.SXESetCarpetSpeed then pcall(_G.SXESetCarpetSpeed, v) end end)
+    makeMainSliderWithInput(tpSpeedSettingsBody, "Grabble TP Speed", 50, 600, Config.TpSettings.GrabbleTPSpeed or 545, function(v) Config.TpSettings.GrabbleTPSpeed=v; saveConfig(); if _G.SXESetCarpetSpeed then pcall(_G.SXESetCarpetSpeed, v) end end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Walk To Brainrot Speed", 50, 1000, Config.TpSettings.WalkTPSpeed or 260, function(v) Config.TpSettings.WalkTPSpeed=v; saveConfig() end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Clone Delay", 0, 2.0, Config.TpSettings.CloneDelayVal or 0, function(v) Config.TpSettings.CloneDelayVal=v; saveConfig() end, "s")
     makeQuickButton(tpSpeedSettingsBody, "Close", function() closeAnim(tpSpeedSettingsPanel) end, Theme.SoftAccentHover)
@@ -10969,7 +10974,7 @@ do
         end
     end
     _G.SXEFireGrapple = fireGrapple
-    local SXESpeed = { CARPET = 500, INBASE = 340 }
+    local SXESpeed = { CARPET = 545, INBASE = 340 }
     _G.SXESetCarpetSpeed = function(v) v = tonumber(v); if v and v > 0 then SXESpeed.CARPET = v end end
     _G.SXESetInbaseSpeed = function(v) v = tonumber(v); if v and v > 0 then SXESpeed.INBASE = v end end
     _G.SXEGetCarpetSpeed = function() return SXESpeed.CARPET end
@@ -11465,7 +11470,7 @@ local function carpetEngage()
         for _, wp in ipairs(waypoints) do line(prev, wp); dot(wp); prev = wp end
     end
     local SPEED = 200
-    local ARRIVE = 0.9
+    local ARRIVE = 2.5
     local MAX_CLIMB = 75
     local function vZero(hrp)
         if hrp then hrp.AssemblyLinearVelocity = Vector3.zero; hrp.AssemblyAngularVelocity = Vector3.zero end
@@ -11526,20 +11531,17 @@ local function carpetEngage()
             local target = waypoints[wpIdx]
             local diff = target - hrp.Position
             local mag = diff.Magnitude
-            if mag < ARRIVE then
-                local _, y = hrp.CFrame:ToEulerAnglesYXZ()
-                hrp.CFrame = CFrame.new(target) * CFrame.Angles(0, y, 0)
-                hrp.AssemblyLinearVelocity = Vector3.zero
+            while mag < ARRIVE and wpIdx < #waypoints do
                 wpIdx = wpIdx + 1
-                if wpIdx > #waypoints then finish(); return end
                 lastDist, stall = math.huge, 0
                 target = waypoints[wpIdx]
                 diff = target - hrp.Position
                 mag = diff.Magnitude
             end
+            if mag < ARRIVE and wpIdx >= #waypoints then finish(); return end
             if mag > lastDist - 0.02 then stall = stall + 1 else stall = 0 end
             lastDist = mag
-            if stall >= 28 then finish(); return end
+            if stall >= 40 then finish(); return end
             if mag >= 0.05 then
                 local dir = diff.Unit
                 if allowJump and diff.Y > 5 and wpIdx < #waypoints then
@@ -12141,7 +12143,7 @@ local function carpetEngage()
             if #semEsteira == 0 then isTeleporting = false; return end
             pet = _pickByMode(semEsteira) or semEsteira[1]
         end
-        local _tpSpd = (Config and Config.TpSettings and Config.TpSettings.GrabbleTPSpeed) or 500
+        local _tpSpd = (Config and Config.TpSettings and Config.TpSettings.GrabbleTPSpeed) or 545
         local _cloneDelay = (Config and Config.TpSettings and tonumber(Config.TpSettings.CloneDelayVal)) or 0
         local petPos = pet.position
         local petName = pet.name
