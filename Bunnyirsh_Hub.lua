@@ -974,7 +974,7 @@ _G.cancelLazyUI = function(element)
         end
     end
 end
-task.delay(4.0, function()
+task.delay(0.35, function()
     for _, item in ipairs(_G.lazyUIs) do
         if item.element and not item.cancelled then
             local vis
@@ -1101,6 +1101,26 @@ do
     local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(0, 9); c.Parent = barra
     local s = Instance.new("UIStroke")
     s.Color = Color3.fromRGB(80, 80, 80); s.Thickness = 1; s.Transparency = 0.2; s.Parent = barra
+    do
+        local img = Instance.new("ImageLabel")
+        img.Name = "TopBarBg"
+        img.BackgroundTransparency = 1
+        img.Image = "rbxassetid://97803827151139"
+        img.ScaleType = Enum.ScaleType.Crop
+        img.Size = UDim2.new(1, 0, 1, 0)
+        img.ImageTransparency = 0.35
+        img.ZIndex = 0
+        img.Parent = barra
+        local dc = Instance.new("UICorner"); dc.CornerRadius = UDim.new(0, 9); dc.Parent = img
+        local dim = Instance.new("Frame")
+        dim.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        dim.BackgroundTransparency = 0.5
+        dim.BorderSizePixel = 0
+        dim.Size = UDim2.new(1, 0, 1, 0)
+        dim.ZIndex = 0
+        dim.Parent = barra
+        local dc2 = Instance.new("UICorner"); dc2.CornerRadius = UDim.new(0, 9); dc2.Parent = dim
+    end
     local faixa = Instance.new("Frame")
     faixa.Size = UDim2.new(1, 0, 0, 2)
     faixa.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -1235,9 +1255,9 @@ Themes = {
     Light = {
         Background=Color3.fromRGB(245,245,245), MainBackground=Color3.fromRGB(255,255,255),
         Panel=Color3.fromRGB(235,235,235), Row=Color3.fromRGB(225,225,225), RowHover=Color3.fromRGB(210,210,210),
-        Accent=Color3.fromRGB(0,0,0), AccentLight=Color3.fromRGB(80,80,80),
-        Green=Color3.fromRGB(40,40,40), Red=Color3.fromRGB(60,60,60), Red2=Color3.fromRGB(40,40,40),
-        Text=Color3.fromRGB(10,10,10), Dim=Color3.fromRGB(100,100,100), Stroke=Color3.fromRGB(180,180,180),
+        Accent=Color3.fromRGB(0,0,0), AccentLight=Color3.fromRGB(60,60,60),
+        Green=Color3.fromRGB(0,0,0), Red=Color3.fromRGB(0,0,0), Red2=Color3.fromRGB(40,40,40),
+        Text=Color3.fromRGB(0,0,0), Dim=Color3.fromRGB(100,100,100), Stroke=Color3.fromRGB(180,180,180),
         SoftButton=Color3.fromRGB(230,230,230), SoftButtonHover=Color3.fromRGB(210,210,210),
         SoftAccent=Color3.fromRGB(230,230,230), SoftAccentHover=Color3.fromRGB(210,210,210),
         ToggleOff=Color3.fromRGB(200,200,200), ToggleOff2=Color3.fromRGB(200,200,200),
@@ -1245,16 +1265,16 @@ Themes = {
         BlacklistHover=Color3.fromRGB(180,180,180), BlacklistLeave=Color3.fromRGB(225,225,225),
     },
     Dark = {
-        Background=Color3.fromRGB(14,14,18), MainBackground=Color3.fromRGB(8,8,12),
-        Panel=Color3.fromRGB(20,20,26), Row=Color3.fromRGB(26,26,34), RowHover=Color3.fromRGB(38,38,48),
-        Accent=Color3.fromRGB(255,255,255), AccentLight=Color3.fromRGB(190,195,210),
+        Background=Color3.fromRGB(0,0,0), MainBackground=Color3.fromRGB(0,0,0),
+        Panel=Color3.fromRGB(16,16,16), Row=Color3.fromRGB(22,22,22), RowHover=Color3.fromRGB(36,36,36),
+        Accent=Color3.fromRGB(255,255,255), AccentLight=Color3.fromRGB(200,200,200),
         Green=Color3.fromRGB(255,255,255), Red=Color3.fromRGB(255,255,255), Red2=Color3.fromRGB(220,220,220),
-        Text=Color3.fromRGB(245,246,250), Dim=Color3.fromRGB(130,135,150), Stroke=Color3.fromRGB(50,52,65),
-        SoftButton=Color3.fromRGB(28,28,36), SoftButtonHover=Color3.fromRGB(42,42,54),
-        SoftAccent=Color3.fromRGB(28,28,36), SoftAccentHover=Color3.fromRGB(42,42,54),
-        ToggleOff=Color3.fromRGB(36,36,46), ToggleOff2=Color3.fromRGB(36,36,46),
-        InputBg=Color3.fromRGB(16,16,22), SliderBg=Color3.fromRGB(55,55,70),
-        BlacklistHover=Color3.fromRGB(48,48,60), BlacklistLeave=Color3.fromRGB(42,42,54),
+        Text=Color3.fromRGB(255,255,255), Dim=Color3.fromRGB(140,140,140), Stroke=Color3.fromRGB(55,55,55),
+        SoftButton=Color3.fromRGB(24,24,24), SoftButtonHover=Color3.fromRGB(40,40,40),
+        SoftAccent=Color3.fromRGB(24,24,24), SoftAccentHover=Color3.fromRGB(40,40,40),
+        ToggleOff=Color3.fromRGB(32,32,32), ToggleOff2=Color3.fromRGB(32,32,32),
+        InputBg=Color3.fromRGB(12,12,12), SliderBg=Color3.fromRGB(48,48,48),
+        BlacklistHover=Color3.fromRGB(40,40,40), BlacklistLeave=Color3.fromRGB(28,28,28),
     }
 }
 HERESY = { NOME="Bunnyirsh Hub", GRAD_A=Color3.fromRGB(255,255,255), GRAD_B=Color3.fromRGB(180,180,180) }
@@ -1335,7 +1355,7 @@ function applyTheme(themeName)
                             for _, btn in ipairs(child:GetChildren()) do
                                 if btn:IsA("TextButton") then
                                     if btn.Name == "BlacklistBtn" then
-                                        btn.BackgroundColor3 = isBlacklisted and Color3.fromRGB(255, 60, 60) or toTheme.BlacklistLeave
+                                        btn.BackgroundColor3 = isBlacklisted and Color3.fromRGB(255, 255, 255) or toTheme.BlacklistLeave
                                     else
                                         btn.BackgroundColor3 = toTheme.SoftButton
                                     end
@@ -1621,12 +1641,60 @@ actionConfig = {
 local CONFIG_FILE = "sxe_hub_v3_config.json"
 local PS_CODE_FILE = "sxe_hub_pscode.txt"
 PrivateServerCode = ""
+local function normalizePSCode(raw)
+    if not raw or type(raw) ~= "string" then return "" end
+    raw = raw:gsub("^%s+", ""):gsub("%s+$", "")
+    if raw == "" then return "" end
+    local code = raw:match("[%?&]code=([%w%-%_]+)")
+        or raw:match("privateServerLinkCode=([%w%-%_]+)")
+        or raw:match("share%?code=([%w%-%_]+)")
+        or raw:match("roblox%.com/share%?code=([%w%-%_]+)")
+    if code and #code >= 4 then return code end
+    if raw:match("^[%w%-%_]+$") then return raw end
+    local only = raw:match("([%w%-%_]{%d,}[%w%-%_]*)")
+    return only or raw
+end
 local function loadPSCode()
-    pcall(function() if typeof(readfile)=="function" and typeof(isfile)=="function" and isfile(PS_CODE_FILE) then PrivateServerCode = readfile(PS_CODE_FILE) end end)
+    pcall(function()
+        if typeof(readfile)=="function" and typeof(isfile)=="function" and isfile(PS_CODE_FILE) then
+            PrivateServerCode = normalizePSCode(readfile(PS_CODE_FILE))
+        end
+    end)
 end
 local function savePSCode()
-    pcall(function() if typeof(writefile)=="function" then writefile(PS_CODE_FILE, PrivateServerCode or "") end end)
+    pcall(function()
+        if typeof(writefile)=="function" then
+            writefile(PS_CODE_FILE, normalizePSCode(PrivateServerCode or ""))
+        end
+    end)
 end
+local function joinPrivateServer()
+    local code = normalizePSCode(PrivateServerCode)
+    if not code or code == "" then return false end
+    PrivateServerCode = code
+    local ok = false
+    pcall(function()
+        local ES = game:GetService("ExperienceService")
+        if ES and ES.LaunchExperience then
+            ES:LaunchExperience({ placeId = game.PlaceId, linkCode = code })
+            ok = true
+        end
+    end)
+    if not ok then
+        pcall(function()
+            TeleportService:TeleportToPrivateServer(game.PlaceId, code, {LocalPlayer})
+            ok = true
+        end)
+    end
+    if not ok then
+        pcall(function()
+            TeleportService:Teleport(game.PlaceId, LocalPlayer)
+            ok = true
+        end)
+    end
+    return ok
+end
+_G.joinPrivateServer = joinPrivateServer
 loadPSCode()
 Config = {
     positions={},keybinds={},actions={},locked=false,
@@ -2011,8 +2079,9 @@ local function initToggles()
     setToggle("ClickToAP", true, true)
     setToggle("Click AP Single Cmd", Config.ClickToAPSingleCommand, true)
     setToggle("ClickToAPSingle", Config.ClickToAPSingleCommand, true)
+    setToggle("Fps Optimizer v1", Config.FPSBoost, true)
     setToggle("FPS Boost (normal)", Config.FPSBoost, true)
-    setToggle("FPS Boost (normal)", Config.FPSBoost, true)
+    setToggle("Fps Optimizer v2", Config.FPSBoostUltra, true)
     setToggle("FPS Boost Ultra", Config.FPSBoostUltra, true)
     setToggle("FPSBoostUltra", Config.FPSBoostUltra, true)
     setToggle("XRay", Config.XRay, true)
@@ -2420,17 +2489,14 @@ local function kickPlayer(stolenText)
     if stolenText and type(stolenText) == "string" then
         isAutoKickSteal = true
     end
-    if Config.KickToPrivateServer and PrivateServerCode and PrivateServerCode ~= "" and isAutoKickSteal then
-        task.delay(0.2, function()
-            pcall(function()
-                local ExperienceService = game:GetService("ExperienceService")
-                ExperienceService:LaunchExperience({
-                    placeId = game.PlaceId,
-                    linkCode = PrivateServerCode,
-                })
+    if Config.KickToPrivateServer and isAutoKickSteal then
+        local code = normalizePSCode(PrivateServerCode)
+        if code and code ~= "" then
+            task.delay(0.15, function()
+                pcall(joinPrivateServer)
             end)
-        end)
-        return
+            return
+        end
     end
     pcall(function() game:Shutdown() end)
     pcall(function() LocalPlayer:Kick("") end)
@@ -2962,66 +3028,78 @@ local function invisTurnOn()
     setToggle("Invisible Steal", true)
     if _G.updateMovementPanelInvisVisual then pcall(_G.updateMovementPanelInvisVisual, true) end
     tracks = {}; removeFolders()
-    local success = doClone()
-    if success then
-        task.wait(0.05); animationTrickery()
-        task.defer(function()
-            if _G.resetBrainrotBeam then pcall(_G.resetBrainrotBeam) end
-            if _G.resetPlotBeam then pcall(_G.resetPlotBeam) end
-            task.wait(0.1)
-            if _G.updateBrainrotBeam then pcall(_G.updateBrainrotBeam) end
-            if _G.createPlotBeam then pcall(_G.createPlotBeam) end
-        end)
-        task.delay(1, function()
-            if _G.invisibleStealEnabled and not WalkSpeedState.enabled then
-                setWalkSpeedEnabled(true)
-            end
-        end)
-        local lastSetPosition = nil; local skipFrames = 5
-        connection = RunService.PreSimulation:Connect(function()
-            if character and character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0 and oldRoot then
-                local root = character.PrimaryPart or character:FindFirstChild("HumanoidRootPart")
-                if root then
-                    if skipFrames > 0 then skipFrames = skipFrames - 1; lastSetPosition = nil
-                    elseif lastSetPosition and ghostEnabled then
-                        local currentPos = oldRoot.Position
-                        local jumpDist = (currentPos - lastSetPosition).Magnitude
-                        if jumpDist > 6 and not _G.RecoveryInProgress and player:GetAttribute("Stealing") then
-                            lastSetPosition = nil; createServerGhost(currentPos)
-                            if _G.AutoRecoverLagback and _G._forceInvisToggle then
-                                _G.RecoveryInProgress = true
-                                task.spawn(function()
-                                    pcall(_G._forceInvisToggle); task.wait(0.6)
-                                    if player:GetAttribute("Stealing") then
-                                        pcall(_G._forceInvisToggle)
-                                    end
-                                    _G.RecoveryInProgress = false
-                                end)
-                            end
+    local success = false
+    pcall(function() success = doClone() end)
+    if not success then
+        animPlaying = false
+        _G.invisibleStealEnabled = false
+        setToggle("Invisible Steal", false)
+        if _G.updateMovementPanelInvisVisual then pcall(_G.updateMovementPanelInvisVisual, false) end
+        _invisToggleCooldown = tick()
+        return
+    end
+    task.wait(0.03)
+    pcall(animationTrickery)
+    task.defer(function()
+        if _G.resetBrainrotBeam then pcall(_G.resetBrainrotBeam) end
+        if _G.resetPlotBeam then pcall(_G.resetPlotBeam) end
+        task.wait(0.05)
+        if _G.updateBrainrotBeam then pcall(_G.updateBrainrotBeam) end
+        if _G.createPlotBeam then pcall(_G.createPlotBeam) end
+    end)
+    task.delay(0.6, function()
+        if _G.invisibleStealEnabled and not WalkSpeedState.enabled then
+            setWalkSpeedEnabled(true)
+        end
+    end)
+    local lastSetPosition = nil
+    local skipFrames = 3
+    if connection then pcall(function() connection:Disconnect() end) connection = nil end
+    connection = RunService.PreSimulation:Connect(function()
+        if not _G.invisibleStealEnabled then return end
+        if character and character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0 and oldRoot then
+            local root = character.PrimaryPart or character:FindFirstChild("HumanoidRootPart")
+            if root then
+                if skipFrames > 0 then skipFrames = skipFrames - 1; lastSetPosition = nil
+                elseif lastSetPosition and ghostEnabled then
+                    local currentPos = oldRoot.Position
+                    local jumpDist = (currentPos - lastSetPosition).Magnitude
+                    if jumpDist > 6 and not _G.RecoveryInProgress and player:GetAttribute("Stealing") then
+                        lastSetPosition = nil; createServerGhost(currentPos)
+                        if _G.AutoRecoverLagback and _G._forceInvisToggle then
+                            _G.RecoveryInProgress = true
+                            task.spawn(function()
+                                pcall(_G._forceInvisToggle); task.wait(0.45)
+                                if player:GetAttribute("Stealing") then
+                                    pcall(_G._forceInvisToggle)
+                                end
+                                _G.RecoveryInProgress = false
+                            end)
                         end
-                    end
-                    if clone then clone.CanCollide = true end
-                    if oldRoot and oldRoot.Parent then
-                        for _, c in pairs(oldRoot:GetChildren()) do
-                            if c:IsA("Attachment") or c:IsA("Beam") then c:Destroy() end
-                        end
-                        local sa = (_G.SinkSliderValue or 7) * 0.5
-                        local cf = root.CFrame - Vector3.new(0, sa, 0)
-                        oldRoot.CFrame = cf * CFrame.Angles(math.rad(_G.InvisStealAngle or 225), 0, 0)
-                        oldRoot.AssemblyLinearVelocity = root.AssemblyLinearVelocity; oldRoot.CanCollide = false
-                        lastSetPosition = oldRoot.Position
                     end
                 end
+                if clone then clone.CanCollide = true end
+                if oldRoot and oldRoot.Parent then
+                    for _, c in pairs(oldRoot:GetChildren()) do
+                        if c:IsA("Attachment") or c:IsA("Beam") then c:Destroy() end
+                    end
+                    local sa = (_G.SinkSliderValue or 7) * 0.5
+                    local cf = root.CFrame - Vector3.new(0, sa, 0)
+                    oldRoot.CFrame = cf * CFrame.Angles(math.rad(_G.InvisStealAngle or 225), 0, 0)
+                    oldRoot.AssemblyLinearVelocity = root.AssemblyLinearVelocity
+                    oldRoot.CanCollide = false
+                    lastSetPosition = oldRoot.Position
+                end
             end
-        end)
-    end
+        end
+    end)
 end
 _G.toggleInvisibleSteal = function()
-    if (tick() - _invisToggleCooldown) < 0.3 then return end
-    if animPlaying then invisTurnOff() else invisTurnOn() end
+    if (tick() - _invisToggleCooldown) < 0.2 then return end
+    if animPlaying or _G.invisibleStealEnabled then invisTurnOff() else invisTurnOn() end
 end
 _G._forceInvisToggle = function()
-    if animPlaying then invisTurnOff() else invisTurnOn() end
+    if animPlaying or _G.invisibleStealEnabled then invisTurnOff() else invisTurnOn() end
 end
 player.CharacterAdded:Connect(function(newChar)
     task.wait(0.1)
@@ -5768,7 +5846,7 @@ local function getPlotKey(plotName)
     return nil
 end
 local SPEED = 200
-local ARRIVE = 1.5
+local ARRIVE = 0.9
 local function vZero(hrp)
     if hrp then hrp.AssemblyLinearVelocity = Vector3.zero; hrp.AssemblyAngularVelocity = Vector3.zero end
 end
@@ -5831,6 +5909,9 @@ local function velMoveThrough(hrp, waypoints, speedOverride, allowJump, quickSta
         local diff = target - hrp.Position
         local mag = diff.Magnitude
         if mag < ARRIVE then
+            local _, y = hrp.CFrame:ToEulerAnglesYXZ()
+            hrp.CFrame = CFrame.new(target) * CFrame.Angles(0, y, 0)
+            hrp.AssemblyLinearVelocity = Vector3.zero
             wpIdx = wpIdx + 1
             if wpIdx > #waypoints then finish() return end
             lastDist, stall = math.huge, 0
@@ -5838,10 +5919,10 @@ local function velMoveThrough(hrp, waypoints, speedOverride, allowJump, quickSta
             diff = target - hrp.Position
             mag = diff.Magnitude
         end
-        if mag > lastDist - 0.05 then stall = stall + 1 else stall = 0 end
+        if mag > lastDist - 0.02 then stall = stall + 1 else stall = 0 end
         lastDist = mag
-        if stall >= 18 then finish() return end
-        if mag >= 0.1 then
+        if stall >= 28 then finish() return end
+        if mag >= 0.05 then
             local dir = diff.Unit
             if allowJump and diff.Y > 5 and wpIdx < #waypoints then
                 local hum = hrp.Parent and hrp.Parent:FindFirstChildOfClass("Humanoid")
@@ -5856,7 +5937,7 @@ local function velMoveThrough(hrp, waypoints, speedOverride, allowJump, quickSta
             local _sp = _runSpeed
             local _vy = dir.Y * _sp
             if _vy > MAX_CLIMB then _vy = MAX_CLIMB end
-            hrp.Velocity = Vector3.new(dir.X * _sp, _vy, dir.Z * _sp)
+            hrp.AssemblyLinearVelocity = Vector3.new(dir.X * _sp, _vy, dir.Z * _sp)
         end
     end)
     local totalDist = 0
@@ -5865,11 +5946,11 @@ local function velMoveThrough(hrp, waypoints, speedOverride, allowJump, quickSta
         totalDist = totalDist + (prev - wp).Magnitude
         prev = wp
     end
-    local timeout = totalDist / math.min(SPEED, _runSpeed) + 2
+    local timeout = totalDist / math.max(1, math.min(SPEED, _runSpeed)) + 1.2
     local elapsed = 0
     while not done and elapsed < timeout do
-        task.wait(0.05)
-        elapsed = elapsed + 0.05
+        task.wait(0.03)
+        elapsed = elapsed + 0.03
     end
     finish()
     vZero(hrp)
@@ -7087,6 +7168,7 @@ local function IsProtected(obj)
 end
 local fpsBoostConnection = nil
 local function setFPSBoost(enabled) Config.FPSBoost=enabled; saveConfig()
+    setToggle("Fps Optimizer v1", enabled)
     setToggle("FPS Boost (normal)", enabled)
     if fpsBoostConnection then
         pcall(function() fpsBoostConnection:Disconnect() end)
@@ -7343,6 +7425,7 @@ end
 local function setFPSBoostUltra(enabled)
     Config.FPSBoostUltra = enabled
     saveConfig()
+    setToggle("Fps Optimizer v2", enabled)
     setToggle("FPS Boost Ultra", enabled)
     if enabled then
         pcall(function()
@@ -8888,7 +8971,7 @@ function openAnim(f)
     f.BackgroundTransparency = 1
     us.Scale = 0.9
     f.Position = UDim2.new(tgt.X.Scale, tgt.X.Offset, tgt.Y.Scale, tgt.Y.Offset + 14)
-    local ti = TweenInfo.new(0.26, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
+    local ti = TweenInfo.new(0.22, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out)
     TweenService:Create(us, ti, {Scale = 1}):Play()
     TweenService:Create(f, ti, {Position = tgt, BackgroundTransparency = baseTrans}):Play()
 end
@@ -8901,11 +8984,11 @@ function closeAnim(f)
     end
     local baseTrans = f.BackgroundTransparency
     local tgt = f.Position
-    local ti = TweenInfo.new(0.18, Enum.EasingStyle.Exponential, Enum.EasingDirection.In)
-    local tw1 = TweenService:Create(us, ti, {Scale = 0.92})
+    local ti = TweenInfo.new(0.15, Enum.EasingStyle.Cubic, Enum.EasingDirection.In)
+    local tw1 = TweenService:Create(us, ti, {Scale = 0.9})
     local tw2 = TweenService:Create(f, ti, {
         BackgroundTransparency = 1,
-        Position = UDim2.new(tgt.X.Scale, tgt.X.Offset, tgt.Y.Scale, tgt.Y.Offset + 12)
+        Position = UDim2.new(tgt.X.Scale, tgt.X.Offset, tgt.Y.Scale, tgt.Y.Offset + 16)
     })
     tw1:Play()
     tw2:Play()
@@ -8966,11 +9049,11 @@ makeResizable = function(frame, minSize, panelName)
 end
 function makeHeader(f,t,isMain)
     local bar=Instance.new("Frame"); bar.Name="HeresyBar"; bar.Size=UDim2.new(1,0,0,2)
-    bar.BackgroundColor3=(HERESY and HERESY.GRAD_A) or Theme.Accent; bar.BorderSizePixel=0; bar.ZIndex=5; bar.Parent=f
+    bar.BackgroundColor3=(HERESY and HERESY.GRAD_A) or Theme.Accent; bar.BorderSizePixel=0; bar.ZIndex=6; bar.Parent=f
     local g=Instance.new("UIGradient"); g.Rotation=0
     g.Color=ColorSequence.new({ColorSequenceKeypoint.new(0,(HERESY and HERESY.GRAD_A) or Theme.Accent),
                                ColorSequenceKeypoint.new(1,(HERESY and HERESY.GRAD_B) or Theme.AccentLight)}); g.Parent=bar
-    local h=Instance.new("Frame"); h.Size=UDim2.new(1,0,0,42); h.BackgroundTransparency=1; h.Parent=f
+    local h=Instance.new("Frame"); h.Size=UDim2.new(1,0,0,42); h.BackgroundTransparency=1; h.ZIndex=5; h.Parent=f
     local parts={}; for s in string.gmatch(t,"([^\n]+)") do table.insert(parts,s) end
     local function marca(txt)
         if not txt then return txt end
@@ -8991,8 +9074,35 @@ function makeHeader(f,t,isMain)
     makeDraggable(f,h,t)
     return h
 end
-function makeMainPanel(t,size,pos) local f=Instance.new("Frame"); f.Size=size; f.Position=pos; f.BackgroundColor3=Theme.MainBackground; f.BackgroundTransparency=0.02; f.BorderSizePixel=0; f.ClipsDescendants=true; f.Parent=gui; corner(f,14); addOutline(f); makeHeader(f,t,true)
-    local body=Instance.new("ScrollingFrame"); body.Size=UDim2.new(1,-12,1,-82); body.Position=UDim2.new(0,6,0,76); body.BackgroundTransparency=1; body.BorderSizePixel=0; body.ScrollBarThickness=5; body.ScrollBarImageColor3=Theme.Accent; body.CanvasSize=UDim2.new(0,0,0,0); body.Active=true; body.ScrollingEnabled=true; body.ElasticBehavior=Enum.ElasticBehavior.Always; body.ScrollingDirection=Enum.ScrollingDirection.Y; body.AutomaticCanvasSize=Enum.AutomaticSize.Y; body.Parent=f
+local PANEL_BG_IMAGE = "rbxassetid://97803827151139"
+local function addPanelBackground(f)
+    if not f or f:FindFirstChild("SXEPanelBg") then return end
+    local img = Instance.new("ImageLabel")
+    img.Name = "SXEPanelBg"
+    img.BackgroundTransparency = 1
+    img.Image = PANEL_BG_IMAGE
+    img.ScaleType = Enum.ScaleType.Crop
+    img.Size = UDim2.new(1, 0, 1, 0)
+    img.Position = UDim2.new(0, 0, 0, 0)
+    img.ZIndex = 0
+    img.ImageTransparency = 0.28
+    img.ImageColor3 = Color3.fromRGB(255, 255, 255)
+    img.Parent = f
+    local dim = Instance.new("Frame")
+    dim.Name = "SXEPanelDim"
+    dim.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    dim.BackgroundTransparency = 0.42
+    dim.BorderSizePixel = 0
+    dim.Size = UDim2.new(1, 0, 1, 0)
+    dim.ZIndex = 0
+    dim.Parent = f
+    pcall(function()
+        local c1 = Instance.new("UICorner"); c1.CornerRadius = UDim.new(0, 14); c1.Parent = img
+        local c2 = Instance.new("UICorner"); c2.CornerRadius = UDim.new(0, 14); c2.Parent = dim
+    end)
+end
+function makeMainPanel(t,size,pos) local f=Instance.new("Frame"); f.Size=size; f.Position=pos; f.BackgroundColor3=Theme.MainBackground; f.BackgroundTransparency=0.15; f.BorderSizePixel=0; f.ClipsDescendants=true; f.Parent=gui; corner(f,14); addOutline(f); addPanelBackground(f); makeHeader(f,t,true)
+    local body=Instance.new("ScrollingFrame"); body.Size=UDim2.new(1,-12,1,-82); body.Position=UDim2.new(0,6,0,76); body.BackgroundTransparency=1; body.BorderSizePixel=0; body.ScrollBarThickness=5; body.ScrollBarImageColor3=Theme.Accent; body.CanvasSize=UDim2.new(0,0,0,0); body.Active=true; body.ScrollingEnabled=true; body.ElasticBehavior=Enum.ElasticBehavior.Always; body.ScrollingDirection=Enum.ScrollingDirection.Y; body.AutomaticCanvasSize=Enum.AutomaticSize.Y; body.ZIndex=2; body.Parent=f
     local lay=Instance.new("UIListLayout"); lay.Padding=UDim.new(0,6); lay.SortOrder=Enum.SortOrder.LayoutOrder; lay.Parent=body
     local function refreshCanvas()
         local h = lay.AbsoluteContentSize.Y + 48
@@ -9002,8 +9112,8 @@ function makeMainPanel(t,size,pos) local f=Instance.new("Frame"); f.Size=size; f
     body:GetPropertyChangedSignal("AbsoluteSize"):Connect(refreshCanvas)
     if Config.sizes and Config.sizes[t] then f.Size = UDim2.new(0, Config.sizes[t].x, 0, Config.sizes[t].y) end
     makeResizable(f, UDim2.new(0, 200, 0, 150), t); return f,body end
-function makeQuickPanel(t,size,pos) local f=Instance.new("Frame"); f.Size=size; f.Position=pos; f.BackgroundColor3=Theme.Background; f.BackgroundTransparency=0.02; f.BorderSizePixel=0; f.ClipsDescendants=true; f.Parent=gui; corner(f,14); addOutline(f); makeHeader(f,t,false)
-    local body=Instance.new("ScrollingFrame"); body.Size=UDim2.new(1,-12,1,-50); body.Position=UDim2.new(0,6,0,46); body.BackgroundTransparency=1; body.BorderSizePixel=0; body.ScrollBarThickness=5; body.ScrollBarImageColor3=Theme.Accent; body.CanvasSize=UDim2.new(0,0,0,0); body.Active=true; body.ScrollingEnabled=true; body.ElasticBehavior=Enum.ElasticBehavior.Always; body.ScrollingDirection=Enum.ScrollingDirection.Y; body.AutomaticCanvasSize=Enum.AutomaticSize.Y; body.Parent=f
+function makeQuickPanel(t,size,pos) local f=Instance.new("Frame"); f.Size=size; f.Position=pos; f.BackgroundColor3=Theme.Background; f.BackgroundTransparency=0.15; f.BorderSizePixel=0; f.ClipsDescendants=true; f.Parent=gui; corner(f,14); addOutline(f); addPanelBackground(f); makeHeader(f,t,false)
+    local body=Instance.new("ScrollingFrame"); body.Size=UDim2.new(1,-12,1,-50); body.Position=UDim2.new(0,6,0,46); body.BackgroundTransparency=1; body.BorderSizePixel=0; body.ScrollBarThickness=5; body.ScrollBarImageColor3=Theme.Accent; body.CanvasSize=UDim2.new(0,0,0,0); body.Active=true; body.ScrollingEnabled=true; body.ElasticBehavior=Enum.ElasticBehavior.Always; body.ScrollingDirection=Enum.ScrollingDirection.Y; body.AutomaticCanvasSize=Enum.AutomaticSize.Y; body.ZIndex=2; body.Parent=f
     local lay=Instance.new("UIListLayout"); lay.Padding=UDim.new(0,6); lay.SortOrder=Enum.SortOrder.LayoutOrder; lay.Parent=body
     local function refreshCanvas()
         local h = lay.AbsoluteContentSize.Y + 36
@@ -9268,18 +9378,19 @@ function rebuildActions()
     end) end
     if actionConfig["Kick (Y)"] then makeQuickButton(panels["ActionsBody"],"Kick (Y)",function() kickPlayer() end) end
     if actionConfig["Kick To Private"] then makeQuickButton(panels["ActionsBody"],"Kick To Private",function()
-        if PrivateServerCode and PrivateServerCode ~= "" then
-            task.delay(0.2, function()
-                pcall(function() game:GetService("ExperienceService"):LaunchExperience({placeId=game.PlaceId,linkCode=PrivateServerCode}) end)
-            end)
+        local code = normalizePSCode(PrivateServerCode)
+        if code and code ~= "" then
+            PrivateServerCode = code
+            savePSCode()
+            task.delay(0.1, function() pcall(joinPrivateServer) end)
         end
     end) end
     if actionConfig["JP"] then makeQuickButton(panels["ActionsBody"],"JP",function()
-        if PrivateServerCode and PrivateServerCode ~= "" then
-            pcall(function() TeleportService:TeleportToPrivateServer(game.PlaceId, PrivateServerCode, {LocalPlayer}) end)
-            task.delay(0.3, function()
-                pcall(function() game:GetService("ExperienceService"):LaunchExperience({placeId=game.PlaceId,linkCode=PrivateServerCode}) end)
-            end)
+        local code = normalizePSCode(PrivateServerCode)
+        if code and code ~= "" then
+            PrivateServerCode = code
+            savePSCode()
+            pcall(joinPrivateServer)
         else
             ShowNotification("JOIN PS","No private server code set!")
         end
@@ -10064,9 +10175,6 @@ function loadTab(tabName)
             ShowNotification("FLY TP", on and "ENABLED" or "DISABLED")
         end)
         makeMainToggle(mainBody,"Carpet to Brainrot",Config.TpSettings.BrainrotCarpet,function(on) Config.TpSettings.BrainrotCarpet=on; saveConfig() end)
-        makeMainButton(mainBody, "Tp Speed", function()
-            if tpSpeedSettingsPanel.Visible then closeAnim(tpSpeedSettingsPanel) else openAnim(tpSpeedSettingsPanel) end
-        end, Theme.Panel)
         makeMainTextBox(mainBody,"Min Gen for Auto TP",Config.TpSettings.MinGenForTp,"e.g. 50k, 1m, 10b",function(v)
             Config.TpSettings.MinGenForTp = v
             saveConfig()
@@ -10198,7 +10306,7 @@ function loadTab(tabName)
         makeMainToggle(mainBody,"Auto Unlock During Steal",Config.AutoUnlockOnSteal,function(on) Config.AutoUnlockOnSteal=on; saveConfig() end)
         makeSyncMainToggle(mainBody,"Anti Ragdoll","Anti Ragdoll",function(on) if on then startAntiRagdoll() else stopAntiRagdoll() end end)
         makeSyncMainToggle(mainBody,"Auto Reset Balloon","Auto Reset Balloon",function(on) Config.AutoResetBalloon=on; saveConfig() end)
-        makeMainTextBox(mainBody,"Private Server Code",PrivateServerCode,"cole o link code aqui",function(v) PrivateServerCode=v; savePSCode() end)
+        makeMainTextBox(mainBody,"Private Server Code",PrivateServerCode,"cole o link ou code aqui",function(v) PrivateServerCode=normalizePSCode(v or ""); savePSCode() end)
         if _G.HeresyExtras then
             makeSyncMainToggle(mainBody,"PS On Steal","PS On Steal",function(on) _G.HeresyExtras.setPs(on) end)
         end
@@ -10500,8 +10608,8 @@ function loadTab(tabName)
     elseif tabName=="Priority" then
         makePriorityAddRow(); makePriorityRestoreRow(); for i=1,#priorityList do makePriorityRow(i) end
     elseif tabName=="Performance" then
-        makeSyncMainToggle(mainBody,"FPS Boost (normal)","FPS Boost (normal)",function(on) if setFPSBoost then setFPSBoost(on) end end)
-        makeSyncMainToggle(mainBody,"FPS Boost Ultra","FPS Boost Ultra",function(on) if setFPSBoostUltra then setFPSBoostUltra(on) end end)
+        makeSyncMainToggle(mainBody,"Fps Optimizer v1","Fps Optimizer v1",function(on) if setFPSBoost then setFPSBoost(on) end end)
+        makeSyncMainToggle(mainBody,"Fps Optimizer v2","Fps Optimizer v2",function(on) if setFPSBoostUltra then setFPSBoostUltra(on) end end)
         makeSyncMainToggle(mainBody,"Xray","XRay",function(on) setXRay(on) end)
         makeQuickSlider(mainBody,"FOV",50,120,Config.FOV or 70,function(v) Config.FOV=v; saveConfig(); pcall(function() Workspace.CurrentCamera.FieldOfView=v end) end)
     end
@@ -11357,7 +11465,7 @@ local function carpetEngage()
         for _, wp in ipairs(waypoints) do line(prev, wp); dot(wp); prev = wp end
     end
     local SPEED = 200
-    local ARRIVE = 1.5
+    local ARRIVE = 0.9
     local MAX_CLIMB = 75
     local function vZero(hrp)
         if hrp then hrp.AssemblyLinearVelocity = Vector3.zero; hrp.AssemblyAngularVelocity = Vector3.zero end
@@ -11419,6 +11527,9 @@ local function carpetEngage()
             local diff = target - hrp.Position
             local mag = diff.Magnitude
             if mag < ARRIVE then
+                local _, y = hrp.CFrame:ToEulerAnglesYXZ()
+                hrp.CFrame = CFrame.new(target) * CFrame.Angles(0, y, 0)
+                hrp.AssemblyLinearVelocity = Vector3.zero
                 wpIdx = wpIdx + 1
                 if wpIdx > #waypoints then finish(); return end
                 lastDist, stall = math.huge, 0
@@ -11426,10 +11537,10 @@ local function carpetEngage()
                 diff = target - hrp.Position
                 mag = diff.Magnitude
             end
-            if mag > lastDist - 0.05 then stall = stall + 1 else stall = 0 end
+            if mag > lastDist - 0.02 then stall = stall + 1 else stall = 0 end
             lastDist = mag
-            if stall >= 18 then finish(); return end
-            if mag >= 0.1 then
+            if stall >= 28 then finish(); return end
+            if mag >= 0.05 then
                 local dir = diff.Unit
                 if allowJump and diff.Y > 5 and wpIdx < #waypoints then
                     local hum = hrp.Parent and hrp.Parent:FindFirstChildOfClass("Humanoid")
@@ -11443,15 +11554,15 @@ local function carpetEngage()
                 end
                 local _vy = dir.Y * _runSpeed
                 if _vy > MAX_CLIMB then _vy = MAX_CLIMB end
-                hrp.Velocity = Vector3.new(dir.X * _runSpeed, _vy, dir.Z * _runSpeed)
+                hrp.AssemblyLinearVelocity = Vector3.new(dir.X * _runSpeed, _vy, dir.Z * _runSpeed)
             end
         end)
         local totalDist = 0
         local prev = hrp.Position
         for _, wp in ipairs(waypoints) do totalDist = totalDist + (prev - wp).Magnitude; prev = wp end
-        local timeout = totalDist / math.min(SPEED, _runSpeed) + 2
+        local timeout = totalDist / math.max(1, math.min(SPEED, _runSpeed)) + 1.2
         local elapsed = 0
-        while not done and elapsed < timeout do task.wait(0.05); elapsed = elapsed + 0.05 end
+        while not done and elapsed < timeout do task.wait(0.03); elapsed = elapsed + 0.03 end
         finish()
         vZero(hrp)
     end
@@ -12344,15 +12455,11 @@ do
                     for _, g in ipairs(pg:GetDescendants()) do
                         local txt = (g:IsA("TextLabel") or g:IsA("TextButton")) and g.Text
                         if txt and string.find(txt, "You stole") then
-                            local code = PrivateServerCode
-                            task.delay(0.2, function()
+                            task.delay(0.15, function()
+                                local code = normalizePSCode(PrivateServerCode)
                                 if code and code ~= "" then
-                                    protegido(function()
-                                        game:GetService("ExperienceService"):LaunchExperience({
-                                            placeId  = tonumber(Config.PsPlaceId) or 109983668079237,
-                                            linkCode = code,
-                                        })
-                                    end)
+                                    PrivateServerCode = code
+                                    protegido(joinPrivateServer)
                                 else
                                     protegido(function() game:Shutdown() end)
                                     protegido(function() eu:Kick("") end)
