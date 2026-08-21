@@ -40,13 +40,15 @@ if not _G.SXEFreeVerboso then
     end
     local real = print
     print = real
-    task.spawn(function()
-        while true do
-            task.wait(45)
-            real(convites[math.random(1, #convites)])
-        end
+    pcall(function()
+        task.spawn(function()
+            while true do
+                task.wait(45)
+                real(convites[math.random(1, #convites)])
+            end
+        end)
+        real(">> Bunnyirsh Hub  Edition  --  discord.gg/DEqfKJHZte")
     end)
-    real(">> Bunnyirsh Hub  Edition  --  discord.gg/DEqfKJHZte")
 end
 _G.SXEBuscaGui = function(nome)
     local alvo = (gethui and gethui()) or game:GetService("CoreGui")
@@ -104,6 +106,11 @@ Lighting = game:GetService("Lighting")
 TeleportService = game:GetService("TeleportService")
 CoreGui = game:GetService("CoreGui")
 VirtualInputManager = game:GetService("VirtualInputManager")
+
+-- early UI anim stubs (overwritten later with full version)
+function openAnim(f) if f then f.Visible = true end end
+function closeAnim(f) if f then f.Visible = false end end
+
 do
 local _xchan
 local _lastTry, _attempts = 0, 0
@@ -362,10 +369,13 @@ do
         return type(s) == "string" and #s == 36
             and s:match("^%x%x%x%x%x%x%x%x%-%x%x%x%x%-%x%x%x%x%-%x%x%x%x%-%x%x%x%x%x%x%x%x%x%x%x%x$") ~= nil
     end
-    local _bufFromString = buffer.fromstring or function(s)
-        local b = buffer.create(#s)
-        buffer.writestring(b, 0, s)
-        return b
+    local _bufFromString = (typeof(buffer) == "table" and buffer.fromstring) or function(s)
+        if typeof(buffer) == "table" and buffer.create then
+            local b = buffer.create(#s)
+            buffer.writestring(b, 0, s)
+            return b
+        end
+        return s
     end
     local _lastBuild, _buildFails = 0, 0
     local function build()
@@ -2210,7 +2220,7 @@ local function getStealingInfo(plr)
     if plots then
         for _, plot in ipairs(plots:GetChildren()) do
             local owner = getPlotOwner(plot)
-            if owner == plr then continue end
+            if owner ~= plr then
             local podiums = plot:FindFirstChild("AnimalPodiums")
             if podiums then
                 for _, pod in ipairs(podiums:GetChildren()) do
@@ -2243,6 +2253,7 @@ local function getStealingInfo(plr)
                         end
                     end
                 end
+            end
             end
         end
     end
