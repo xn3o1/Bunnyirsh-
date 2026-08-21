@@ -1088,8 +1088,8 @@ do
     jpSg.Parent = ((gethui and gethui()) or game:GetService("CoreGui"))
     local barra = Instance.new("Frame")
     barra.Name = "BunnyirshTopBar"
-    barra.Size = UDim2.new(0, 280, 0, 46)
-    barra.Position = UDim2.new(0.5, -140, 0, 8)
+    barra.Size = UDim2.new(0, 240, 0, 46)
+    barra.Position = UDim2.new(0.5, -120, 0, 8)
     barra.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     barra.BackgroundTransparency = 0.08
     barra.BorderSizePixel = 0
@@ -1143,7 +1143,7 @@ do
     nHub.Size = UDim2.new(0, 0, 0, 16)
     nHub.LayoutOrder = 1
     nHub.BackgroundTransparency = 1
-    nHub.Text = "Bunnyirsh Hub"
+    nHub.Text = "Bunnyirsh"
     nHub.Font = Enum.Font.GothamBlack
     nHub.TextSize = 13
     nHub.Parent = nome
@@ -1254,7 +1254,7 @@ Themes = {
         BlacklistHover=Color3.fromRGB(50,50,50), BlacklistLeave=Color3.fromRGB(45,45,45),
     }
 }
-HERESY = { NOME="Bunnyirsh Hub", GRAD_A=Color3.fromRGB(255,255,255), GRAD_B=Color3.fromRGB(180,180,180) }
+HERESY = { NOME="Bunnyirsh", GRAD_A=Color3.fromRGB(255,255,255), GRAD_B=Color3.fromRGB(180,180,180) }
 Theme = {}
 for k, v in pairs(Themes.Dark) do
     Theme[k] = v
@@ -1660,7 +1660,7 @@ Config = {
         Tool="Flying Carpet", TpKey="T", CloneKey="V", CarpetSpeedKey="Q",
         InfiniteJump=false, DelayVal=0.4, CloneDelayVal=0.1,
         RagdollTP=false, FPSWait=false, FlyTP=false, FlyTPSpeed=160, FlyTPCloseSpeed=75,
-        GrabbleTP=false, GrabbleTPSpeed=480,
+        GrabbleTP=false, GrabbleTPSpeed=230,
         TpOnLoad=false, MinGenForTp="", MinGenForGrab="",
         BrainrotCarpet=false,
     },
@@ -5155,8 +5155,8 @@ local LOWER = {
 local UPPER_Y_THRESHOLD = 7
 local TALL_PETS = { ["La Secret Combinasion"]=true, ["La Jolly Grande"]=true }
 local TALL_OFFSET = 3
-local CARPET_SPEED = 480
-local INBASE_SPEED = 340
+local CARPET_SPEED = 230
+local INBASE_SPEED = 230
 local function getCarpetSpeed()
     return Config.TpSettings.FlyTPSpeed or 230
 end
@@ -5673,7 +5673,7 @@ end
 local MAX_CLIMB = 75
 local function velMoveThrough(hrp, waypoints, speedOverride, allowJump, quickStart)
     if not hrp or not hrp.Parent or #waypoints == 0 then return end
-    local _runSpeed = speedOverride or Config.TpSettings.GrabbleTPSpeed or (_G.SXECarpetSpeed or CARPET_SPEED or 480)
+    local _runSpeed = speedOverride or Config.TpSettings.GrabbleTPSpeed or (_G.SXECarpetSpeed or CARPET_SPEED or 230)
     vizPath(hrp.Position, waypoints)
     local _myVizGen = _G.__vizGen
     local wpIdx = 1
@@ -8371,13 +8371,11 @@ function openAnim(f)
     local baseTrans = f.BackgroundTransparency
     if baseTrans > 0.9 then baseTrans = 0.04 end
     f.Visible = true
-    f.BackgroundTransparency = 1
-    us.Scale = 0.72
-    f.Position = UDim2.new(tgt.X.Scale, tgt.X.Offset, tgt.Y.Scale, tgt.Y.Offset + 48)
-    local ti = TweenInfo.new(0.42, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-    local ti2 = TweenInfo.new(0.38, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+    us.Scale = 0.82
+    f.Position = UDim2.new(tgt.X.Scale, tgt.X.Offset, tgt.Y.Scale, tgt.Y.Offset + 32)
+    local ti = TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
     TweenService:Create(us, ti, {Scale = 1}):Play()
-    TweenService:Create(f, ti2, {Position = tgt, BackgroundTransparency = baseTrans}):Play()
+    TweenService:Create(f, ti, {Position = tgt}):Play()
 end
 function closeAnim(f)
     if not f then return end
@@ -8386,16 +8384,12 @@ function closeAnim(f)
         f.Visible = false
         return
     end
-    local baseTrans = f.BackgroundTransparency
-    local ti = TweenInfo.new(0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
-    local tw1 = TweenService:Create(us, ti, {Scale = 0.78})
-    local tw2 = TweenService:Create(f, ti, {BackgroundTransparency = 1})
+    local ti = TweenInfo.new(0.20, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
+    local tw1 = TweenService:Create(us, ti, {Scale = 0.88})
     tw1:Play()
-    tw2:Play()
     tw1.Completed:Connect(function()
         f.Visible = false
         us.Scale = 1
-        f.BackgroundTransparency = baseTrans
     end)
 end
 makeDraggable = function(frame,handle,saveName) local dragging,dragStart,startPos=false,nil,nil
@@ -8782,7 +8776,7 @@ function rebuildTpSpeedSettings()
     clearBody(tpSpeedSettingsBody)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Fly TP Speed", 50, 300, Config.TpSettings.FlyTPSpeed or 160, function(v) Config.TpSettings.FlyTPSpeed=v; saveConfig() end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "100 Studs Base Speed", 20, 250, Config.TpSettings.FlyTPCloseSpeed or 75, function(v) Config.TpSettings.FlyTPCloseSpeed=v; saveConfig() end)
-    makeMainSliderWithInput(tpSpeedSettingsBody, "Grabble TP Speed", 50, 600, Config.TpSettings.GrabbleTPSpeed or 480, function(v) Config.TpSettings.GrabbleTPSpeed=v; saveConfig(); if _G.SXESetCarpetSpeed then pcall(_G.SXESetCarpetSpeed, v) end end)
+    makeMainSliderWithInput(tpSpeedSettingsBody, "Grabble TP Speed", 50, 600, Config.TpSettings.GrabbleTPSpeed or 230, function(v) Config.TpSettings.GrabbleTPSpeed=v; saveConfig(); if _G.SXESetCarpetSpeed then pcall(_G.SXESetCarpetSpeed, v) end end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Walk To Brainrot Speed", 50, 1000, Config.TpSettings.WalkTPSpeed or 260, function(v) Config.TpSettings.WalkTPSpeed=v; saveConfig() end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Clone Delay", 0.05, 2.0, Config.TpSettings.CloneDelayVal or 0.1, function(v) Config.TpSettings.CloneDelayVal=v; saveConfig() end, "s")
     makeQuickButton(tpSpeedSettingsBody, "Close", function() closeAnim(tpSpeedSettingsPanel) end, Theme.SoftAccentHover)
@@ -10259,7 +10253,7 @@ do
         end
     end
     _G.SXEFireGrapple = fireGrapple
-    local SXESpeed = { CARPET = 480, INBASE = 340 }
+    local SXESpeed = { CARPET = 520, INBASE = 340 }
     _G.SXESetCarpetSpeed = function(v) v = tonumber(v); if v and v > 0 then SXESpeed.CARPET = v end end
     _G.SXESetInbaseSpeed = function(v) v = tonumber(v); if v and v > 0 then SXESpeed.INBASE = v end end
     _G.SXEGetCarpetSpeed = function() return SXESpeed.CARPET end
@@ -11421,7 +11415,7 @@ local function carpetEngage()
             if #semEsteira == 0 then isTeleporting = false; return end
             pet = _pickByMode(semEsteira) or semEsteira[1]
         end
-        local _tpSpd = (Config and Config.TpSettings and Config.TpSettings.GrabbleTPSpeed) or 480
+        local _tpSpd = (Config and Config.TpSettings and Config.TpSettings.GrabbleTPSpeed) or 520
         local _cloneDelay = (Config and Config.TpSettings and Config.TpSettings.CloneDelayVal) or 0.35
         local petPos = pet.position
         local petName = pet.name
@@ -12325,6 +12319,7 @@ do
     end)
     task.spawn(function()
         task.wait(2)
+        pcall(construirBotaoPs)
         if Config.FaceAway    then faceAwayLigar()    end
         if Config.PsOnSteal   then psLoop()           end
         if Config.AntiFlasher then antiFlasherLigar() end
