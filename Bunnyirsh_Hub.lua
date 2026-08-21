@@ -40,15 +40,13 @@ if not _G.SXEFreeVerboso then
     end
     local real = print
     print = real
-    pcall(function()
-        task.spawn(function()
-            while true do
-                task.wait(45)
-                real(convites[math.random(1, #convites)])
-            end
-        end)
-        real(">> Bunnyirsh Hub  Edition  --  discord.gg/DEqfKJHZte")
+    task.spawn(function()
+        while true do
+            task.wait(45)
+            real(convites[math.random(1, #convites)])
+        end
     end)
+    real(">> Bunnyirsh Hub  Edition  --  discord.gg/DEqfKJHZte")
 end
 _G.SXEBuscaGui = function(nome)
     local alvo = (gethui and gethui()) or game:GetService("CoreGui")
@@ -106,11 +104,6 @@ Lighting = game:GetService("Lighting")
 TeleportService = game:GetService("TeleportService")
 CoreGui = game:GetService("CoreGui")
 VirtualInputManager = game:GetService("VirtualInputManager")
-
--- early UI anim stubs (overwritten later with full version)
-function openAnim(f) if f then f.Visible = true end end
-function closeAnim(f) if f then f.Visible = false end end
-
 do
 local _xchan
 local _lastTry, _attempts = 0, 0
@@ -369,13 +362,10 @@ do
         return type(s) == "string" and #s == 36
             and s:match("^%x%x%x%x%x%x%x%x%-%x%x%x%x%-%x%x%x%x%-%x%x%x%x%-%x%x%x%x%x%x%x%x%x%x%x%x$") ~= nil
     end
-    local _bufFromString = (typeof(buffer) == "table" and buffer.fromstring) or function(s)
-        if typeof(buffer) == "table" and buffer.create then
-            local b = buffer.create(#s)
-            buffer.writestring(b, 0, s)
-            return b
-        end
-        return s
+    local _bufFromString = buffer.fromstring or function(s)
+        local b = buffer.create(#s)
+        buffer.writestring(b, 0, s)
+        return b
     end
     local _lastBuild, _buildFails = 0, 0
     local function build()
@@ -1098,8 +1088,8 @@ do
     jpSg.Parent = ((gethui and gethui()) or game:GetService("CoreGui"))
     local barra = Instance.new("Frame")
     barra.Name = "BunnyirshTopBar"
-    barra.Size = UDim2.new(0, 240, 0, 46)
-    barra.Position = UDim2.new(0.5, -120, 0, 8)
+    barra.Size = UDim2.new(0, 280, 0, 46)
+    barra.Position = UDim2.new(0.5, -140, 0, 8)
     barra.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     barra.BackgroundTransparency = 0.08
     barra.BorderSizePixel = 0
@@ -2220,7 +2210,7 @@ local function getStealingInfo(plr)
     if plots then
         for _, plot in ipairs(plots:GetChildren()) do
             local owner = getPlotOwner(plot)
-            if owner ~= plr then
+            if owner == plr then continue end
             local podiums = plot:FindFirstChild("AnimalPodiums")
             if podiums then
                 for _, pod in ipairs(podiums:GetChildren()) do
@@ -2253,7 +2243,6 @@ local function getStealingInfo(plr)
                         end
                     end
                 end
-            end
             end
         end
     end
@@ -5167,12 +5156,12 @@ local UPPER_Y_THRESHOLD = 7
 local TALL_PETS = { ["La Secret Combinasion"]=true, ["La Jolly Grande"]=true }
 local TALL_OFFSET = 3
 local CARPET_SPEED = 480
-local INBASE_SPEED = 230
+local INBASE_SPEED = 340
 local function getCarpetSpeed()
-    return Config.TpSettings.FlyTPSpeed or 480
+    return Config.TpSettings.FlyTPSpeed or 230
 end
 local function getInBaseSpeed()
-    return Config.TpSettings.FlyTPCloseSpeed or 480
+    return Config.TpSettings.FlyTPCloseSpeed or 230
 end
 local SKY_CLONE_WAIT = 0.2
 local CARPET_NAMES = { "Flying Carpet", "Carpet", "Cloud", "Witch's Broom", "Cupid's Wings", "Santa's Sleigh", "Magic Carpet", "Waverider" }
@@ -8379,12 +8368,16 @@ function openAnim(f)
     us.Name = "SXEScale"
     us.Parent = f
     local tgt = f.Position
+    local baseTrans = f.BackgroundTransparency
+    if baseTrans > 0.9 then baseTrans = 0.04 end
     f.Visible = true
-    us.Scale = 0.78
-    f.Position = UDim2.new(tgt.X.Scale, tgt.X.Offset, tgt.Y.Scale, tgt.Y.Offset + 40)
-    local ti = TweenInfo.new(0.38, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+    f.BackgroundTransparency = 1
+    us.Scale = 0.72
+    f.Position = UDim2.new(tgt.X.Scale, tgt.X.Offset, tgt.Y.Scale, tgt.Y.Offset + 48)
+    local ti = TweenInfo.new(0.42, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+    local ti2 = TweenInfo.new(0.38, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
     TweenService:Create(us, ti, {Scale = 1}):Play()
-    TweenService:Create(f, TweenInfo.new(0.32, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position = tgt}):Play()
+    TweenService:Create(f, ti2, {Position = tgt, BackgroundTransparency = baseTrans}):Play()
 end
 function closeAnim(f)
     if not f then return end
@@ -8393,12 +8386,16 @@ function closeAnim(f)
         f.Visible = false
         return
     end
-    local ti = TweenInfo.new(0.18, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
-    local tw1 = TweenService:Create(us, ti, {Scale = 0.85})
+    local baseTrans = f.BackgroundTransparency
+    local ti = TweenInfo.new(0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
+    local tw1 = TweenService:Create(us, ti, {Scale = 0.78})
+    local tw2 = TweenService:Create(f, ti, {BackgroundTransparency = 1})
     tw1:Play()
+    tw2:Play()
     tw1.Completed:Connect(function()
         f.Visible = false
         us.Scale = 1
+        f.BackgroundTransparency = baseTrans
     end)
 end
 makeDraggable = function(frame,handle,saveName) local dragging,dragStart,startPos=false,nil,nil
@@ -8786,7 +8783,7 @@ function rebuildTpSpeedSettings()
     makeMainSliderWithInput(tpSpeedSettingsBody, "Fly TP Speed", 50, 300, Config.TpSettings.FlyTPSpeed or 160, function(v) Config.TpSettings.FlyTPSpeed=v; saveConfig() end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "100 Studs Base Speed", 20, 250, Config.TpSettings.FlyTPCloseSpeed or 75, function(v) Config.TpSettings.FlyTPCloseSpeed=v; saveConfig() end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Grabble TP Speed", 50, 600, Config.TpSettings.GrabbleTPSpeed or 480, function(v) Config.TpSettings.GrabbleTPSpeed=v; saveConfig(); if _G.SXESetCarpetSpeed then pcall(_G.SXESetCarpetSpeed, v) end end)
-    makeMainSliderWithInput(tpSpeedSettingsBody, "Walk To Brainrot Speed", 50, 1000, Config.TpSettings.WalkTPSpeed or 230, function(v) Config.TpSettings.WalkTPSpeed=v; saveConfig() end)
+    makeMainSliderWithInput(tpSpeedSettingsBody, "Walk To Brainrot Speed", 50, 1000, Config.TpSettings.WalkTPSpeed or 260, function(v) Config.TpSettings.WalkTPSpeed=v; saveConfig() end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Clone Delay", 0.05, 2.0, Config.TpSettings.CloneDelayVal or 0.1, function(v) Config.TpSettings.CloneDelayVal=v; saveConfig() end, "s")
     makeQuickButton(tpSpeedSettingsBody, "Close", function() closeAnim(tpSpeedSettingsPanel) end, Theme.SoftAccentHover)
 end
@@ -10262,7 +10259,7 @@ do
         end
     end
     _G.SXEFireGrapple = fireGrapple
-    local SXESpeed = { CARPET = 480, INBASE = 300 }
+    local SXESpeed = { CARPET = 480, INBASE = 340 }
     _G.SXESetCarpetSpeed = function(v) v = tonumber(v); if v and v > 0 then SXESpeed.CARPET = v end end
     _G.SXESetInbaseSpeed = function(v) v = tonumber(v); if v and v > 0 then SXESpeed.INBASE = v end end
     _G.SXEGetCarpetSpeed = function() return SXESpeed.CARPET end
@@ -11000,7 +10997,7 @@ local function carpetEngage()
         if not hrp then return end
         pcall(function() hrp.Anchored = false end)
         pcall(equipCarpet)
-        local SPEED = (Config.TpSettings and (tonumber(Config.TpSettings.WalkTPSpeed) or tonumber(Config.TpSettings.GrabbleTPSpeed))) or 480
+        local SPEED = (Config.TpSettings and (tonumber(Config.TpSettings.WalkTPSpeed) or tonumber(Config.TpSettings.GrabbleTPSpeed))) or 260
         local FLOAT_OFFSET = (targetPos.Y > 20) and -4 or 0
         local goal = Vector3.new(targetPos.X, targetPos.Y + FLOAT_OFFSET, targetPos.Z)
         local t0 = os.clock()
@@ -11770,7 +11767,6 @@ do
         if psStroke then psStroke.Color = on and Theme.Green or Theme.Stroke end
     end
     local function construirBotaoPs()
-        return
         if psBtn then return end
         psBtn = Instance.new("Frame")
         psBtn.Name = "HeresyPsButton"
@@ -12329,7 +12325,6 @@ do
     end)
     task.spawn(function()
         task.wait(2)
-        -- PS button removed
         if Config.FaceAway    then faceAwayLigar()    end
         if Config.PsOnSteal   then psLoop()           end
         if Config.AntiFlasher then antiFlasherLigar() end
