@@ -23,11 +23,11 @@ if not _G.SXEFreeVerboso then
         "[BUNNYIRSH] the answer is 42, the question is pending",
     }
     local convites = {
-        ">> BUNNYIRSH FREE  --  join discord.gg/DEqfKJHZte for updates",
+        ">> BUNNYIRSH  --  join discord.gg/DEqfKJHZte for updates",
         ">> get the full version at discord.gg/DEqfKJHZte",
         ">> stuck? support lives at discord.gg/DEqfKJHZte",
         ">> discord.gg/DEqfKJHZte  --  giveaways, updates, help",
-        ">> Bunnyirsh Hub FREE  --  discord.gg/DEqfKJHZte",
+        ">> Bunnyirsh Hub  --  discord.gg/DEqfKJHZte",
         ">> tell your friends: discord.gg/DEqfKJHZte",
     }
     local n = 0
@@ -39,14 +39,14 @@ if not _G.SXEFreeVerboso then
         return frases[math.random(1, #frases)]
     end
     local real = print
-    print = function() real(troll()) end
+    print = real
     task.spawn(function()
         while true do
             task.wait(45)
             real(convites[math.random(1, #convites)])
         end
     end)
-    real(">> Bunnyirsh Hub  FREE EDITION  --  discord.gg/DEqfKJHZte")
+    real(">> Bunnyirsh Hub  Edition  --  discord.gg/DEqfKJHZte")
 end
 _G.SXEBuscaGui = function(nome)
     local alvo = (gethui and gethui()) or game:GetService("CoreGui")
@@ -109,9 +109,9 @@ local _xchan
 local _lastTry, _attempts = 0, 0
 local _deepScans, _lastDeep = 0, 0
 local _mod
-local MAX_ATTEMPTS, RETRY_GAP = 40, 0.5
+local MAX_ATTEMPTS, RETRY_GAP = 12, 1.0
 local BOOT_T0, BOOT_BURST, BOOT_GAP = os.clock(), 3.0, 0.10
-local MAX_DEEP, DEEP_GAP = 3, 1.5
+local MAX_DEEP, DEEP_GAP = 1, 3.0
 local function _retryGap()
     if (os.clock() - BOOT_T0) < BOOT_BURST then return BOOT_GAP end
     return RETRY_GAP
@@ -1088,8 +1088,8 @@ do
     jpSg.Parent = ((gethui and gethui()) or game:GetService("CoreGui"))
     local barra = Instance.new("Frame")
     barra.Name = "BunnyirshTopBar"
-    barra.Size = UDim2.new(0, 240, 0, 46)
-    barra.Position = UDim2.new(0.5, -120, 0, 8)
+    barra.Size = UDim2.new(0, 280, 0, 46)
+    barra.Position = UDim2.new(0.5, -140, 0, 8)
     barra.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     barra.BackgroundTransparency = 0.08
     barra.BorderSizePixel = 0
@@ -1154,29 +1154,14 @@ do
         ColorSequenceKeypoint.new(0.70, Color3.fromRGB(255,255,255)),
         ColorSequenceKeypoint.new(1.00, Color3.fromRGB(180,180,180)),
     }, 3.2)
-    local nFree = Instance.new("TextLabel")
-    nFree.AutomaticSize = Enum.AutomaticSize.X
-    nFree.Size = UDim2.new(0, 0, 0, 14)
-    nFree.LayoutOrder = 2
-    nFree.BackgroundTransparency = 1
-    nFree.Text = "FREE"
-    nFree.Font = Enum.Font.GothamBlack
-    nFree.TextSize = 11
-    nFree.Parent = nome
-    _tituloGrad(nFree, {
-        ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255,255,255)),
-        ColorSequenceKeypoint.new(0.28, Color3.fromRGB(200,200,200)),
-        ColorSequenceKeypoint.new(0.50, Color3.fromRGB(150,150,150)),
-        ColorSequenceKeypoint.new(0.72, Color3.fromRGB(200,200,200)),
-        ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255,255,255)),
-    }, 4.0)
+
     local stats = Instance.new("TextLabel")
     stats.Size = UDim2.new(0.55, 0, 0, 12)
     stats.Position = UDim2.new(0, 5, 0, 22)
     stats.BackgroundTransparency = 1
     stats.Text = "FPS: -- | PING: --"
     stats.TextColor3 = Color3.fromRGB(160, 160, 160)
-    stats.Font = Enum.Font.GothamMedium
+    stats.Font = Enum.Font.GothamBold
     stats.TextSize = 10
     stats.TextXAlignment = Enum.TextXAlignment.Center
     stats.Parent = barra
@@ -1186,7 +1171,7 @@ do
     disc.BackgroundTransparency = 1
     disc.Text = "discord.gg/DEqfKJHZte"
     disc.TextColor3 = Color3.fromRGB(160, 160, 160)
-    disc.Font = Enum.Font.GothamMedium
+    disc.Font = Enum.Font.GothamBold
     disc.TextSize = 10
     disc.TextXAlignment = Enum.TextXAlignment.Center
     disc.Parent = barra
@@ -1196,7 +1181,7 @@ do
     aviso.BackgroundTransparency = 1
     aviso.Text = ""
     aviso.TextColor3 = Color3.fromRGB(200, 200, 200)
-    aviso.Font = Enum.Font.GothamMedium
+    aviso.Font = Enum.Font.GothamBold
     aviso.TextSize = 9
     aviso.Parent = barra
     local clique = Instance.new("TextButton")
@@ -1206,28 +1191,21 @@ do
     clique.AutoButtonColor = false
     clique.ZIndex = 5
     clique.Parent = barra
-    clique.MouseEnter:Connect(function() barra.BackgroundColor3 = Color3.fromRGB(30, 30, 30) end)
-    clique.MouseLeave:Connect(function() barra.BackgroundColor3 = Color3.fromRGB(0, 0, 0) end)
+    clique.MouseEnter:Connect(function()
+        TweenService:Create(barra, TweenInfo.new(0.18, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(28, 28, 28)}):Play()
+    end)
+    clique.MouseLeave:Connect(function()
+        TweenService:Create(barra, TweenInfo.new(0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(0, 0, 0)}):Play()
+    end)
     clique.MouseButton1Click:Connect(function()
-        if PrivateServerCode and PrivateServerCode ~= "" then
-            aviso.Text = "entrando no servidor privado..."
-            aviso.TextColor3 = Color3.fromRGB(255, 255, 255)
-            task.spawn(function()
-                local ok = pcall(function()
-                    TeleportService:TeleportToPrivateServer(game.PlaceId, PrivateServerCode, {LocalPlayer})
-                end)
-                if not ok then
-                    pcall(function()
-                        game:GetService("ExperienceService"):LaunchExperience({placeId=game.PlaceId, linkCode=PrivateServerCode})
-                    end)
-                end
-                task.wait(3)
-                aviso.Text = ""
-            end)
-        else
-            aviso.Text = "sem Private Server Code"
-            aviso.TextColor3 = Color3.fromRGB(200, 200, 200)
-            task.delay(2, function() aviso.Text = "" end)
+        if main then
+            if main.Visible then
+                closeAnim(main)
+                if tpSpeedSettingsPanel and tpSpeedSettingsPanel.Visible then closeAnim(tpSpeedSettingsPanel) end
+                if actionSettingsPanel and actionSettingsPanel.Visible then closeAnim(actionSettingsPanel) end
+            else
+                openAnim(main)
+            end
         end
     end)
     _G.__HeresyStats = stats
@@ -1276,7 +1254,7 @@ Themes = {
         BlacklistHover=Color3.fromRGB(50,50,50), BlacklistLeave=Color3.fromRGB(45,45,45),
     }
 }
-HERESY = { NOME="Bunnyirsh", GRAD_A=Color3.fromRGB(255,255,255), GRAD_B=Color3.fromRGB(180,180,180) }
+HERESY = { NOME="Bunnyirsh Hub", GRAD_A=Color3.fromRGB(255,255,255), GRAD_B=Color3.fromRGB(180,180,180) }
 Theme = {}
 for k, v in pairs(Themes.Dark) do
     Theme[k] = v
@@ -1682,7 +1660,7 @@ Config = {
         Tool="Flying Carpet", TpKey="T", CloneKey="V", CarpetSpeedKey="Q",
         InfiniteJump=false, DelayVal=0.4, CloneDelayVal=0.1,
         RagdollTP=false, FPSWait=false, FlyTP=false, FlyTPSpeed=160, FlyTPCloseSpeed=75,
-        GrabbleTP=false, GrabbleTPSpeed=230,
+        GrabbleTP=false, GrabbleTPSpeed=480,
         TpOnLoad=false, MinGenForTp="", MinGenForGrab="",
         BrainrotCarpet=false,
     },
@@ -2533,136 +2511,122 @@ end)
 local RESET_POS  = Vector3.new(-300.5074157714844, -5.099719524383545, 113.69993591308594)
 local RESET_TOOL = "Flying Carpet"
 local _ultimoReset = 0
+local CAM_BIND = "InstaResetCam"
+local FLING_TIME = 0.4
+local FLING_POWER = 50000
+local USE_VOID = true
+local VOID_TIME = 0.6
+local TIMEOUT = 6
+local function hide_locally(obj)
+    if obj:IsA("BasePart") or obj:IsA("Decal") then
+        obj.LocalTransparencyModifier = 1
+    end
+end
 local function instantReset()
     if instaResetCooldown then return end
-    if tick() - _ultimoReset < 2 then return end
-    local lp   = LocalPlayer
-    local char = lp.Character
-    local root = char and char:FindFirstChild("HumanoidRootPart")
-    local hum  = char and char:FindFirstChildOfClass("Humanoid")
-    if not root or not hum then return end
+    if tick() - _ultimoReset < 1.2 then return end
+    local Player = LocalPlayer
+    local char = Player.Character
+    if not char or not char.Parent then return end
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hum or hum.Health <= 0 then return end
+    local hrp = hum.RootPart or char:FindFirstChild("HumanoidRootPart")
     _ultimoReset = tick()
     instaResetCooldown = true
-    local meuTurno = {}
-    _G.__resetDono = meuTurno
-    local mt, oldIdx, minhaClosure
-    local destravou = false
-    local comHook = pcall(function()
-        mt = getrawmetatable(game)
-        oldIdx = mt.__index
-        setreadonly(mt, false)
-        destravou = true
-        minhaClosure = newcclosure(function(s, k)
-            if k == "WalkSpeed" and instaResetCooldown then return 16 end
-            return oldIdx(s, k)
-        end)
-        mt.__index = minhaClosure
-        setreadonly(mt, true)
-    end)
-    if destravou and not comHook then
-        pcall(function() setreadonly(mt, true) end)
-    end
-    local function desfazerHook()
-        if not comHook or not mt then return end
-        comHook = false
-        pcall(function()
-            setreadonly(mt, false)
-            if mt.__index == minhaClosure then
-                mt.__index = oldIdx
-            end
-            setreadonly(mt, true)
-        end)
-    end
-    local function liberarTrava()
-        if _G.__resetDono ~= meuTurno then return end
-        instaResetCooldown = false
-    end
-    local conn
-    local t0 = tick()
-    conn = RunService.Heartbeat:Connect(function()
-        if tick() - t0 > 0.15
-        or not char.Parent
-        or hum.Health <= 0
-        or lp.Character ~= char then
-            conn:Disconnect()
-            return
-        end
-        pcall(function()
-            root:SetNetworkOwner(lp)
-            root.AssemblyLinearVelocity = Vector3.new(1e7, 1e7, 1e7)
-            hum.Health = 0
-        end)
-    end)
-    task.delay(12, function()
-        if conn then pcall(function() conn:Disconnect() end) end
-        desfazerHook()
-        liberarTrava()
-    end)
     task.spawn(function()
-        local novo
-        local t = tick()
-        repeat
-            novo = lp.Character
-            if novo and novo ~= char then break end
-            task.wait(0.05)
-        until tick() - t > 10
-        if not novo or novo == char then
-            desfazerHook()
-            liberarTrava()
-            return
+        local cam = workspace.CurrentCamera
+        local frozen = cam and cam.CFrame
+        local old_type = cam and cam.CameraType
+        pcall(function()
+            if cam then
+                cam.CameraType = Enum.CameraType.Scriptable
+                RunService:BindToRenderStep(CAM_BIND, Enum.RenderPriority.Camera.Value + 1, function()
+                    if cam then cam.CFrame = frozen end
+                end)
+            end
+        end)
+        local added
+        pcall(function()
+            for _, obj in ipairs(char:GetDescendants()) do pcall(hide_locally, obj) end
+            added = char.DescendantAdded:Connect(function(obj) pcall(hide_locally, obj) end)
+        end)
+        local new_char
+        local respawned = Player.CharacterAdded:Connect(function(c) new_char = c end)
+        local function unlock()
+            pcall(function() hum.PlatformStand = false end)
+            pcall(function() hum.Sit = false end)
+            pcall(function() hum.AutoRotate = true end)
         end
-        local nRoot = novo:WaitForChild("HumanoidRootPart", 5)
-        local nHum  = novo:WaitForChild("Humanoid", 5)
-        task.wait(0.3)
-        if nHum then
-            local bp = lp:FindFirstChildOfClass("Backpack")
-            local tool = bp and bp:WaitForChild(RESET_TOOL, 5)
-            if tool then
-                pcall(function() nHum:EquipTool(tool) end)
-                task.wait(0.05)
+        unlock()
+        for _, obj in ipairs(char:GetDescendants()) do
+            if obj:IsA("BasePart") then
+                pcall(function() obj.Anchored = false end)
+                pcall(function() obj.CanCollide = false end)
+            elseif obj.Name == "SeatWeld" then
+                pcall(function() obj:Destroy() end)
             end
         end
-        if nRoot then
-            pcall(function() nRoot.CFrame = CFrame.new(RESET_POS + Vector3.new(0, 1, 0)) end)
-            task.wait(0.05)
+        local started = os.clock()
+        local function alive_hrp()
+            if hrp and hrp.Parent then return hrp end
+            hrp = hum.RootPart or char:FindFirstChild("HumanoidRootPart")
+            if hrp and hrp.Parent then return hrp end
+            return nil
         end
-        if nHum then pcall(function() nHum.Jump = true end) end
-        desfazerHook()
-        liberarTrava()
+        local fling_until = os.clock() + FLING_TIME
+        while not new_char and os.clock() < fling_until and hum.Parent do
+            unlock()
+            pcall(function() hum.HipHeight = 1e30 end)
+            local root = alive_hrp()
+            if root then
+                pcall(function() root.Anchored = false end)
+                pcall(function() root.AssemblyLinearVelocity = Vector3.new(0, FLING_POWER, 0) end)
+                pcall(function() root.Velocity = Vector3.new(0, FLING_POWER, 0) end)
+            end
+            RunService.Heartbeat:Wait()
+        end
+        if USE_VOID and not new_char then
+            local floor = -500
+            pcall(function() floor = workspace.FallenPartsDestroyHeight end)
+            local void_until = os.clock() + VOID_TIME
+            while not new_char and os.clock() < void_until do
+                local root = alive_hrp()
+                if not root then break end
+                pcall(function() root.CFrame = CFrame.new(0, floor - 500, 0) end)
+                pcall(function() root.AssemblyLinearVelocity = Vector3.new(0, -FLING_POWER, 0) end)
+                RunService.Heartbeat:Wait()
+            end
+        end
+        while not new_char and os.clock() - started < TIMEOUT do
+            if hum.Parent then
+                pcall(function() hum.Health = 0 end)
+                pcall(function() hum:ChangeState(Enum.HumanoidStateType.Dead) end)
+            end
+            if char.Parent then pcall(function() char:BreakJoints() end) end
+            task.wait(0.1)
+        end
+        pcall(function() respawned:Disconnect() end)
+        if added then pcall(function() added:Disconnect() end) end
+        pcall(function() RunService:UnbindFromRenderStep(CAM_BIND) end)
+        pcall(function()
+            if cam then
+                cam.CameraType = (old_type == Enum.CameraType.Scriptable) and Enum.CameraType.Custom or (old_type or Enum.CameraType.Custom)
+                if new_char then
+                    local new_hum = new_char:FindFirstChildOfClass("Humanoid") or new_char:WaitForChild("Humanoid", 5)
+                    if new_hum then cam.CameraSubject = new_hum end
+                end
+            end
+        end)
+        instaResetCooldown = false
     end)
 end
+_G.InstantReset = instantReset
+local lastBalloonResetTime = 0
 local _sxeResetBindable = Instance.new("BindableEvent")
 _sxeResetBindable.Event:Connect(function() pcall(instantReset) end)
-task.spawn(function()
-    for _ = 1, 12 do
-        local ok = pcall(function()
-            game:GetService("StarterGui"):SetCore("ResetButtonCallback", _sxeResetBindable)
-        end)
-        if ok then break end
-        task.wait(1)
-    end
+pcall(function()
+    game:GetService("StarterGui"):SetCore("ResetButtonCallback", _sxeResetBindable)
 end)
-_G.InstantReset = instantReset
-local function updateHistory(pos)
-    local now = tick()
-    if now - lastHistoryUpdate < 0.05 then return end
-    lastHistoryUpdate = now
-    table.insert(positionHistory, {pos = pos, time = now})
-    while #positionHistory > 0 and now - positionHistory[1].time > Config.HistoryDuration do
-        table.remove(positionHistory, 1)
-    end
-end
-local function onHeartbeat(dt)
-    if resetting then return end
-    scanTimer = scanTimer + dt
-    if scanTimer >= Config.ScanInterval then
-        scanTimer = 0
-        scanForRemotes()
-    end
-end
-scanForRemotes()
-RunService.Heartbeat:Connect(onHeartbeat)
-local lastBalloonResetTime = 0
 executeReset = function(isBalloon)
     if isBalloon then
         if tick() - lastBalloonResetTime < 20 then return end
@@ -5191,8 +5155,8 @@ local LOWER = {
 local UPPER_Y_THRESHOLD = 7
 local TALL_PETS = { ["La Secret Combinasion"]=true, ["La Jolly Grande"]=true }
 local TALL_OFFSET = 3
-local CARPET_SPEED = 230
-local INBASE_SPEED = 230
+local CARPET_SPEED = 480
+local INBASE_SPEED = 340
 local function getCarpetSpeed()
     return Config.TpSettings.FlyTPSpeed or 230
 end
@@ -5702,14 +5666,14 @@ local function getPlotKey(plotName)
     return nil
 end
 local SPEED = 200
-local ARRIVE = 3
+local ARRIVE = 2.2
 local function vZero(hrp)
     if hrp then hrp.AssemblyLinearVelocity = Vector3.zero; hrp.AssemblyAngularVelocity = Vector3.zero end
 end
-local MAX_CLIMB = 60
+local MAX_CLIMB = 75
 local function velMoveThrough(hrp, waypoints, speedOverride, allowJump, quickStart)
     if not hrp or not hrp.Parent or #waypoints == 0 then return end
-    local _runSpeed = speedOverride or Config.TpSettings.GrabbleTPSpeed or (_G.SXECarpetSpeed or CARPET_SPEED or 230)
+    local _runSpeed = speedOverride or Config.TpSettings.GrabbleTPSpeed or (_G.SXECarpetSpeed or CARPET_SPEED or 480)
     vizPath(hrp.Position, waypoints)
     local _myVizGen = _G.__vizGen
     local wpIdx = 1
@@ -6522,7 +6486,7 @@ local function makePlayerBillboard(plr)
     nameLbl.Font=Enum.Font.GothamBold; nameLbl.TextSize=14; nameLbl.TextColor3=Color3.fromRGB(255,255,255)
     nameLbl.TextStrokeTransparency=0.4; nameLbl.TextStrokeColor3=Color3.fromRGB(0,0,0); nameLbl.Text=plr.Name
     local toolLbl=Instance.new("TextLabel",bb); toolLbl.Name="ToolLabel"; toolLbl.Size=UDim2.new(1,0,0,13); toolLbl.Position=UDim2.new(0,0,0,18)
-    toolLbl.BackgroundTransparency=1; toolLbl.Font=Enum.Font.GothamMedium; toolLbl.TextSize=11; toolLbl.TextColor3=Color3.fromRGB(100,220,255)
+    toolLbl.BackgroundTransparency=1; toolLbl.Font=Enum.Font.GothamBold; toolLbl.TextSize=11; toolLbl.TextColor3=Color3.fromRGB(100,220,255)
     toolLbl.TextStrokeTransparency=0.4; toolLbl.TextStrokeColor3=Color3.fromRGB(0,0,0); toolLbl.Text=getHeldTool(plr) or ""
     return bb,nameLbl
 end
@@ -8054,7 +8018,7 @@ local function buildRemoteSell()
     rsSellAll.BackgroundColor3=Theme.Accent; rsSellAll.Text="Proximity sell"; rsSellAll.TextColor3=Color3.new(1,1,1); rsSellAll.Font=Enum.Font.GothamBlack; rsSellAll.TextSize=12; rsSellAll.BorderSizePixel=0
     Instance.new("UICorner",rsSellAll).CornerRadius=UDim.new(0,8)
     local rsStatus=Instance.new("TextLabel",rsFrame); rsStatus.Size=UDim2.new(1,-18,0,14); rsStatus.Position=UDim2.new(0,9,0,72)
-    rsStatus.BackgroundTransparency=1; rsStatus.Text="Waiting for scan..."; rsStatus.TextColor3=Theme.Dim; rsStatus.Font=Enum.Font.Gotham; rsStatus.TextSize=10; rsStatus.TextXAlignment=Enum.TextXAlignment.Left
+    rsStatus.BackgroundTransparency=1; rsStatus.Text="Waiting for scan..."; rsStatus.TextColor3=Theme.Dim; rsStatus.Font=Enum.Font.GothamBold; rsStatus.TextSize=10; rsStatus.TextXAlignment=Enum.TextXAlignment.Left
     local rsScroll=Instance.new("ScrollingFrame",rsFrame); rsScroll.Size=UDim2.new(1,-18,1,-102); rsScroll.Position=UDim2.new(0,9,0,92)
     rsScroll.BackgroundColor3=Theme.Panel; rsScroll.BorderSizePixel=0; rsScroll.ScrollBarThickness=3; rsScroll.ScrollBarImageColor3=Theme.Accent; rsScroll.Active=true
     Instance.new("UICorner",rsScroll).CornerRadius=UDim.new(0,8)
@@ -8398,9 +8362,42 @@ addOutline = function(f)
     return s
 end
 function clearBody(body) for _,c in ipairs(body:GetChildren()) do if not c:IsA("UIListLayout") and not c:IsA("UIPadding") then c:Destroy() end end end
-function openAnim(f) if not f then return end; local us=f:FindFirstChild("SXEScale") or Instance.new("UIScale"); us.Name="SXEScale"; us.Parent=f
-    local tgt=f.Position; f.Visible=true; us.Scale=0.92; f.Position=UDim2.new(tgt.X.Scale,tgt.X.Offset,tgt.Y.Scale,tgt.Y.Offset+18); tw(us,{Scale=1},0.20); tw(f,{Position=tgt},0.20) end
-function closeAnim(f) if not f then return end; f.Visible = false end
+function openAnim(f)
+    if not f then return end
+    local us = f:FindFirstChild("SXEScale") or Instance.new("UIScale")
+    us.Name = "SXEScale"
+    us.Parent = f
+    local tgt = f.Position
+    local baseTrans = f.BackgroundTransparency
+    if baseTrans > 0.9 then baseTrans = 0.04 end
+    f.Visible = true
+    f.BackgroundTransparency = 1
+    us.Scale = 0.72
+    f.Position = UDim2.new(tgt.X.Scale, tgt.X.Offset, tgt.Y.Scale, tgt.Y.Offset + 48)
+    local ti = TweenInfo.new(0.42, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+    local ti2 = TweenInfo.new(0.38, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+    TweenService:Create(us, ti, {Scale = 1}):Play()
+    TweenService:Create(f, ti2, {Position = tgt, BackgroundTransparency = baseTrans}):Play()
+end
+function closeAnim(f)
+    if not f then return end
+    local us = f:FindFirstChild("SXEScale")
+    if not us then
+        f.Visible = false
+        return
+    end
+    local baseTrans = f.BackgroundTransparency
+    local ti = TweenInfo.new(0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
+    local tw1 = TweenService:Create(us, ti, {Scale = 0.78})
+    local tw2 = TweenService:Create(f, ti, {BackgroundTransparency = 1})
+    tw1:Play()
+    tw2:Play()
+    tw1.Completed:Connect(function()
+        f.Visible = false
+        us.Scale = 1
+        f.BackgroundTransparency = baseTrans
+    end)
+end
 makeDraggable = function(frame,handle,saveName) local dragging,dragStart,startPos=false,nil,nil
     handle.InputBegan:Connect(function(i) if UI.Locked then return end; if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dragging=true; dragStart=i.Position; startPos=frame.Position end end)
     UIS.InputEnded:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then if dragging and saveName then rememberPosition(saveName,frame) end; dragging=false end end)
@@ -8471,7 +8468,7 @@ function makeHeader(f,t,isMain)
         l.Font=Enum.Font.GothamBlack; l.TextSize=12; l.TextXAlignment=Enum.TextXAlignment.Center; l.Parent=h
         local s=Instance.new("TextLabel"); s.Size=UDim2.new(1,-58,0,13); s.Position=UDim2.new(0,12,0,22)
         s.BackgroundTransparency=1; s.Text=marca(parts[3] or ""); s.TextColor3=Theme.Dim
-        s.Font=Enum.Font.GothamMedium; s.TextSize=10; s.TextXAlignment=Enum.TextXAlignment.Center; s.Parent=h
+        s.Font=Enum.Font.GothamBold; s.TextSize=10; s.TextXAlignment=Enum.TextXAlignment.Center; s.Parent=h
     end
     makeDraggable(f,h,t)
     return h
@@ -8491,7 +8488,7 @@ function makeQuickPanel(t,size,pos) local f=Instance.new("Frame"); f.Size=size; 
 function makeSyncStateRow(parent,text,toggleName,callback,bindName)
     regToggle(toggleName,getToggle(toggleName))
     local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,34); row.BackgroundTransparency=1; row.Parent=parent
-    local label=Instance.new("TextLabel"); label.Size=UDim2.new(1,(bindName and -140 or -84),1,0); label.Position=UDim2.new(0,4,0,0); label.BackgroundTransparency=1; label.Text=text; label.TextColor3=Theme.Text; label.Font=Enum.Font.GothamSemibold; label.TextSize=12; label.TextXAlignment=Enum.TextXAlignment.Left; label.TextTruncate=Enum.TextTruncate.AtEnd; label.Parent=row
+    local label=Instance.new("TextLabel"); label.Size=UDim2.new(1,(bindName and -140 or -84),1,0); label.Position=UDim2.new(0,4,0,0); label.BackgroundTransparency=1; label.Text=text; label.TextColor3=Theme.Text; label.Font=Enum.Font.GothamBlack; label.TextSize=12; label.TextXAlignment=Enum.TextXAlignment.Left; label.TextTruncate=Enum.TextTruncate.AtEnd; label.Parent=row
     local btn=Instance.new("TextButton"); btn.Name="WhiteTextBtn"; btn.Size=UDim2.new(0,72,0,30); btn.Position=UDim2.new(1,-74,0.5,-15); btn.TextColor3=Color3.new(1,1,1); btn.Font=Enum.Font.GothamBlack; btn.TextSize=12; btn.AutoButtonColor=false; btn.Parent=row; corner(btn,6)
     local function refresh(val) btn.BackgroundColor3=val and Theme.Green or Theme.ToggleOff2; btn.Text=val and "ON" or "OFF" end
     refresh(getToggle(toggleName)); onToggleChanged(toggleName,function(val) refresh(val) end)
@@ -8514,7 +8511,7 @@ end
 function makeSyncMainToggle(parent,text,toggleName,callback,bindName)
     regToggle(toggleName,getToggle(toggleName))
     local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,31); row.BackgroundColor3=Theme.Panel; row.BackgroundTransparency=0.18; row.Parent=parent; corner(row,6)
-    local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,(bindName and -112 or -54),1,0); l.Position=UDim2.new(0,8,0,0); l.BackgroundTransparency=1; l.Text=text; l.TextColor3=Theme.Text; l.Font=Enum.Font.GothamMedium; l.TextSize=10; l.TextXAlignment=Enum.TextXAlignment.Left; l.TextTruncate=Enum.TextTruncate.AtEnd; l.Parent=row
+    local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,(bindName and -112 or -54),1,0); l.Position=UDim2.new(0,8,0,0); l.BackgroundTransparency=1; l.Text=text; l.TextColor3=Theme.Text; l.Font=Enum.Font.GothamBold; l.TextSize=10; l.TextXAlignment=Enum.TextXAlignment.Left; l.TextTruncate=Enum.TextTruncate.AtEnd; l.Parent=row
     if bindName then
         local kb=Instance.new("TextButton"); kb.Name="HeresyBind"; kb.Size=UDim2.new(0,56,0,21)
         kb.Position=UDim2.new(1,-104,0.5,-10.5); kb.BackgroundColor3=Theme.SoftButton
@@ -8542,7 +8539,7 @@ function makeQuickButton(parent,text,callback,bg) local b=Instance.new("TextButt
     b.MouseEnter:Connect(function() tw(b,{BackgroundColor3=bg or Theme.SoftButtonHover},0.12) end); b.MouseLeave:Connect(function() tw(b,{BackgroundColor3=bg or Theme.SoftButton},0.12) end)
     b.MouseButton1Click:Connect(function() if callback then callback() end end); return b end
 function makeQuickSlider(parent,text,min,max,default,callback,suffix) local holder=Instance.new("Frame"); holder.Size=UDim2.new(1,-4,0,50); holder.BackgroundTransparency=1; holder.Parent=parent
-    local label=Instance.new("TextLabel"); label.Size=UDim2.new(1,0,0,16); label.Position=UDim2.new(0,4,0,0); label.BackgroundTransparency=1; label.Text=text..": "..tostring(default)..(suffix or ""); label.TextColor3=Theme.Text; label.Font=Enum.Font.GothamMedium; label.TextSize=10; label.TextXAlignment=Enum.TextXAlignment.Left; label.Parent=holder
+    local label=Instance.new("TextLabel"); label.Size=UDim2.new(1,0,0,16); label.Position=UDim2.new(0,4,0,0); label.BackgroundTransparency=1; label.Text=text..": "..tostring(default)..(suffix or ""); label.TextColor3=Theme.Text; label.Font=Enum.Font.GothamBold; label.TextSize=10; label.TextXAlignment=Enum.TextXAlignment.Left; label.Parent=holder
     local bar=Instance.new("Frame"); bar.Size=UDim2.new(1,-10,0,6); bar.Position=UDim2.new(0,4,0,26); bar.BackgroundColor3=Theme.SliderBg; bar.BorderSizePixel=0; bar.Parent=holder; corner(bar,10)
     local fill=Instance.new("Frame"); fill.Size=UDim2.new(math.clamp((default-min)/(max-min),0,1),0,1,0); fill.BackgroundColor3=Theme.Accent; fill.BorderSizePixel=0; fill.Parent=bar; corner(fill,10)
     local knob=Instance.new("Frame"); knob.Size=UDim2.new(0,14,0,14); knob.AnchorPoint=Vector2.new(0.5,0.5); knob.Position=UDim2.new(math.clamp((default-min)/(max-min),0,1),0,0.5,0); knob.Name = "WhiteSliderKnob"; knob.BackgroundColor3=Color3.fromRGB(255, 255, 255); knob.BorderSizePixel=0; knob.Parent=bar; corner(knob,20)
@@ -8575,7 +8572,7 @@ function makeMainSliderWithInput(parent,text,min,max,default,callback,suffix)
     label.BackgroundTransparency = 1
     label.Text = text
     label.TextColor3 = Theme.Text
-    label.Font = Enum.Font.GothamMedium
+    label.Font = Enum.Font.GothamBold
     label.TextSize = 10
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.Parent = row
@@ -8660,7 +8657,7 @@ function makeMainButton(parent,text,callback,color) local b=Instance.new("TextBu
     b.MouseButton1Click:Connect(function() if callback then callback() end end); return b end
 function makeMainToggle(parent,text,enabled,callback)
     local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,31); row.BackgroundColor3=Theme.Panel; row.BackgroundTransparency=0.18; row.Parent=parent; corner(row,6)
-    local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,-54,1,0); l.Position=UDim2.new(0,8,0,0); l.BackgroundTransparency=1; l.Text=text; l.TextColor3=Theme.Text; l.Font=Enum.Font.GothamMedium; l.TextSize=10; l.TextXAlignment=Enum.TextXAlignment.Left; l.TextTruncate=Enum.TextTruncate.AtEnd; l.Parent=row
+    local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,-54,1,0); l.Position=UDim2.new(0,8,0,0); l.BackgroundTransparency=1; l.Text=text; l.TextColor3=Theme.Text; l.Font=Enum.Font.GothamBold; l.TextSize=10; l.TextXAlignment=Enum.TextXAlignment.Left; l.TextTruncate=Enum.TextTruncate.AtEnd; l.Parent=row
     local toggle=Instance.new("TextButton"); toggle.Size=UDim2.new(0,38,0,21); toggle.Position=UDim2.new(1,-44,0.5,-10.5); toggle.BackgroundColor3=enabled and Theme.Green or Theme.ToggleOff; toggle.Text=""; toggle.AutoButtonColor=false; toggle.Parent=row; corner(toggle,20)
     local dot=Instance.new("Frame"); dot.Size=UDim2.new(0,16,0,16); dot.Position=enabled and UDim2.new(1,-19,0.5,-8) or UDim2.new(0,3,0.5,-8); dot.BackgroundColor3=Theme.InputBg; dot.Parent=toggle; corner(dot,20)
     local state=enabled
@@ -8670,8 +8667,8 @@ function makeMainToggle(parent,text,enabled,callback)
 end
 function makeMainTextBox(parent,text,default,placeholder,callback)
     local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,31); row.BackgroundColor3=Theme.Panel; row.BackgroundTransparency=0.18; row.Parent=parent; corner(row,6)
-    local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,-100,1,0); l.Position=UDim2.new(0,8,0,0); l.BackgroundTransparency=1; l.Text=text; l.TextColor3=Theme.Text; l.Font=Enum.Font.GothamMedium; l.TextSize=10; l.TextXAlignment=Enum.TextXAlignment.Left; l.TextTruncate=Enum.TextTruncate.AtEnd; l.Parent=row
-    local box=Instance.new("TextBox"); box.Size=UDim2.new(0,80,0,21); box.Position=UDim2.new(1,-88,0.5,-10.5); box.BackgroundColor3=Theme.InputBg; box.BorderSizePixel=0; box.Text=default or ""; box.PlaceholderText=placeholder or ""; box.TextColor3=Theme.Text; box.Font=Enum.Font.GothamMedium; box.TextSize=10; box.ClearTextOnFocus=false; box.Parent=row; corner(box,4)
+    local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,-100,1,0); l.Position=UDim2.new(0,8,0,0); l.BackgroundTransparency=1; l.Text=text; l.TextColor3=Theme.Text; l.Font=Enum.Font.GothamBold; l.TextSize=10; l.TextXAlignment=Enum.TextXAlignment.Left; l.TextTruncate=Enum.TextTruncate.AtEnd; l.Parent=row
+    local box=Instance.new("TextBox"); box.Size=UDim2.new(0,80,0,21); box.Position=UDim2.new(1,-88,0.5,-10.5); box.BackgroundColor3=Theme.InputBg; box.BorderSizePixel=0; box.Text=default or ""; box.PlaceholderText=placeholder or ""; box.TextColor3=Theme.Text; box.Font=Enum.Font.GothamBlack; box.TextSize=10; box.ClearTextOnFocus=false; box.Parent=row; corner(box,4)
     box.FocusLost:Connect(function()
         local raw = box.Text:gsub("%s", "")
         if callback then callback(raw) end
@@ -8680,9 +8677,9 @@ function makeMainTextBox(parent,text,default,placeholder,callback)
 end
 function makeKeybindRow(parent,nameText)
     local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,31); row.BackgroundColor3=Theme.Panel; row.BackgroundTransparency=0.18; row.Parent=parent; corner(row,6)
-    local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,-88,1,0); l.Position=UDim2.new(0,8,0,0); l.BackgroundTransparency=1; l.Text=nameText; l.TextColor3=Theme.Text; l.Font=Enum.Font.GothamSemibold; l.TextSize=10; l.TextXAlignment=Enum.TextXAlignment.Left; l.Parent=row
-    local x=Instance.new("TextButton"); x.Name="WhiteTextBtn"; x.Size=UDim2.new(0,22,0,20); x.Position=UDim2.new(1,-74,0.5,-10); x.BackgroundColor3=Theme.Red; x.Text="X"; x.TextColor3=Color3.new(1,1,1); x.Font=Enum.Font.GothamBold; x.TextSize=10; x.Parent=row; corner(x,5)
-    local key=Instance.new("TextButton"); key.Name="WhiteTextBtn"; key.Size=UDim2.new(0,50,0,20); key.Position=UDim2.new(1,-50,0.5,-10); key.BackgroundColor3=Theme.Accent; key.Text=Keybinds[nameText] or "NONE"; key.TextColor3=Color3.new(1,1,1); key.Font=Enum.Font.GothamBold; key.TextSize=9; key.Parent=row; corner(key,5)
+    local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,-88,1,0); l.Position=UDim2.new(0,8,0,0); l.BackgroundTransparency=1; l.Text=nameText; l.TextColor3=Theme.Text; l.Font=Enum.Font.GothamBlack; l.TextSize=10; l.TextXAlignment=Enum.TextXAlignment.Left; l.Parent=row
+    local x=Instance.new("TextButton"); x.Name="WhiteTextBtn"; x.Size=UDim2.new(0,22,0,20); x.Position=UDim2.new(1,-74,0.5,-10); x.BackgroundColor3=Theme.Red; x.Text="X"; x.TextColor3=Color3.new(1,1,1); x.Font=Enum.Font.GothamBlack; x.TextSize=10; x.Parent=row; corner(x,5)
+    local key=Instance.new("TextButton"); key.Name="WhiteTextBtn"; key.Size=UDim2.new(0,50,0,20); key.Position=UDim2.new(1,-50,0.5,-10); key.BackgroundColor3=Theme.Accent; key.Text=Keybinds[nameText] or "NONE"; key.TextColor3=Color3.new(1,1,1); key.Font=Enum.Font.GothamBlack; key.TextSize=9; key.Parent=row; corner(key,5)
     x.MouseButton1Click:Connect(function() Keybinds[nameText]="NONE"; Config.keybinds[nameText]="NONE"; saveConfig(); key.Text="NONE"; if updateMovementPanelLabels then updateMovementPanelLabels() end end)
     key.MouseButton1Click:Connect(function() key.Text="..."
         local con; con=UIS.InputBegan:Connect(function(input,gp) if gp then return end; if input.UserInputType==Enum.UserInputType.Keyboard then Keybinds[nameText]=input.KeyCode.Name; Config.keybinds[nameText]=input.KeyCode.Name; saveConfig(); key.Text=input.KeyCode.Name; if nameText=="Open Menu" then UI.OpenMenuKey=input.KeyCode end; con:Disconnect(); if updateMovementPanelLabels then updateMovementPanelLabels() end end end)
@@ -8771,7 +8768,7 @@ function rebuildActionSettings()
     clearBody(actionSettingsBody)
     for actionName,enabled in pairs(actionConfig) do
         local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,34); row.BackgroundTransparency=1; row.Parent=actionSettingsBody
-        local label=Instance.new("TextLabel"); label.Size=UDim2.new(1,-84,1,0); label.Position=UDim2.new(0,4,0,0); label.BackgroundTransparency=1; label.Text=actionName; label.TextColor3=Theme.Text; label.Font=Enum.Font.GothamSemibold; label.TextSize=11; label.TextXAlignment=Enum.TextXAlignment.Left; label.TextTruncate=Enum.TextTruncate.AtEnd; label.Parent=row
+        local label=Instance.new("TextLabel"); label.Size=UDim2.new(1,-84,1,0); label.Position=UDim2.new(0,4,0,0); label.BackgroundTransparency=1; label.Text=actionName; label.TextColor3=Theme.Text; label.Font=Enum.Font.GothamBlack; label.TextSize=11; label.TextXAlignment=Enum.TextXAlignment.Left; label.TextTruncate=Enum.TextTruncate.AtEnd; label.Parent=row
         local btn=Instance.new("TextButton"); btn.Name="WhiteTextBtn"; btn.Size=UDim2.new(0,72,0,30); btn.Position=UDim2.new(1,-74,0.5,-15); btn.BackgroundColor3=enabled and Theme.Green or Theme.ToggleOff2; btn.Text=enabled and "ON" or "OFF"; btn.TextColor3=Color3.new(1,1,1); btn.Font=Enum.Font.GothamBlack; btn.TextSize=12; btn.AutoButtonColor=false; btn.Parent=row; corner(btn,6)
         btn.MouseButton1Click:Connect(function()
             actionConfig[actionName]=not actionConfig[actionName]; Config.actions[actionName]=actionConfig[actionName]; saveConfig()
@@ -8785,8 +8782,8 @@ function rebuildTpSpeedSettings()
     clearBody(tpSpeedSettingsBody)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Fly TP Speed", 50, 300, Config.TpSettings.FlyTPSpeed or 160, function(v) Config.TpSettings.FlyTPSpeed=v; saveConfig() end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "100 Studs Base Speed", 20, 250, Config.TpSettings.FlyTPCloseSpeed or 75, function(v) Config.TpSettings.FlyTPCloseSpeed=v; saveConfig() end)
-    makeMainSliderWithInput(tpSpeedSettingsBody, "Grabble TP Speed", 50, 600, Config.TpSettings.GrabbleTPSpeed or 230, function(v) Config.TpSettings.GrabbleTPSpeed=v; saveConfig(); if _G.SXESetCarpetSpeed then pcall(_G.SXESetCarpetSpeed, v) end end)
-    makeMainSliderWithInput(tpSpeedSettingsBody, "Walk To Brainrot Speed", 50, 1000, Config.TpSettings.WalkTPSpeed or 190, function(v) Config.TpSettings.WalkTPSpeed=v; saveConfig() end)
+    makeMainSliderWithInput(tpSpeedSettingsBody, "Grabble TP Speed", 50, 600, Config.TpSettings.GrabbleTPSpeed or 480, function(v) Config.TpSettings.GrabbleTPSpeed=v; saveConfig(); if _G.SXESetCarpetSpeed then pcall(_G.SXESetCarpetSpeed, v) end end)
+    makeMainSliderWithInput(tpSpeedSettingsBody, "Walk To Brainrot Speed", 50, 1000, Config.TpSettings.WalkTPSpeed or 260, function(v) Config.TpSettings.WalkTPSpeed=v; saveConfig() end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Clone Delay", 0.05, 2.0, Config.TpSettings.CloneDelayVal or 0.1, function(v) Config.TpSettings.CloneDelayVal=v; saveConfig() end, "s")
     makeQuickButton(tpSpeedSettingsBody, "Close", function() closeAnim(tpSpeedSettingsPanel) end, Theme.SoftAccentHover)
 end
@@ -8965,7 +8962,7 @@ function refreshTargetPanel()
         l.BackgroundTransparency = 1
         l.Text = "Scanning..."
         l.TextColor3 = Theme.Dim
-        l.Font = Enum.Font.GothamSemibold
+        l.Font = Enum.Font.GothamBlack
         l.TextSize = 11
         l.TextXAlignment = Enum.TextXAlignment.Center
         l.Parent = panels["TargetBody"]
@@ -9036,7 +9033,7 @@ function refreshTargetPanel()
         nm.BackgroundTransparency = 1
         nm.Text = pet.petName or "?"
         nm.TextColor3 = isPriority and Color3.new(1,1,1) or Theme.Text
-        nm.Font = isPriority and Enum.Font.GothamBold or Enum.Font.GothamSemibold
+        nm.Font = isPriority and Enum.Font.GothamBold or Enum.Font.GothamBlack
         nm.TextSize = 13
         nm.TextXAlignment = Enum.TextXAlignment.Left
         nm.TextTruncate = Enum.TextTruncate.AtEnd
@@ -9049,7 +9046,7 @@ function refreshTargetPanel()
         local ownerText = pet.owner and (' <font color="#999999">| @' .. tostring(pet.owner) .. '</font>') or ""
         gn.Text = '<font color="#38D66E">Gem: ' .. (pet.mpsText or "") .. '</font>' .. ownerText
         gn.TextColor3 = Color3.new(1,1,1)
-        gn.Font = Enum.Font.GothamMedium
+        gn.Font = Enum.Font.GothamBold
         gn.TextSize = 11
         gn.TextXAlignment = Enum.TextXAlignment.Left
         gn.TextTruncate = Enum.TextTruncate.AtEnd
@@ -9158,7 +9155,7 @@ LazyInit("Admin Panel UI", function()
         elseif _G.SXEIsGoodBoy and _G.SXEIsGoodBoy(plr) then
             nameLabel.Text = plr.DisplayName .. '  <font color="#5aff8c">[PROTECTED]</font>'
         end
-        local userL=Instance.new("TextLabel"); userL.BackgroundTransparency=1; userL.Position=UDim2.fromOffset(8,23); userL.Size=UDim2.new(1,txtW,0,16); userL.TextXAlignment=Enum.TextXAlignment.Left; userL.Text="@"..plr.Name; userL.Font=Enum.Font.GothamMedium; userL.TextSize=10; userL.TextColor3=Theme.Dim; userL.ZIndex=10; userL.Parent=row
+        local userL=Instance.new("TextLabel"); userL.BackgroundTransparency=1; userL.Position=UDim2.fromOffset(8,23); userL.Size=UDim2.new(1,txtW,0,16); userL.TextXAlignment=Enum.TextXAlignment.Left; userL.Text="@"..plr.Name; userL.Font=Enum.Font.GothamBold; userL.TextSize=10; userL.TextColor3=Theme.Dim; userL.ZIndex=10; userL.Parent=row
         local statusL=Instance.new("TextLabel"); statusL.BackgroundTransparency=1; statusL.Position=UDim2.fromOffset(8,37); statusL.Size=UDim2.new(1,txtW,0,14); statusL.TextXAlignment=Enum.TextXAlignment.Left; statusL.Text=""; statusL.Font=Enum.Font.GothamBold; statusL.TextSize=11; statusL.TextColor3=Theme.AccentLight; statusL.ZIndex=10; statusL.Parent=row
         stealLabels[plr.UserId]=statusL
         local actions=Instance.new("Frame"); actions.BackgroundTransparency=1; actions.AnchorPoint=Vector2.new(1,0.5); actions.Position=UDim2.new(1,-8,0.5,0); actions.Size=UDim2.fromOffset(actW+10,38); actions.ZIndex=12; actions.Parent=row
@@ -9302,7 +9299,7 @@ LazyInit("Admin Panel UI", function()
 end)
 tabBar=Instance.new("Frame"); tabBar.Size=UDim2.new(1,-12,0,28); tabBar.Position=UDim2.new(0,6,0,43); tabBar.BackgroundTransparency=1; tabBar.Parent=main
 local tabs={"Keybinds","Auto TP","ESP","UI","Misc","Priority","Performance"}
-for i,name in ipairs(tabs) do local b=Instance.new("TextButton"); b.Size=UDim2.new(0,49,0,27); b.Position=UDim2.new(0,(i-1)*51,0,0); b.BackgroundColor3=Theme.SoftAccent; b.BackgroundTransparency=0.05; b.Text=name; b.TextColor3=Theme.Dim; b.Font=Enum.Font.GothamMedium; b.TextSize=8; b.AutoButtonColor=false; b.Parent=tabBar; corner(b,5); tabButtons[name]=b end
+for i,name in ipairs(tabs) do local b=Instance.new("TextButton"); b.Size=UDim2.new(0,49,0,27); b.Position=UDim2.new(0,(i-1)*51,0,0); b.BackgroundColor3=Theme.SoftAccent; b.BackgroundTransparency=0.05; b.Text=name; b.TextColor3=Theme.Dim; b.Font=Enum.Font.GothamBold; b.TextSize=8; b.AutoButtonColor=false; b.Parent=tabBar; corner(b,5); tabButtons[name]=b end
 local _allAnimalNames = nil
 local function getAllAnimalNames()
     if _allAnimalNames and #_allAnimalNames > 0 then return _allAnimalNames end
@@ -9336,7 +9333,7 @@ end
 function makePriorityRow(index)
     local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,31); row.BackgroundColor3=Theme.Panel; row.BackgroundTransparency=0.18; row.Parent=mainBody; corner(row,6); row.LayoutOrder=index
     local num=Instance.new("TextLabel"); num.Size=UDim2.new(0,24,1,0); num.Position=UDim2.new(0,4,0,0); num.BackgroundTransparency=1; num.Text=tostring(index).."."; num.TextColor3=Theme.Dim; num.Font=Enum.Font.GothamBold; num.TextSize=10; num.TextXAlignment=Enum.TextXAlignment.Left; num.Parent=row
-    local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,-120,1,0); l.Position=UDim2.new(0,28,0,0); l.BackgroundTransparency=1; l.Text=priorityList[index]; l.TextColor3=Theme.Text; l.Font=Enum.Font.GothamMedium; l.TextSize=10; l.TextXAlignment=Enum.TextXAlignment.Left; l.TextTruncate=Enum.TextTruncate.AtEnd; l.Parent=row
+    local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,-120,1,0); l.Position=UDim2.new(0,28,0,0); l.BackgroundTransparency=1; l.Text=priorityList[index]; l.TextColor3=Theme.Text; l.Font=Enum.Font.GothamBold; l.TextSize=10; l.TextXAlignment=Enum.TextXAlignment.Left; l.TextTruncate=Enum.TextTruncate.AtEnd; l.Parent=row
     local up=Instance.new("TextButton"); up.Name="WhiteTextBtn"; up.Size=UDim2.new(0,26,0,22); up.Position=UDim2.new(1,-86,0.5,-11); up.BackgroundColor3=Theme.Accent; up.Text="▲"; up.TextColor3=Color3.new(1,1,1); up.Font=Enum.Font.GothamBold; up.TextSize=10; up.Parent=row; corner(up,5)
     local dn=Instance.new("TextButton"); dn.Name="WhiteTextBtn"; dn.Size=UDim2.new(0,26,0,22); dn.Position=UDim2.new(1,-56,0.5,-11); dn.BackgroundColor3=Theme.Accent; dn.Text="▼"; dn.TextColor3=Color3.new(1,1,1); dn.Font=Enum.Font.GothamBold; dn.TextSize=10; dn.Parent=row; corner(dn,5)
     local del=Instance.new("TextButton"); del.Name="WhiteTextBtn"; del.Size=UDim2.new(0,26,0,22); del.Position=UDim2.new(1,-26,0.5,-11); del.BackgroundColor3=Theme.Red; del.Text="X"; del.TextColor3=Color3.new(1,1,1); del.Font=Enum.Font.GothamBold; del.TextSize=10; del.Parent=row; corner(del,5)
@@ -9390,7 +9387,7 @@ function makePriorityRow(index)
 end
 function makePriorityAddRow()
     local holder = Instance.new("Frame"); holder.Size=UDim2.new(1,-4,0,31); holder.BackgroundColor3=Theme.SoftAccent; holder.BackgroundTransparency=0.1; holder.ClipsDescendants=false; holder.Parent=mainBody; holder.ZIndex=20; corner(holder,6); holder.LayoutOrder = -2
-    local box=Instance.new("TextBox"); box.Size=UDim2.new(1,-60,1,-6); box.Position=UDim2.new(0,6,0,3); box.BackgroundColor3=Theme.InputBg; box.BorderSizePixel=0; box.Text=""; box.PlaceholderText="Enter pet name..."; box.TextColor3=Theme.Text; box.PlaceholderColor3=Theme.Dim; box.Font=Enum.Font.GothamMedium; box.TextSize=10; box.ClearTextOnFocus=false; box.Parent=holder; box.ZIndex=21; corner(box,4)
+    local box=Instance.new("TextBox"); box.Size=UDim2.new(1,-60,1,-6); box.Position=UDim2.new(0,6,0,3); box.BackgroundColor3=Theme.InputBg; box.BorderSizePixel=0; box.Text=""; box.PlaceholderText="Enter pet name..."; box.TextColor3=Theme.Text; box.PlaceholderColor3=Theme.Dim; box.Font=Enum.Font.GothamBlack; box.TextSize=10; box.ClearTextOnFocus=false; box.Parent=holder; box.ZIndex=21; corner(box,4)
     local addBtn=Instance.new("TextButton"); addBtn.Name="WhiteTextBtn"; addBtn.Size=UDim2.new(0,44,0,25); addBtn.Position=UDim2.new(1,-50,0.5,-12.5); addBtn.BackgroundColor3=Theme.Accent; addBtn.Text="ADD"; addBtn.TextColor3=Color3.new(1,1,1); addBtn.Font=Enum.Font.GothamBlack; addBtn.TextSize=10; addBtn.AutoButtonColor=false; addBtn.Parent=holder; addBtn.ZIndex=21; corner(addBtn,5)
     local dropdown = Instance.new("Frame"); dropdown.Name="PriorityDropdown"; dropdown.Size=UDim2.new(1,-60,0,0); dropdown.Position=UDim2.new(0,6,1,2)
     dropdown.BackgroundColor3=Theme.Background; dropdown.BorderSizePixel=0; dropdown.ClipsDescendants=true; dropdown.Visible=false; dropdown.ZIndex=50; dropdown.Parent=holder; corner(dropdown,6)
@@ -9432,7 +9429,7 @@ function makePriorityAddRow()
         dropdown.Size = UDim2.new(1,-60,0,math.min(#matches,6)*itemH)
         dropdown.Visible = true
         for _, name in ipairs(matches) do
-            local btn = Instance.new("TextButton"); btn.Size=UDim2.new(1,0,0,itemH); btn.BackgroundColor3=Theme.Row; btn.BackgroundTransparency=0.1; btn.Text=name; btn.TextColor3=Theme.Text; btn.Font=Enum.Font.GothamMedium; btn.TextSize=10; btn.AutoButtonColor=false; btn.ZIndex=52; btn.Parent=ddScroll
+            local btn = Instance.new("TextButton"); btn.Size=UDim2.new(1,0,0,itemH); btn.BackgroundColor3=Theme.Row; btn.BackgroundTransparency=0.1; btn.Text=name; btn.TextColor3=Theme.Text; btn.Font=Enum.Font.GothamBold; btn.TextSize=10; btn.AutoButtonColor=false; btn.ZIndex=52; btn.Parent=ddScroll
             btn.MouseEnter:Connect(function() btn.BackgroundColor3=Theme.RowHover end)
             btn.MouseLeave:Connect(function() btn.BackgroundColor3=Theme.Row end)
             btn.MouseButton1Click:Connect(function() addName(name) end)
@@ -9446,7 +9443,7 @@ end
 function makePriorityRestoreRow()
     if not Config.RemovedFromPriority or #Config.RemovedFromPriority == 0 then return end
     local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,31); row.BackgroundColor3=Theme.SoftAccent; row.BackgroundTransparency=0.1; row.Parent=mainBody; corner(row,6); row.LayoutOrder = -1
-    local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,-96,1,0); l.Position=UDim2.new(0,8,0,0); l.BackgroundTransparency=1; l.Text=tostring(#Config.RemovedFromPriority).." ignored pet(s) available"; l.TextColor3=Theme.Dim; l.Font=Enum.Font.GothamMedium; l.TextSize=10; l.TextXAlignment=Enum.TextXAlignment.Left; l.Parent=row
+    local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,-96,1,0); l.Position=UDim2.new(0,8,0,0); l.BackgroundTransparency=1; l.Text=tostring(#Config.RemovedFromPriority).." ignored pet(s) available"; l.TextColor3=Theme.Dim; l.Font=Enum.Font.GothamBold; l.TextSize=10; l.TextXAlignment=Enum.TextXAlignment.Left; l.Parent=row
     local restBtn=Instance.new("TextButton"); restBtn.Name="WhiteTextBtn"; restBtn.Size=UDim2.new(0,74,0,25); restBtn.Position=UDim2.new(1,-80,0.5,-12.5); restBtn.BackgroundColor3=Theme.Green; restBtn.Text="RESTORE"; restBtn.TextColor3=Color3.new(1,1,1); restBtn.Font=Enum.Font.GothamBlack; restBtn.TextSize=10; restBtn.AutoButtonColor=false; restBtn.Parent=row; corner(restBtn,5)
     restBtn.MouseButton1Click:Connect(function()
         for _, name in ipairs(Config.RemovedFromPriority) do
@@ -9567,7 +9564,7 @@ function loadTab(tabName)
         shareBox.Text = ""
         shareBox.PlaceholderText = "Paste config here to import, or click Export..."
         shareBox.TextColor3 = Theme.Text
-        shareBox.Font = Enum.Font.GothamMedium
+        shareBox.Font = Enum.Font.GothamBold
         shareBox.TextSize = 9
         shareBox.ClearTextOnFocus = false
         shareBox.Parent = shareRow
@@ -9625,9 +9622,9 @@ function loadTab(tabName)
         local lockBtn; lockBtn=makeMainButton(mainBody,UI.Locked and "Locked" or "Unlocked",function() UI.Locked=not UI.Locked; Config.locked=UI.Locked; saveConfig(); lockBtn.Text=UI.Locked and "Locked" or "Unlocked" end,Theme.SoftButton)
     elseif tabName=="Misc" then
         if _G.HeresyExtras then
-            makeSyncMainToggle(mainBody,"Anti Colisao (atravessar players)","Anti Colisao",function(on) _G.HeresyExtras.setAntiColisao(on) end)
-            makeSyncMainToggle(mainBody,"Anti Flasher (remove acessorios)","Anti Flasher",function(on) _G.HeresyExtras.setAntiFlasher(on) end)
-            makeSyncMainToggle(mainBody,"Ps On Steal","Ps On Steal",function(on) _G.HeresyExtras.setPs(on) end)
+            makeSyncMainToggle(mainBody,"Anti Collision (pass through players)","Anti Colisao",function(on) _G.HeresyExtras.setAntiColisao(on) end)
+            makeSyncMainToggle(mainBody,"Anti Flasher (remove accessories)","Anti Flasher",function(on) _G.HeresyExtras.setAntiFlasher(on) end)
+            makeSyncMainToggle(mainBody,"PS On Steal","PS On Steal",function(on) _G.HeresyExtras.setPs(on) end)
         end
         makeMainToggle(mainBody,"Instant Clone",true)
         makeMainToggle(mainBody,"Auto Invisible During Steal",Config.AutoInvisDuringSteal,function(on) _G.AutoInvisDuringSteal=on; Config.AutoInvisDuringSteal=on; saveConfig() end)
@@ -9761,7 +9758,7 @@ function loadTab(tabName)
                 lbl.BackgroundTransparency = 1
                 lbl.Text = emoji .. " " .. cmd
                 lbl.TextColor3 = Theme.Text
-                lbl.Font = Enum.Font.GothamMedium
+                lbl.Font = Enum.Font.GothamBold
                 lbl.TextSize = 11
                 lbl.TextXAlignment = Enum.TextXAlignment.Left
                 lbl.ZIndex = 103
@@ -10262,7 +10259,7 @@ do
         end
     end
     _G.SXEFireGrapple = fireGrapple
-    local SXESpeed = { CARPET = 400, INBASE = 250 }
+    local SXESpeed = { CARPET = 480, INBASE = 340 }
     _G.SXESetCarpetSpeed = function(v) v = tonumber(v); if v and v > 0 then SXESpeed.CARPET = v end end
     _G.SXESetInbaseSpeed = function(v) v = tonumber(v); if v and v > 0 then SXESpeed.INBASE = v end end
     _G.SXEGetCarpetSpeed = function() return SXESpeed.CARPET end
@@ -10751,8 +10748,8 @@ local function carpetEngage()
         for _, wp in ipairs(waypoints) do line(prev, wp); dot(wp); prev = wp end
     end
     local SPEED = 200
-    local ARRIVE = 3
-    local MAX_CLIMB = 60
+    local ARRIVE = 2.2
+    local MAX_CLIMB = 75
     local function vZero(hrp)
         if hrp then hrp.AssemblyLinearVelocity = Vector3.zero; hrp.AssemblyAngularVelocity = Vector3.zero end
     end
@@ -11000,7 +10997,7 @@ local function carpetEngage()
         if not hrp then return end
         pcall(function() hrp.Anchored = false end)
         pcall(equipCarpet)
-        local SPEED = (Config.TpSettings and (tonumber(Config.TpSettings.WalkTPSpeed) or tonumber(Config.TpSettings.GrabbleTPSpeed))) or 190
+        local SPEED = (Config.TpSettings and (tonumber(Config.TpSettings.WalkTPSpeed) or tonumber(Config.TpSettings.GrabbleTPSpeed))) or 260
         local FLOAT_OFFSET = (targetPos.Y > 20) and -4 or 0
         local goal = Vector3.new(targetPos.X, targetPos.Y + FLOAT_OFFSET, targetPos.Z)
         local t0 = os.clock()
@@ -11298,7 +11295,7 @@ local function carpetEngage()
         local now = os.clock()
         if AUTO_STEAL and _started and not LP:GetAttribute("Stealing")
             and not (isTeleporting and _cloneTP)
-            and (now - _autoLastScan) >= 0.1 then
+            and (now - _autoLastScan) >= 0.25 then
             _autoLastScan = now
             local char = LP.Character
             local hrp = char and char:FindFirstChild("HumanoidRootPart")
@@ -11353,7 +11350,7 @@ local function carpetEngage()
         if STEAL_MODE == "Nearest" and now - _stealArmedAt > STEAL_ARM_TIMEOUT then
             disarmSteal(); return
         end
-        if now - _stealLastScan < 0.067 then return end
+        if now - _stealLastScan < 0.12 then return end
         _stealLastScan = now
         local t = timeUntilCanSteal()
         if t == -1 then
@@ -11424,7 +11421,7 @@ local function carpetEngage()
             if #semEsteira == 0 then isTeleporting = false; return end
             pet = _pickByMode(semEsteira) or semEsteira[1]
         end
-        local _tpSpd = (Config and Config.TpSettings and Config.TpSettings.GrabbleTPSpeed) or 400
+        local _tpSpd = (Config and Config.TpSettings and Config.TpSettings.GrabbleTPSpeed) or 480
         local _cloneDelay = (Config and Config.TpSettings and Config.TpSettings.CloneDelayVal) or 0.35
         local petPos = pet.position
         local petName = pet.name
@@ -11846,7 +11843,7 @@ do
             if _G.HeresyExtras then _G.HeresyExtras.setPs(not Config.PsOnSteal) end
         end)
         pcall(function() applySavedPosition("HERESY Ps Button", psBtn) end)
-        pcall(function() onToggleChanged("Ps On Steal", pintarPs) end)
+        pcall(function() onToggleChanged("PS On Steal", pintarPs) end)
         pintarPs()
     end
     local fa = { roubando = false, travado = nil, autoRot = nil, conn = nil,
@@ -12027,7 +12024,7 @@ do
         s.BackgroundTransparency = 1
         s.Text = o.sub or ""
         s.TextColor3 = Theme.Dim
-        s.Font = Enum.Font.GothamMedium
+        s.Font = Enum.Font.GothamBold
         s.TextSize = 9
         s.TextXAlignment = Enum.TextXAlignment.Left
         s.TextTruncate = Enum.TextTruncate.AtEnd
@@ -12102,7 +12099,7 @@ do
         pNome.Size = UDim2.new(1, -70, 0, 18)
         pNome.Position = UDim2.new(0, 64, 0, 11)
         pNome.BackgroundTransparency = 1
-        pNome.Text = "sem alvo"
+        pNome.Text = "no target"
         pNome.TextColor3 = Theme.Text
         pNome.Font = Enum.Font.GothamBold
         pNome.TextSize = 12
@@ -12115,7 +12112,7 @@ do
         pModo.BackgroundTransparency = 1
         pModo.Text = "Base Owner"
         pModo.TextColor3 = Theme.Dim
-        pModo.Font = Enum.Font.GothamMedium
+        pModo.Font = Enum.Font.GothamBold
         pModo.TextSize = 10
         pModo.TextXAlignment = Enum.TextXAlignment.Left
         pModo.Parent = caixa
@@ -12125,7 +12122,7 @@ do
         pDist.BackgroundTransparency = 1
         pDist.Text = "--"
         pDist.TextColor3 = Theme.Dim
-        pDist.Font = Enum.Font.GothamMedium
+        pDist.Font = Enum.Font.GothamBold
         pDist.TextSize = 10
         pDist.TextXAlignment = Enum.TextXAlignment.Left
         pDist.Parent = caixa
@@ -12133,7 +12130,7 @@ do
         pBarra.Size = UDim2.new(1, -18, 0, 20)
         pBarra.Position = UDim2.new(0, 9, 0, 61)
         pBarra.BackgroundColor3 = Theme.ToggleOff
-        pBarra.Text = "AGUARDANDO"
+        pBarra.Text = "WAITING"
         pBarra.TextColor3 = Theme.Dim
         pBarra.Font = Enum.Font.GothamBlack
         pBarra.TextSize = 10
@@ -12173,19 +12170,19 @@ do
             end
             pDist.Text = tostring(d or 0) .. " studs"
             if fa.roubando then
-                pBarra.Text = "VIRANDO DE COSTAS"
+                pBarra.Text = "FACING AWAY"
                 pBarra.BackgroundColor3 = Theme.Green
                 pBarra.TextColor3 = Color3.new(1, 1, 1)
             else
-                pBarra.Text = "ARMADO  -  sem pet na mao"
+                pBarra.Text = "ARMED - no pet in hand"
                 pBarra.BackgroundColor3 = Theme.SoftAccent
                 pBarra.TextColor3 = Theme.Dim
             end
         else
-            pNome.Text = "sem alvo"
+            pNome.Text = "no target"
             pAvatar.Image = ""
             pDist.Text = "--"
-            pBarra.Text = "SEM ALVO"
+            pBarra.Text = "NO TARGET"
             pBarra.BackgroundColor3 = Theme.ToggleOff
             pBarra.TextColor3 = Theme.Dim
         end
@@ -12308,7 +12305,7 @@ do
         end,
         setPs = function(on)
             Config.PsOnSteal = on and true or false
-            setToggle("Ps On Steal", Config.PsOnSteal)
+            setToggle("PS On Steal", Config.PsOnSteal)
             if Config.PsOnSteal then psLoop() end
             pcall(saveConfig)
         end,
@@ -12322,13 +12319,12 @@ do
     pcall(function()
         regToggle("Face Away",    Config.FaceAway)
         regToggle("Face Nearest", Config.FaceAwayNearest)
-        regToggle("Ps On Steal",  Config.PsOnSteal)
+        regToggle("PS On Steal",  Config.PsOnSteal)
         regToggle("Anti Flasher", Config.AntiFlasher)
         regToggle("Anti Colisao", Config.AntiColisao)
     end)
     task.spawn(function()
         task.wait(2)
-        pcall(construirBotaoPs)
         if Config.FaceAway    then faceAwayLigar()    end
         if Config.PsOnSteal   then psLoop()           end
         if Config.AntiFlasher then antiFlasherLigar() end
