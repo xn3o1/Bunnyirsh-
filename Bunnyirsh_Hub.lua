@@ -23,11 +23,11 @@ if not _G.SXEFreeVerboso then
         "[BUNNYIRSH] the answer is 42, the question is pending",
     }
     local convites = {
-        ">> BUNNYIRSH Free  --  join discord.gg/DEqfKJHZte for updates",
+        ">> BUNNYIRSH  --  join discord.gg/DEqfKJHZte for updates",
         ">> get the full version at discord.gg/DEqfKJHZte",
         ">> stuck? support lives at discord.gg/DEqfKJHZte",
         ">> discord.gg/DEqfKJHZte  --  giveaways, updates, help",
-        ">> Bunnyirsh Hub Free  --  discord.gg/DEqfKJHZte",
+        ">> Bunnyirsh Hub  --  discord.gg/DEqfKJHZte",
         ">> tell your friends: discord.gg/DEqfKJHZte",
     }
     local n = 0
@@ -39,14 +39,14 @@ if not _G.SXEFreeVerboso then
         return frases[math.random(1, #frases)]
     end
     local real = print
-    print = function() real(troll()) end
+    print = real
     task.spawn(function()
         while true do
             task.wait(45)
             real(convites[math.random(1, #convites)])
         end
     end)
-    real(">> Bunnyirsh Hub  Free Edition  --  discord.gg/DEqfKJHZte")
+    real(">> Bunnyirsh Hub  Edition  --  discord.gg/DEqfKJHZte")
 end
 _G.SXEBuscaGui = function(nome)
     local alvo = (gethui and gethui()) or game:GetService("CoreGui")
@@ -109,9 +109,9 @@ local _xchan
 local _lastTry, _attempts = 0, 0
 local _deepScans, _lastDeep = 0, 0
 local _mod
-local MAX_ATTEMPTS, RETRY_GAP = 40, 0.5
+local MAX_ATTEMPTS, RETRY_GAP = 12, 1.0
 local BOOT_T0, BOOT_BURST, BOOT_GAP = os.clock(), 3.0, 0.10
-local MAX_DEEP, DEEP_GAP = 3, 1.5
+local MAX_DEEP, DEEP_GAP = 1, 3.0
 local function _retryGap()
     if (os.clock() - BOOT_T0) < BOOT_BURST then return BOOT_GAP end
     return RETRY_GAP
@@ -1154,22 +1154,7 @@ do
         ColorSequenceKeypoint.new(0.70, Color3.fromRGB(255,255,255)),
         ColorSequenceKeypoint.new(1.00, Color3.fromRGB(180,180,180)),
     }, 3.2)
-    local nFree = Instance.new("TextLabel")
-    nFree.AutomaticSize = Enum.AutomaticSize.X
-    nFree.Size = UDim2.new(0, 0, 0, 14)
-    nFree.LayoutOrder = 2
-    nFree.BackgroundTransparency = 1
-    nFree.Text = "Free"
-    nFree.Font = Enum.Font.GothamBlack
-    nFree.TextSize = 11
-    nFree.Parent = nome
-    _tituloGrad(nFree, {
-        ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255,255,255)),
-        ColorSequenceKeypoint.new(0.28, Color3.fromRGB(200,200,200)),
-        ColorSequenceKeypoint.new(0.50, Color3.fromRGB(150,150,150)),
-        ColorSequenceKeypoint.new(0.72, Color3.fromRGB(200,200,200)),
-        ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255,255,255)),
-    }, 4.0)
+
     local stats = Instance.new("TextLabel")
     stats.Size = UDim2.new(0.55, 0, 0, 12)
     stats.Position = UDim2.new(0, 5, 0, 22)
@@ -2526,136 +2511,122 @@ end)
 local RESET_POS  = Vector3.new(-300.5074157714844, -5.099719524383545, 113.69993591308594)
 local RESET_TOOL = "Flying Carpet"
 local _ultimoReset = 0
+local CAM_BIND = "InstaResetCam"
+local FLING_TIME = 0.4
+local FLING_POWER = 50000
+local USE_VOID = true
+local VOID_TIME = 0.6
+local TIMEOUT = 6
+local function hide_locally(obj)
+    if obj:IsA("BasePart") or obj:IsA("Decal") then
+        obj.LocalTransparencyModifier = 1
+    end
+end
 local function instantReset()
     if instaResetCooldown then return end
-    if tick() - _ultimoReset < 2 then return end
-    local lp   = LocalPlayer
-    local char = lp.Character
-    local root = char and char:FindFirstChild("HumanoidRootPart")
-    local hum  = char and char:FindFirstChildOfClass("Humanoid")
-    if not root or not hum then return end
+    if tick() - _ultimoReset < 1.2 then return end
+    local Player = LocalPlayer
+    local char = Player.Character
+    if not char or not char.Parent then return end
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hum or hum.Health <= 0 then return end
+    local hrp = hum.RootPart or char:FindFirstChild("HumanoidRootPart")
     _ultimoReset = tick()
     instaResetCooldown = true
-    local meuTurno = {}
-    _G.__resetDono = meuTurno
-    local mt, oldIdx, minhaClosure
-    local destravou = false
-    local comHook = pcall(function()
-        mt = getrawmetatable(game)
-        oldIdx = mt.__index
-        setreadonly(mt, false)
-        destravou = true
-        minhaClosure = newcclosure(function(s, k)
-            if k == "WalkSpeed" and instaResetCooldown then return 16 end
-            return oldIdx(s, k)
-        end)
-        mt.__index = minhaClosure
-        setreadonly(mt, true)
-    end)
-    if destravou and not comHook then
-        pcall(function() setreadonly(mt, true) end)
-    end
-    local function desfazerHook()
-        if not comHook or not mt then return end
-        comHook = false
-        pcall(function()
-            setreadonly(mt, false)
-            if mt.__index == minhaClosure then
-                mt.__index = oldIdx
-            end
-            setreadonly(mt, true)
-        end)
-    end
-    local function liberarTrava()
-        if _G.__resetDono ~= meuTurno then return end
-        instaResetCooldown = false
-    end
-    local conn
-    local t0 = tick()
-    conn = RunService.Heartbeat:Connect(function()
-        if tick() - t0 > 0.15
-        or not char.Parent
-        or hum.Health <= 0
-        or lp.Character ~= char then
-            conn:Disconnect()
-            return
-        end
-        pcall(function()
-            root:SetNetworkOwner(lp)
-            root.AssemblyLinearVelocity = Vector3.new(1e7, 1e7, 1e7)
-            hum.Health = 0
-        end)
-    end)
-    task.delay(12, function()
-        if conn then pcall(function() conn:Disconnect() end) end
-        desfazerHook()
-        liberarTrava()
-    end)
     task.spawn(function()
-        local novo
-        local t = tick()
-        repeat
-            novo = lp.Character
-            if novo and novo ~= char then break end
-            task.wait(0.05)
-        until tick() - t > 10
-        if not novo or novo == char then
-            desfazerHook()
-            liberarTrava()
-            return
+        local cam = workspace.CurrentCamera
+        local frozen = cam and cam.CFrame
+        local old_type = cam and cam.CameraType
+        pcall(function()
+            if cam then
+                cam.CameraType = Enum.CameraType.Scriptable
+                RunService:BindToRenderStep(CAM_BIND, Enum.RenderPriority.Camera.Value + 1, function()
+                    if cam then cam.CFrame = frozen end
+                end)
+            end
+        end)
+        local added
+        pcall(function()
+            for _, obj in ipairs(char:GetDescendants()) do pcall(hide_locally, obj) end
+            added = char.DescendantAdded:Connect(function(obj) pcall(hide_locally, obj) end)
+        end)
+        local new_char
+        local respawned = Player.CharacterAdded:Connect(function(c) new_char = c end)
+        local function unlock()
+            pcall(function() hum.PlatformStand = false end)
+            pcall(function() hum.Sit = false end)
+            pcall(function() hum.AutoRotate = true end)
         end
-        local nRoot = novo:WaitForChild("HumanoidRootPart", 5)
-        local nHum  = novo:WaitForChild("Humanoid", 5)
-        task.wait(0.3)
-        if nHum then
-            local bp = lp:FindFirstChildOfClass("Backpack")
-            local tool = bp and bp:WaitForChild(RESET_TOOL, 5)
-            if tool then
-                pcall(function() nHum:EquipTool(tool) end)
-                task.wait(0.05)
+        unlock()
+        for _, obj in ipairs(char:GetDescendants()) do
+            if obj:IsA("BasePart") then
+                pcall(function() obj.Anchored = false end)
+                pcall(function() obj.CanCollide = false end)
+            elseif obj.Name == "SeatWeld" then
+                pcall(function() obj:Destroy() end)
             end
         end
-        if nRoot then
-            pcall(function() nRoot.CFrame = CFrame.new(RESET_POS + Vector3.new(0, 1, 0)) end)
-            task.wait(0.05)
+        local started = os.clock()
+        local function alive_hrp()
+            if hrp and hrp.Parent then return hrp end
+            hrp = hum.RootPart or char:FindFirstChild("HumanoidRootPart")
+            if hrp and hrp.Parent then return hrp end
+            return nil
         end
-        if nHum then pcall(function() nHum.Jump = true end) end
-        desfazerHook()
-        liberarTrava()
+        local fling_until = os.clock() + FLING_TIME
+        while not new_char and os.clock() < fling_until and hum.Parent do
+            unlock()
+            pcall(function() hum.HipHeight = 1e30 end)
+            local root = alive_hrp()
+            if root then
+                pcall(function() root.Anchored = false end)
+                pcall(function() root.AssemblyLinearVelocity = Vector3.new(0, FLING_POWER, 0) end)
+                pcall(function() root.Velocity = Vector3.new(0, FLING_POWER, 0) end)
+            end
+            RunService.Heartbeat:Wait()
+        end
+        if USE_VOID and not new_char then
+            local floor = -500
+            pcall(function() floor = workspace.FallenPartsDestroyHeight end)
+            local void_until = os.clock() + VOID_TIME
+            while not new_char and os.clock() < void_until do
+                local root = alive_hrp()
+                if not root then break end
+                pcall(function() root.CFrame = CFrame.new(0, floor - 500, 0) end)
+                pcall(function() root.AssemblyLinearVelocity = Vector3.new(0, -FLING_POWER, 0) end)
+                RunService.Heartbeat:Wait()
+            end
+        end
+        while not new_char and os.clock() - started < TIMEOUT do
+            if hum.Parent then
+                pcall(function() hum.Health = 0 end)
+                pcall(function() hum:ChangeState(Enum.HumanoidStateType.Dead) end)
+            end
+            if char.Parent then pcall(function() char:BreakJoints() end) end
+            task.wait(0.1)
+        end
+        pcall(function() respawned:Disconnect() end)
+        if added then pcall(function() added:Disconnect() end) end
+        pcall(function() RunService:UnbindFromRenderStep(CAM_BIND) end)
+        pcall(function()
+            if cam then
+                cam.CameraType = (old_type == Enum.CameraType.Scriptable) and Enum.CameraType.Custom or (old_type or Enum.CameraType.Custom)
+                if new_char then
+                    local new_hum = new_char:FindFirstChildOfClass("Humanoid") or new_char:WaitForChild("Humanoid", 5)
+                    if new_hum then cam.CameraSubject = new_hum end
+                end
+            end
+        end)
+        instaResetCooldown = false
     end)
 end
+_G.InstantReset = instantReset
+local lastBalloonResetTime = 0
 local _sxeResetBindable = Instance.new("BindableEvent")
 _sxeResetBindable.Event:Connect(function() pcall(instantReset) end)
-task.spawn(function()
-    for _ = 1, 12 do
-        local ok = pcall(function()
-            game:GetService("StarterGui"):SetCore("ResetButtonCallback", _sxeResetBindable)
-        end)
-        if ok then break end
-        task.wait(1)
-    end
+pcall(function()
+    game:GetService("StarterGui"):SetCore("ResetButtonCallback", _sxeResetBindable)
 end)
-_G.InstantReset = instantReset
-local function updateHistory(pos)
-    local now = tick()
-    if now - lastHistoryUpdate < 0.05 then return end
-    lastHistoryUpdate = now
-    table.insert(positionHistory, {pos = pos, time = now})
-    while #positionHistory > 0 and now - positionHistory[1].time > Config.HistoryDuration do
-        table.remove(positionHistory, 1)
-    end
-end
-local function onHeartbeat(dt)
-    if resetting then return end
-    scanTimer = scanTimer + dt
-    if scanTimer >= Config.ScanInterval then
-        scanTimer = 0
-        scanForRemotes()
-    end
-end
-scanForRemotes()
-RunService.Heartbeat:Connect(onHeartbeat)
-local lastBalloonResetTime = 0
 executeReset = function(isBalloon)
     if isBalloon then
         if tick() - lastBalloonResetTime < 20 then return end
@@ -5695,11 +5666,11 @@ local function getPlotKey(plotName)
     return nil
 end
 local SPEED = 200
-local ARRIVE = 3
+local ARRIVE = 2.2
 local function vZero(hrp)
     if hrp then hrp.AssemblyLinearVelocity = Vector3.zero; hrp.AssemblyAngularVelocity = Vector3.zero end
 end
-local MAX_CLIMB = 60
+local MAX_CLIMB = 75
 local function velMoveThrough(hrp, waypoints, speedOverride, allowJump, quickStart)
     if not hrp or not hrp.Parent or #waypoints == 0 then return end
     local _runSpeed = speedOverride or Config.TpSettings.GrabbleTPSpeed or (_G.SXECarpetSpeed or CARPET_SPEED or 230)
@@ -8511,7 +8482,7 @@ function makeQuickPanel(t,size,pos) local f=Instance.new("Frame"); f.Size=size; 
 function makeSyncStateRow(parent,text,toggleName,callback,bindName)
     regToggle(toggleName,getToggle(toggleName))
     local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,34); row.BackgroundTransparency=1; row.Parent=parent
-    local label=Instance.new("TextLabel"); label.Size=UDim2.new(1,(bindName and -140 or -84),1,0); label.Position=UDim2.new(0,4,0,0); label.BackgroundTransparency=1; label.Text=text; label.TextColor3=Theme.Text; label.Font=Enum.Font.GothamSemibold; label.TextSize=12; label.TextXAlignment=Enum.TextXAlignment.Left; label.TextTruncate=Enum.TextTruncate.AtEnd; label.Parent=row
+    local label=Instance.new("TextLabel"); label.Size=UDim2.new(1,(bindName and -140 or -84),1,0); label.Position=UDim2.new(0,4,0,0); label.BackgroundTransparency=1; label.Text=text; label.TextColor3=Theme.Text; label.Font=Enum.Font.GothamBlack; label.TextSize=12; label.TextXAlignment=Enum.TextXAlignment.Left; label.TextTruncate=Enum.TextTruncate.AtEnd; label.Parent=row
     local btn=Instance.new("TextButton"); btn.Name="WhiteTextBtn"; btn.Size=UDim2.new(0,72,0,30); btn.Position=UDim2.new(1,-74,0.5,-15); btn.TextColor3=Color3.new(1,1,1); btn.Font=Enum.Font.GothamBlack; btn.TextSize=12; btn.AutoButtonColor=false; btn.Parent=row; corner(btn,6)
     local function refresh(val) btn.BackgroundColor3=val and Theme.Green or Theme.ToggleOff2; btn.Text=val and "ON" or "OFF" end
     refresh(getToggle(toggleName)); onToggleChanged(toggleName,function(val) refresh(val) end)
@@ -8691,7 +8662,7 @@ end
 function makeMainTextBox(parent,text,default,placeholder,callback)
     local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,31); row.BackgroundColor3=Theme.Panel; row.BackgroundTransparency=0.18; row.Parent=parent; corner(row,6)
     local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,-100,1,0); l.Position=UDim2.new(0,8,0,0); l.BackgroundTransparency=1; l.Text=text; l.TextColor3=Theme.Text; l.Font=Enum.Font.GothamBold; l.TextSize=10; l.TextXAlignment=Enum.TextXAlignment.Left; l.TextTruncate=Enum.TextTruncate.AtEnd; l.Parent=row
-    local box=Instance.new("TextBox"); box.Size=UDim2.new(0,80,0,21); box.Position=UDim2.new(1,-88,0.5,-10.5); box.BackgroundColor3=Theme.InputBg; box.BorderSizePixel=0; box.Text=default or ""; box.PlaceholderText=placeholder or ""; box.TextColor3=Theme.Text; box.Font=Enum.Font.GothamBold; box.TextSize=10; box.ClearTextOnFocus=false; box.Parent=row; corner(box,4)
+    local box=Instance.new("TextBox"); box.Size=UDim2.new(0,80,0,21); box.Position=UDim2.new(1,-88,0.5,-10.5); box.BackgroundColor3=Theme.InputBg; box.BorderSizePixel=0; box.Text=default or ""; box.PlaceholderText=placeholder or ""; box.TextColor3=Theme.Text; box.Font=Enum.Font.GothamBlack; box.TextSize=10; box.ClearTextOnFocus=false; box.Parent=row; corner(box,4)
     box.FocusLost:Connect(function()
         local raw = box.Text:gsub("%s", "")
         if callback then callback(raw) end
@@ -8700,9 +8671,9 @@ function makeMainTextBox(parent,text,default,placeholder,callback)
 end
 function makeKeybindRow(parent,nameText)
     local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,31); row.BackgroundColor3=Theme.Panel; row.BackgroundTransparency=0.18; row.Parent=parent; corner(row,6)
-    local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,-88,1,0); l.Position=UDim2.new(0,8,0,0); l.BackgroundTransparency=1; l.Text=nameText; l.TextColor3=Theme.Text; l.Font=Enum.Font.GothamSemibold; l.TextSize=10; l.TextXAlignment=Enum.TextXAlignment.Left; l.Parent=row
-    local x=Instance.new("TextButton"); x.Name="WhiteTextBtn"; x.Size=UDim2.new(0,22,0,20); x.Position=UDim2.new(1,-74,0.5,-10); x.BackgroundColor3=Theme.Red; x.Text="X"; x.TextColor3=Color3.new(1,1,1); x.Font=Enum.Font.GothamBold; x.TextSize=10; x.Parent=row; corner(x,5)
-    local key=Instance.new("TextButton"); key.Name="WhiteTextBtn"; key.Size=UDim2.new(0,50,0,20); key.Position=UDim2.new(1,-50,0.5,-10); key.BackgroundColor3=Theme.Accent; key.Text=Keybinds[nameText] or "NONE"; key.TextColor3=Color3.new(1,1,1); key.Font=Enum.Font.GothamBold; key.TextSize=9; key.Parent=row; corner(key,5)
+    local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,-88,1,0); l.Position=UDim2.new(0,8,0,0); l.BackgroundTransparency=1; l.Text=nameText; l.TextColor3=Theme.Text; l.Font=Enum.Font.GothamBlack; l.TextSize=10; l.TextXAlignment=Enum.TextXAlignment.Left; l.Parent=row
+    local x=Instance.new("TextButton"); x.Name="WhiteTextBtn"; x.Size=UDim2.new(0,22,0,20); x.Position=UDim2.new(1,-74,0.5,-10); x.BackgroundColor3=Theme.Red; x.Text="X"; x.TextColor3=Color3.new(1,1,1); x.Font=Enum.Font.GothamBlack; x.TextSize=10; x.Parent=row; corner(x,5)
+    local key=Instance.new("TextButton"); key.Name="WhiteTextBtn"; key.Size=UDim2.new(0,50,0,20); key.Position=UDim2.new(1,-50,0.5,-10); key.BackgroundColor3=Theme.Accent; key.Text=Keybinds[nameText] or "NONE"; key.TextColor3=Color3.new(1,1,1); key.Font=Enum.Font.GothamBlack; key.TextSize=9; key.Parent=row; corner(key,5)
     x.MouseButton1Click:Connect(function() Keybinds[nameText]="NONE"; Config.keybinds[nameText]="NONE"; saveConfig(); key.Text="NONE"; if updateMovementPanelLabels then updateMovementPanelLabels() end end)
     key.MouseButton1Click:Connect(function() key.Text="..."
         local con; con=UIS.InputBegan:Connect(function(input,gp) if gp then return end; if input.UserInputType==Enum.UserInputType.Keyboard then Keybinds[nameText]=input.KeyCode.Name; Config.keybinds[nameText]=input.KeyCode.Name; saveConfig(); key.Text=input.KeyCode.Name; if nameText=="Open Menu" then UI.OpenMenuKey=input.KeyCode end; con:Disconnect(); if updateMovementPanelLabels then updateMovementPanelLabels() end end end)
@@ -8791,7 +8762,7 @@ function rebuildActionSettings()
     clearBody(actionSettingsBody)
     for actionName,enabled in pairs(actionConfig) do
         local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,34); row.BackgroundTransparency=1; row.Parent=actionSettingsBody
-        local label=Instance.new("TextLabel"); label.Size=UDim2.new(1,-84,1,0); label.Position=UDim2.new(0,4,0,0); label.BackgroundTransparency=1; label.Text=actionName; label.TextColor3=Theme.Text; label.Font=Enum.Font.GothamSemibold; label.TextSize=11; label.TextXAlignment=Enum.TextXAlignment.Left; label.TextTruncate=Enum.TextTruncate.AtEnd; label.Parent=row
+        local label=Instance.new("TextLabel"); label.Size=UDim2.new(1,-84,1,0); label.Position=UDim2.new(0,4,0,0); label.BackgroundTransparency=1; label.Text=actionName; label.TextColor3=Theme.Text; label.Font=Enum.Font.GothamBlack; label.TextSize=11; label.TextXAlignment=Enum.TextXAlignment.Left; label.TextTruncate=Enum.TextTruncate.AtEnd; label.Parent=row
         local btn=Instance.new("TextButton"); btn.Name="WhiteTextBtn"; btn.Size=UDim2.new(0,72,0,30); btn.Position=UDim2.new(1,-74,0.5,-15); btn.BackgroundColor3=enabled and Theme.Green or Theme.ToggleOff2; btn.Text=enabled and "ON" or "OFF"; btn.TextColor3=Color3.new(1,1,1); btn.Font=Enum.Font.GothamBlack; btn.TextSize=12; btn.AutoButtonColor=false; btn.Parent=row; corner(btn,6)
         btn.MouseButton1Click:Connect(function()
             actionConfig[actionName]=not actionConfig[actionName]; Config.actions[actionName]=actionConfig[actionName]; saveConfig()
@@ -8806,7 +8777,7 @@ function rebuildTpSpeedSettings()
     makeMainSliderWithInput(tpSpeedSettingsBody, "Fly TP Speed", 50, 300, Config.TpSettings.FlyTPSpeed or 160, function(v) Config.TpSettings.FlyTPSpeed=v; saveConfig() end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "100 Studs Base Speed", 20, 250, Config.TpSettings.FlyTPCloseSpeed or 75, function(v) Config.TpSettings.FlyTPCloseSpeed=v; saveConfig() end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Grabble TP Speed", 50, 600, Config.TpSettings.GrabbleTPSpeed or 230, function(v) Config.TpSettings.GrabbleTPSpeed=v; saveConfig(); if _G.SXESetCarpetSpeed then pcall(_G.SXESetCarpetSpeed, v) end end)
-    makeMainSliderWithInput(tpSpeedSettingsBody, "Walk To Brainrot Speed", 50, 1000, Config.TpSettings.WalkTPSpeed or 220, function(v) Config.TpSettings.WalkTPSpeed=v; saveConfig() end)
+    makeMainSliderWithInput(tpSpeedSettingsBody, "Walk To Brainrot Speed", 50, 1000, Config.TpSettings.WalkTPSpeed or 260, function(v) Config.TpSettings.WalkTPSpeed=v; saveConfig() end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Clone Delay", 0.05, 2.0, Config.TpSettings.CloneDelayVal or 0.1, function(v) Config.TpSettings.CloneDelayVal=v; saveConfig() end, "s")
     makeQuickButton(tpSpeedSettingsBody, "Close", function() closeAnim(tpSpeedSettingsPanel) end, Theme.SoftAccentHover)
 end
@@ -8985,7 +8956,7 @@ function refreshTargetPanel()
         l.BackgroundTransparency = 1
         l.Text = "Scanning..."
         l.TextColor3 = Theme.Dim
-        l.Font = Enum.Font.GothamSemibold
+        l.Font = Enum.Font.GothamBlack
         l.TextSize = 11
         l.TextXAlignment = Enum.TextXAlignment.Center
         l.Parent = panels["TargetBody"]
@@ -9056,7 +9027,7 @@ function refreshTargetPanel()
         nm.BackgroundTransparency = 1
         nm.Text = pet.petName or "?"
         nm.TextColor3 = isPriority and Color3.new(1,1,1) or Theme.Text
-        nm.Font = isPriority and Enum.Font.GothamBold or Enum.Font.GothamSemibold
+        nm.Font = isPriority and Enum.Font.GothamBold or Enum.Font.GothamBlack
         nm.TextSize = 13
         nm.TextXAlignment = Enum.TextXAlignment.Left
         nm.TextTruncate = Enum.TextTruncate.AtEnd
@@ -9410,7 +9381,7 @@ function makePriorityRow(index)
 end
 function makePriorityAddRow()
     local holder = Instance.new("Frame"); holder.Size=UDim2.new(1,-4,0,31); holder.BackgroundColor3=Theme.SoftAccent; holder.BackgroundTransparency=0.1; holder.ClipsDescendants=false; holder.Parent=mainBody; holder.ZIndex=20; corner(holder,6); holder.LayoutOrder = -2
-    local box=Instance.new("TextBox"); box.Size=UDim2.new(1,-60,1,-6); box.Position=UDim2.new(0,6,0,3); box.BackgroundColor3=Theme.InputBg; box.BorderSizePixel=0; box.Text=""; box.PlaceholderText="Enter pet name..."; box.TextColor3=Theme.Text; box.PlaceholderColor3=Theme.Dim; box.Font=Enum.Font.GothamBold; box.TextSize=10; box.ClearTextOnFocus=false; box.Parent=holder; box.ZIndex=21; corner(box,4)
+    local box=Instance.new("TextBox"); box.Size=UDim2.new(1,-60,1,-6); box.Position=UDim2.new(0,6,0,3); box.BackgroundColor3=Theme.InputBg; box.BorderSizePixel=0; box.Text=""; box.PlaceholderText="Enter pet name..."; box.TextColor3=Theme.Text; box.PlaceholderColor3=Theme.Dim; box.Font=Enum.Font.GothamBlack; box.TextSize=10; box.ClearTextOnFocus=false; box.Parent=holder; box.ZIndex=21; corner(box,4)
     local addBtn=Instance.new("TextButton"); addBtn.Name="WhiteTextBtn"; addBtn.Size=UDim2.new(0,44,0,25); addBtn.Position=UDim2.new(1,-50,0.5,-12.5); addBtn.BackgroundColor3=Theme.Accent; addBtn.Text="ADD"; addBtn.TextColor3=Color3.new(1,1,1); addBtn.Font=Enum.Font.GothamBlack; addBtn.TextSize=10; addBtn.AutoButtonColor=false; addBtn.Parent=holder; addBtn.ZIndex=21; corner(addBtn,5)
     local dropdown = Instance.new("Frame"); dropdown.Name="PriorityDropdown"; dropdown.Size=UDim2.new(1,-60,0,0); dropdown.Position=UDim2.new(0,6,1,2)
     dropdown.BackgroundColor3=Theme.Background; dropdown.BorderSizePixel=0; dropdown.ClipsDescendants=true; dropdown.Visible=false; dropdown.ZIndex=50; dropdown.Parent=holder; corner(dropdown,6)
@@ -10282,7 +10253,7 @@ do
         end
     end
     _G.SXEFireGrapple = fireGrapple
-    local SXESpeed = { CARPET = 480, INBASE = 300 }
+    local SXESpeed = { CARPET = 520, INBASE = 340 }
     _G.SXESetCarpetSpeed = function(v) v = tonumber(v); if v and v > 0 then SXESpeed.CARPET = v end end
     _G.SXESetInbaseSpeed = function(v) v = tonumber(v); if v and v > 0 then SXESpeed.INBASE = v end end
     _G.SXEGetCarpetSpeed = function() return SXESpeed.CARPET end
@@ -10771,8 +10742,8 @@ local function carpetEngage()
         for _, wp in ipairs(waypoints) do line(prev, wp); dot(wp); prev = wp end
     end
     local SPEED = 200
-    local ARRIVE = 3
-    local MAX_CLIMB = 60
+    local ARRIVE = 2.2
+    local MAX_CLIMB = 75
     local function vZero(hrp)
         if hrp then hrp.AssemblyLinearVelocity = Vector3.zero; hrp.AssemblyAngularVelocity = Vector3.zero end
     end
@@ -11020,7 +10991,7 @@ local function carpetEngage()
         if not hrp then return end
         pcall(function() hrp.Anchored = false end)
         pcall(equipCarpet)
-        local SPEED = (Config.TpSettings and (tonumber(Config.TpSettings.WalkTPSpeed) or tonumber(Config.TpSettings.GrabbleTPSpeed))) or 220
+        local SPEED = (Config.TpSettings and (tonumber(Config.TpSettings.WalkTPSpeed) or tonumber(Config.TpSettings.GrabbleTPSpeed))) or 260
         local FLOAT_OFFSET = (targetPos.Y > 20) and -4 or 0
         local goal = Vector3.new(targetPos.X, targetPos.Y + FLOAT_OFFSET, targetPos.Z)
         local t0 = os.clock()
@@ -11318,7 +11289,7 @@ local function carpetEngage()
         local now = os.clock()
         if AUTO_STEAL and _started and not LP:GetAttribute("Stealing")
             and not (isTeleporting and _cloneTP)
-            and (now - _autoLastScan) >= 0.1 then
+            and (now - _autoLastScan) >= 0.25 then
             _autoLastScan = now
             local char = LP.Character
             local hrp = char and char:FindFirstChild("HumanoidRootPart")
@@ -11373,7 +11344,7 @@ local function carpetEngage()
         if STEAL_MODE == "Nearest" and now - _stealArmedAt > STEAL_ARM_TIMEOUT then
             disarmSteal(); return
         end
-        if now - _stealLastScan < 0.067 then return end
+        if now - _stealLastScan < 0.12 then return end
         _stealLastScan = now
         local t = timeUntilCanSteal()
         if t == -1 then
@@ -11444,7 +11415,7 @@ local function carpetEngage()
             if #semEsteira == 0 then isTeleporting = false; return end
             pet = _pickByMode(semEsteira) or semEsteira[1]
         end
-        local _tpSpd = (Config and Config.TpSettings and Config.TpSettings.GrabbleTPSpeed) or 480
+        local _tpSpd = (Config and Config.TpSettings and Config.TpSettings.GrabbleTPSpeed) or 520
         local _cloneDelay = (Config and Config.TpSettings and Config.TpSettings.CloneDelayVal) or 0.35
         local petPos = pet.position
         local petName = pet.name
