@@ -1031,11 +1031,15 @@ local function registerScreenGui(sg)
         master.Name = "SXE_MasterFrame"
         master.BackgroundTransparency = 1
         master.BorderSizePixel = 0
+        master.Active = false
+        master.Selectable = false
         master.Parent = sg
         local scaleObj = Instance.new("UIScale")
         scaleObj.Name = "SXE_GlobalScale"
         scaleObj.Parent = master
     end
+    master.Active = false
+    master.Selectable = false
     scaledGuis[sg] = master
     pcall(function()
         local scaleObj = master:FindFirstChild("SXE_GlobalScale")
@@ -1101,30 +1105,6 @@ do
     local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(0, 9); c.Parent = barra
     local s = Instance.new("UIStroke")
     s.Color = Color3.fromRGB(80, 80, 80); s.Thickness = 1; s.Transparency = 0.2; s.Parent = barra
-    do
-        local img = Instance.new("ImageLabel")
-        img.Name = "TopBarBg"
-        img.BackgroundTransparency = 1
-        img.Image = "rbxassetid://97803827151139"
-        img.ScaleType = Enum.ScaleType.Crop
-        img.Size = UDim2.new(1, 0, 1, 0)
-        img.ImageTransparency = 0.15
-        img.ZIndex = 0
-        img.Active = false
-        img.Selectable = false
-        img.Parent = barra
-        local dc = Instance.new("UICorner"); dc.CornerRadius = UDim.new(0, 9); dc.Parent = img
-        local dim = Instance.new("Frame")
-        dim.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-        dim.BackgroundTransparency = 0.55
-        dim.BorderSizePixel = 0
-        dim.Size = UDim2.new(1, 0, 1, 0)
-        dim.ZIndex = 0
-        dim.Active = false
-        dim.Selectable = false
-        dim.Parent = barra
-        local dc2 = Instance.new("UICorner"); dc2.CornerRadius = UDim.new(0, 9); dc2.Parent = dim
-    end
     local faixa = Instance.new("Frame")
     faixa.Size = UDim2.new(1, 0, 0, 2)
     faixa.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -1269,16 +1249,16 @@ Themes = {
         BlacklistHover=Color3.fromRGB(180,180,180), BlacklistLeave=Color3.fromRGB(225,225,225),
     },
     Dark = {
-        Background=Color3.fromRGB(8,8,12), MainBackground=Color3.fromRGB(6,6,10),
-        Panel=Color3.fromRGB(18,18,26), Row=Color3.fromRGB(24,24,34), RowHover=Color3.fromRGB(40,40,54),
-        Accent=Color3.fromRGB(255,255,255), AccentLight=Color3.fromRGB(180,190,220),
+        Background=Color3.fromRGB(10,10,10), MainBackground=Color3.fromRGB(8,8,8),
+        Panel=Color3.fromRGB(20,20,20), Row=Color3.fromRGB(26,26,26), RowHover=Color3.fromRGB(40,40,40),
+        Accent=Color3.fromRGB(255,255,255), AccentLight=Color3.fromRGB(210,210,210),
         Green=Color3.fromRGB(90,220,140), Red=Color3.fromRGB(230,90,100), Red2=Color3.fromRGB(180,60,70),
-        Text=Color3.fromRGB(250,250,255), Dim=Color3.fromRGB(130,135,155), Stroke=Color3.fromRGB(55,58,75),
-        SoftButton=Color3.fromRGB(28,28,40), SoftButtonHover=Color3.fromRGB(44,44,60),
-        SoftAccent=Color3.fromRGB(28,28,40), SoftAccentHover=Color3.fromRGB(44,44,60),
-        ToggleOff=Color3.fromRGB(40,40,52), ToggleOff2=Color3.fromRGB(40,40,52),
-        InputBg=Color3.fromRGB(14,14,20), SliderBg=Color3.fromRGB(50,52,68),
-        BlacklistHover=Color3.fromRGB(50,40,40), BlacklistLeave=Color3.fromRGB(34,34,46),
+        Text=Color3.fromRGB(255,255,255), Dim=Color3.fromRGB(160,160,160), Stroke=Color3.fromRGB(60,60,60),
+        SoftButton=Color3.fromRGB(30,30,30), SoftButtonHover=Color3.fromRGB(48,48,48),
+        SoftAccent=Color3.fromRGB(30,30,30), SoftAccentHover=Color3.fromRGB(48,48,48),
+        ToggleOff=Color3.fromRGB(42,42,42), ToggleOff2=Color3.fromRGB(42,42,42),
+        InputBg=Color3.fromRGB(16,16,16), SliderBg=Color3.fromRGB(55,55,55),
+        BlacklistHover=Color3.fromRGB(50,40,40), BlacklistLeave=Color3.fromRGB(36,36,36),
     }
 }
 HERESY = { NOME="Bunnyirsh Hub", GRAD_A=Color3.fromRGB(255,255,255), GRAD_B=Color3.fromRGB(180,180,180) }
@@ -1735,7 +1715,7 @@ Config = {
         Tool="Flying Carpet", TpKey="T", CloneKey="V", CarpetSpeedKey="Q",
         InfiniteJump=false, DelayVal=0.15, CloneDelayVal=0,
         RagdollTP=false, FPSWait=false, FlyTP=false, FlyTPSpeed=160, FlyTPCloseSpeed=75,
-        GrabbleTP=false, GrabbleTPSpeed=545,
+        GrabbleTP=false, GrabbleTPSpeed=475,
         TpOnLoad=false, MinGenForTp="", MinGenForGrab="",
         BrainrotCarpet=false,
     },
@@ -1984,87 +1964,80 @@ local function applySavedPosition(name, frame)
     if d then frame.Position=UDim2.new(d.xs or 0,d.xo or 0,d.ys or 0,d.yo or 0) end
 end
 local function resetAllPositions()
-    Config.positions = {}
-    saveConfig()
-    if main then
-        main.Position = UDim2.new(0.5, -187, 0.5, -275)
-    end
-    for _,pair in ipairs({
-        {"Bunnyirsh Hub\nInvisible Steal", panels and panels["Invisible Steal Panel"]},
-        {"Bunnyirsh Hub\nAdmin Command Panel", panels and panels["Admin Command Panel"]},
-        {"Bunnyirsh Hub\nCommand Cooldowns", panels and panels["Command Cooldowns"]},
-        {"Bunnyirsh Hub\nActions", panels and panels["Actions"]},
-        {"Bunnyirsh Hub\nSteal Panel", panels and panels["Steal Panel"]},
-        {"Bunnyirsh Hub\nSteal Target", panels and panels["Steal Target"]},
-        {"Bunnyirsh Hub\nAction Settings", actionSettingsPanel},
-        {"Bunnyirsh Hub\nTP & Clone Settings", tpSpeedSettingsPanel},
-    }) do
-        if pair[2] then
-            pcall(function()
-                if pair[2] == (panels and panels["Invisible Steal Panel"]) then pair[2].Position = UDim2.new(0,80,0.5,-220)
-                elseif pair[2] == (panels and panels["Admin Command Panel"]) then pair[2].Position = UDim2.new(0.5,85,1,-340)
-                elseif pair[2] == (panels and panels["Command Cooldowns"]) then pair[2].Position = UDim2.new(0.5,245,1,-390)
-                elseif pair[2] == (panels and panels["Actions"]) then pair[2].Position = UDim2.new(0.5,505,1,-415)
-                elseif pair[2] == (panels and panels["Steal Panel"]) then pair[2].Position = UDim2.new(1,-300,1,-385)
-                elseif pair[2] == (panels and panels["Steal Target"]) then pair[2].Position = UDim2.new(1,-330,0,85)
-                elseif pair[2] == actionSettingsPanel then pair[2].Position = UDim2.new(0.5,745,1,-440)
-                elseif pair[2] == tpSpeedSettingsPanel then pair[2].Position = UDim2.new(0.5,745,1,-440)
-                end
-            end)
+    pcall(function()
+        if Config then Config.positions = {} end
+        if saveConfig then saveConfig() end
+        UI.Locked = false
+        if Config then Config.locked = false end
+        if main then main.Position = UDim2.new(0.5, -187, 0.5, -275) end
+        if panels then
+            if panels["Invisible Steal Panel"] then panels["Invisible Steal Panel"].Position = UDim2.new(0,80,0.5,-220) end
+            if panels["Admin Command Panel"] then panels["Admin Command Panel"].Position = UDim2.new(0.5,85,1,-340) end
+            if panels["Command Cooldowns"] then panels["Command Cooldowns"].Position = UDim2.new(0.5,245,1,-390) end
+            if panels["Actions"] then panels["Actions"].Position = UDim2.new(0.5,505,1,-415) end
+            if panels["Steal Panel"] then panels["Steal Panel"].Position = UDim2.new(1,-300,1,-385) end
+            if panels["Steal Target"] then panels["Steal Target"].Position = UDim2.new(1,-330,0,85) end
         end
-    end
-    if ShowNotification then pcall(ShowNotification, "UI", "All positions reset") end
+        if actionSettingsPanel then actionSettingsPanel.Position = UDim2.new(0.5,745,1,-440) end
+        if tpSpeedSettingsPanel then tpSpeedSettingsPanel.Position = UDim2.new(0.5,745,1,-440) end
+        if bottomBar then bottomBar.Position = UDim2.new(0.5,-287,1,-125) end
+    end)
 end
 local function resetAllSettings()
-    local keepPos = Config.positions
-    Config = {
-        positions = keepPos or {},
-        keybinds = {},
-        actions = {},
-        locked = false,
-        DarkMode = true,
-        AntiRagdoll = false, InfiniteJump = false, Float = false,
-        AutoResetBalloon = false, AutoKickOnSteal = false, KickToPrivateServer = false, CleanErrorGUIs = false,
-        LineToBase = false, LineToBrainrot = false, InvisStealAngle = 225, SinkSliderValue = 7,
-        AutoRecoverLagback = true,
-        WalkSpeedEnabled = false, WalkSpeedValue = 16,
-        AutoTPPriority = true, AutoTPHighestGen = false, AutoTPHighestValue = false, AutoTPFloor2FromFloor1 = false,
-        FPSBoost = false, FPSBoostUltra = false, XRay = false, FOV = 70,
-        BrainrotESP = true, TimerESP = false, SubspaceMineESP = false, PlayerESP = true, BaseOwnerESP = false,
-        AutoBuyEnabled = false, AutoBuyRange = 17, AutoGrabSpeed = 17, AutoBuyKey = "K",
-        AutoDestroyTurrets = false, AutoUnlockOnSteal = false, AutoInvisDuringSteal = false,
-        ClickToAP = false, ClickToAPSingleCommand = false, ClickToAPRadius = 8,
-        SpamBaseOwnerCommands = {balloon=true,inverse=true,jail=true,jumpscare=true,morph=true,nightvision=true,ragdoll=true,rocket=true,tiny=true},
-        SpamBaseOwnerOrder = {"balloon","inverse","jail","jumpscare","morph","nightvision","ragdoll","rocket","tiny"},
-        SpamBaseOwnerSingleCommand = false,
-        ProximityAP = false, ShowJobJoiner = true, AntiBeeDisco = false, AntiEffects = false,
-        AutoDestroySentry = false, LaserWebAimbot = false,
-        RemoteSellEnabled = false, AdminPanelUI = false,
-        StealHighest = false, StealPriority = true, StealNearest = false, AutoStealEnabled = true,
-        Unwalk = false,
-        Visibilities = {
-            ["Invisible Steal Panel"] = true, ["Admin Command Panel"] = false,
-            ["Command Cooldowns"] = true, ["Actions"] = true,
-            ["Steal Panel"] = true, ["Steal Target"] = true,
-        },
-        TpSettings = {
-            Tool = "Flying Carpet", TpKey = "T", CloneKey = "V", CarpetSpeedKey = "Q",
-            InfiniteJump = false, DelayVal = 0.25, CloneDelayVal = 0,
-            RagdollTP = false, FPSWait = false, FlyTP = false, FlyTPSpeed = 160, FlyTPCloseSpeed = 75,
-            GrabbleTP = false, GrabbleTPSpeed = 545,
-            TpOnLoad = false, MinGenForTp = "", MinGenForGrab = "",
-            BrainrotCarpet = false,
-        },
-        PriorityList = priorityList,
-        RemovedFromPriority = {},
-    }
-    saveConfig()
-    initToggles()
-    if setFPSBoost then pcall(setFPSBoost, false) end
-    if setFPSBoostUltra then pcall(setFPSBoostUltra, false) end
-    if setXRay then pcall(setXRay, false) end
-    if loadTab then pcall(loadTab, UI.CurrentTab or "Auto TP") end
-    if ShowNotification then pcall(ShowNotification, "CONFIG", "All settings reset") end
+    pcall(function()
+        UI.Locked = false
+        local keepPos = (Config and Config.positions) or {}
+        local defaultPri = priorityList
+        Config = {
+            positions = keepPos,
+            keybinds = {},
+            actions = {},
+            locked = false,
+            DarkMode = true,
+            AntiRagdoll = false, InfiniteJump = false, Float = false,
+            AutoResetBalloon = false, AutoKickOnSteal = false, KickToPrivateServer = false, CleanErrorGUIs = false,
+            LineToBase = false, LineToBrainrot = false, InvisStealAngle = 225, SinkSliderValue = 7,
+            AutoRecoverLagback = true,
+            WalkSpeedEnabled = false, WalkSpeedValue = 16,
+            AutoTPPriority = true, AutoTPHighestGen = false, AutoTPHighestValue = false, AutoTPFloor2FromFloor1 = false,
+            FPSBoost = false, FPSBoostUltra = false, XRay = false, FOV = 70,
+            BrainrotESP = true, TimerESP = false, SubspaceMineESP = false, PlayerESP = true, BaseOwnerESP = false,
+            AutoBuyEnabled = false, AutoBuyRange = 17, AutoGrabSpeed = 17, AutoBuyKey = "K",
+            AutoDestroyTurrets = false, AutoUnlockOnSteal = false, AutoInvisDuringSteal = false,
+            ClickToAP = false, ClickToAPSingleCommand = false, ClickToAPRadius = 8,
+            SpamBaseOwnerCommands = {balloon=true,inverse=true,jail=true,jumpscare=true,morph=true,nightvision=true,ragdoll=true,rocket=true,tiny=true},
+            SpamBaseOwnerOrder = {"balloon","inverse","jail","jumpscare","morph","nightvision","ragdoll","rocket","tiny"},
+            SpamBaseOwnerSingleCommand = false,
+            ProximityAP = false, ShowJobJoiner = true, AntiBeeDisco = false, AntiEffects = false,
+            AutoDestroySentry = false, LaserWebAimbot = false,
+            RemoteSellEnabled = false, AdminPanelUI = false,
+            StealHighest = false, StealPriority = true, StealNearest = false, AutoStealEnabled = true,
+            Unwalk = false,
+            Visibilities = {
+                ["Invisible Steal Panel"] = true, ["Admin Command Panel"] = false,
+                ["Command Cooldowns"] = true, ["Actions"] = true,
+                ["Steal Panel"] = true, ["Steal Target"] = true,
+            },
+            TpSettings = {
+                Tool = "Flying Carpet", TpKey = "T", CloneKey = "V", CarpetSpeedKey = "Q",
+                InfiniteJump = false, DelayVal = 0.15, CloneDelayVal = 0,
+                RagdollTP = false, FPSWait = false, FlyTP = false, FlyTPSpeed = 160, FlyTPCloseSpeed = 75,
+                GrabbleTP = false, GrabbleTPSpeed = 475,
+                TpOnLoad = false, MinGenForTp = "", MinGenForGrab = "",
+                BrainrotCarpet = false,
+            },
+            PriorityList = defaultPri,
+            RemovedFromPriority = {},
+        }
+        if saveConfig then saveConfig() end
+        if initToggles then initToggles() end
+        if setFPSBoost then pcall(setFPSBoost, false) end
+        if setFPSBoostUltra then pcall(setFPSBoostUltra, false) end
+        if setXRay then pcall(setXRay, false) end
+        if loadTab then pcall(loadTab, (UI and UI.CurrentTab) or "Auto TP") end
+        if rebuildActions then pcall(rebuildActions) end
+        if setStealMode then pcall(setStealMode, "Priority") end
+    end)
 end
 _G.resetAllPositions = resetAllPositions
 _G.resetAllSettings = resetAllSettings
@@ -5339,7 +5312,7 @@ local LOWER = {
 local UPPER_Y_THRESHOLD = 7
 local TALL_PETS = { ["La Secret Combinasion"]=true, ["La Jolly Grande"]=true }
 local TALL_OFFSET = 3
-local CARPET_SPEED = 545
+local CARPET_SPEED = 475
 local INBASE_SPEED = 340
 local function getCarpetSpeed()
     return Config.TpSettings.FlyTPSpeed or 230
@@ -5850,14 +5823,14 @@ local function getPlotKey(plotName)
     return nil
 end
 local SPEED = 200
-local ARRIVE = 2.5
+local ARRIVE = 3.5
 local function vZero(hrp)
     if hrp then hrp.AssemblyLinearVelocity = Vector3.zero; hrp.AssemblyAngularVelocity = Vector3.zero end
 end
 local MAX_CLIMB = 75
 local function velMoveThrough(hrp, waypoints, speedOverride, allowJump, quickStart)
     if not hrp or not hrp.Parent or #waypoints == 0 then return end
-    local _runSpeed = speedOverride or Config.TpSettings.GrabbleTPSpeed or (_G.SXECarpetSpeed or CARPET_SPEED or 545)
+    local _runSpeed = speedOverride or Config.TpSettings.GrabbleTPSpeed or (_G.SXECarpetSpeed or CARPET_SPEED or 475)
     vizPath(hrp.Position, waypoints)
     local _myVizGen = _G.__vizGen
     local wpIdx = 1
@@ -5878,54 +5851,38 @@ local function velMoveThrough(hrp, waypoints, speedOverride, allowJump, quickSta
         end)
     end
     local lastDist, stall = math.huge, 0
-    if quickStart then
-        local _hp = RaycastParams.new()
-        _hp.FilterType = Enum.RaycastFilterType.Exclude
-        _hp.IgnoreWater = true
-        local _skip = {}
-        for _, pl in ipairs(Players:GetPlayers()) do
-            if pl.Character then _skip[#_skip + 1] = pl.Character end
-        end
-        _hp.FilterDescendantsInstances = _skip
-        for _ = 1, 3 do
-            local target = waypoints[wpIdx]
-            if not target then break end
-            local flat = Vector3.new(target.X - hrp.Position.X, 0, target.Z - hrp.Position.Z)
-            local mag = flat.Magnitude
-            if mag < 1 then break end
-            local nextPos = hrp.Position + flat.Unit * math.min(20, mag)
-            local _hit = Workspace:Raycast(hrp.Position, nextPos - hrp.Position, _hp)
-            if _hit and _hit.Instance and _hit.Instance.CanCollide then break end
-            hrp.CFrame = (hrp.CFrame - hrp.CFrame.Position) + nextPos
-            hrp.AssemblyLinearVelocity = Vector3.zero
-            hrp.AssemblyAngularVelocity = Vector3.zero
-            RunService.Heartbeat:Wait()
-            if not hrp or not hrp.Parent then return end
+    if quickStart and waypoints[1] then
+        local flat = Vector3.new(waypoints[1].X - hrp.Position.X, 0, waypoints[1].Z - hrp.Position.Z)
+        if flat.Magnitude > 2 then
+            local boost = hrp.Position + flat.Unit * math.min(28, flat.Magnitude * 0.35)
+            hrp.CFrame = (hrp.CFrame - hrp.CFrame.Position) + boost
         end
     end
-    conn = RunService.Heartbeat:Connect(function()
+    conn = RunService.Heartbeat:Connect(function(dt)
         if not hrp or not hrp.Parent or done then
             if conn then conn:Disconnect() end
             return
         end
         equipCarpet()
         local target = waypoints[wpIdx]
+        if not target then finish() return end
         local diff = target - hrp.Position
         local mag = diff.Magnitude
         while mag < ARRIVE and wpIdx < #waypoints do
             wpIdx = wpIdx + 1
             lastDist, stall = math.huge, 0
             target = waypoints[wpIdx]
+            if not target then break end
             diff = target - hrp.Position
             mag = diff.Magnitude
         end
-        if mag < ARRIVE and wpIdx >= #waypoints then finish() return end
-        if mag > lastDist - 0.02 then stall = stall + 1 else stall = 0 end
+        if (not target) or (mag < ARRIVE and wpIdx >= #waypoints) then finish() return end
+        if mag > lastDist - 0.05 then stall = stall + 1 else stall = 0 end
         lastDist = mag
-        if stall >= 40 then finish() return end
-        if mag >= 0.05 then
+        if stall >= 50 then finish() return end
+        if mag >= 0.08 then
             local dir = diff.Unit
-            if allowJump and diff.Y > 5 and wpIdx < #waypoints then
+            if allowJump and diff.Y > 4 and wpIdx < #waypoints then
                 local hum = hrp.Parent and hrp.Parent:FindFirstChildOfClass("Humanoid")
                 if hum then
                     local st = hum:GetState()
@@ -9075,39 +9032,8 @@ function makeHeader(f,t,isMain)
     makeDraggable(f,h,t)
     return h
 end
-local PANEL_BG_IMAGE = "rbxassetid://97803827151139"
-local function addPanelBackground(f)
-    if not f or f:FindFirstChild("SXEPanelBg") then return end
-    local img = Instance.new("ImageLabel")
-    img.Name = "SXEPanelBg"
-    img.BackgroundTransparency = 1
-    img.Image = PANEL_BG_IMAGE
-    img.ScaleType = Enum.ScaleType.Crop
-    img.Size = UDim2.new(1, 0, 1, 0)
-    img.Position = UDim2.new(0, 0, 0, 0)
-    img.ZIndex = 0
-    img.ImageTransparency = 0.12
-    img.ImageColor3 = Color3.fromRGB(255, 255, 255)
-    img.Active = false
-    img.Selectable = false
-    img.Parent = f
-    local dim = Instance.new("Frame")
-    dim.Name = "SXEPanelDim"
-    dim.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    dim.BackgroundTransparency = 0.55
-    dim.BorderSizePixel = 0
-    dim.Size = UDim2.new(1, 0, 1, 0)
-    dim.ZIndex = 0
-    dim.Active = false
-    dim.Selectable = false
-    dim.Parent = f
-    pcall(function()
-        local c1 = Instance.new("UICorner"); c1.CornerRadius = UDim.new(0, 14); c1.Parent = img
-        local c2 = Instance.new("UICorner"); c2.CornerRadius = UDim.new(0, 14); c2.Parent = dim
-    end)
-end
-function makeMainPanel(t,size,pos) local f=Instance.new("Frame"); f.Size=size; f.Position=pos; f.BackgroundColor3=Theme.MainBackground; f.BackgroundTransparency=0.15; f.BorderSizePixel=0; f.ClipsDescendants=true; f.Parent=gui; corner(f,14); addOutline(f); addPanelBackground(f); makeHeader(f,t,true)
-    local body=Instance.new("ScrollingFrame"); body.Size=UDim2.new(1,-12,1,-82); body.Position=UDim2.new(0,6,0,76); body.BackgroundTransparency=1; body.BorderSizePixel=0; body.ScrollBarThickness=5; body.ScrollBarImageColor3=Theme.Accent; body.CanvasSize=UDim2.new(0,0,0,0); body.Active=true; body.ScrollingEnabled=true; body.ElasticBehavior=Enum.ElasticBehavior.Always; body.ScrollingDirection=Enum.ScrollingDirection.Y; body.AutomaticCanvasSize=Enum.AutomaticSize.Y; body.ZIndex=2; body.Parent=f
+function makeMainPanel(t,size,pos) local f=Instance.new("Frame"); f.Size=size; f.Position=pos; f.BackgroundColor3=Theme.MainBackground; f.BackgroundTransparency=0.02; f.BorderSizePixel=0; f.ClipsDescendants=true; f.Active=true; f.Parent=gui; corner(f,14); addOutline(f); makeHeader(f,t,true)
+    local body=Instance.new("ScrollingFrame"); body.Size=UDim2.new(1,-12,1,-82); body.Position=UDim2.new(0,6,0,76); body.BackgroundTransparency=1; body.BorderSizePixel=0; body.ScrollBarThickness=5; body.ScrollBarImageColor3=Theme.Accent; body.CanvasSize=UDim2.new(0,0,0,0); body.Active=true; body.ScrollingEnabled=true; body.ElasticBehavior=Enum.ElasticBehavior.Always; body.ScrollingDirection=Enum.ScrollingDirection.Y; body.AutomaticCanvasSize=Enum.AutomaticSize.Y; body.ZIndex=5; body.Parent=f
     local lay=Instance.new("UIListLayout"); lay.Padding=UDim.new(0,6); lay.SortOrder=Enum.SortOrder.LayoutOrder; lay.Parent=body
     local function refreshCanvas()
         local h = lay.AbsoluteContentSize.Y + 48
@@ -9117,8 +9043,8 @@ function makeMainPanel(t,size,pos) local f=Instance.new("Frame"); f.Size=size; f
     body:GetPropertyChangedSignal("AbsoluteSize"):Connect(refreshCanvas)
     if Config.sizes and Config.sizes[t] then f.Size = UDim2.new(0, Config.sizes[t].x, 0, Config.sizes[t].y) end
     makeResizable(f, UDim2.new(0, 200, 0, 150), t); return f,body end
-function makeQuickPanel(t,size,pos) local f=Instance.new("Frame"); f.Size=size; f.Position=pos; f.BackgroundColor3=Theme.Background; f.BackgroundTransparency=0.15; f.BorderSizePixel=0; f.ClipsDescendants=true; f.Parent=gui; corner(f,14); addOutline(f); addPanelBackground(f); makeHeader(f,t,false)
-    local body=Instance.new("ScrollingFrame"); body.Size=UDim2.new(1,-12,1,-50); body.Position=UDim2.new(0,6,0,46); body.BackgroundTransparency=1; body.BorderSizePixel=0; body.ScrollBarThickness=5; body.ScrollBarImageColor3=Theme.Accent; body.CanvasSize=UDim2.new(0,0,0,0); body.Active=true; body.ScrollingEnabled=true; body.ElasticBehavior=Enum.ElasticBehavior.Always; body.ScrollingDirection=Enum.ScrollingDirection.Y; body.AutomaticCanvasSize=Enum.AutomaticSize.Y; body.ZIndex=2; body.Parent=f
+function makeQuickPanel(t,size,pos) local f=Instance.new("Frame"); f.Size=size; f.Position=pos; f.BackgroundColor3=Theme.Background; f.BackgroundTransparency=0.02; f.BorderSizePixel=0; f.ClipsDescendants=true; f.Active=true; f.Parent=gui; corner(f,14); addOutline(f); makeHeader(f,t,false)
+    local body=Instance.new("ScrollingFrame"); body.Size=UDim2.new(1,-12,1,-50); body.Position=UDim2.new(0,6,0,46); body.BackgroundTransparency=1; body.BorderSizePixel=0; body.ScrollBarThickness=5; body.ScrollBarImageColor3=Theme.Accent; body.CanvasSize=UDim2.new(0,0,0,0); body.Active=true; body.ScrollingEnabled=true; body.ElasticBehavior=Enum.ElasticBehavior.Always; body.ScrollingDirection=Enum.ScrollingDirection.Y; body.AutomaticCanvasSize=Enum.AutomaticSize.Y; body.ZIndex=5; body.Parent=f
     local lay=Instance.new("UIListLayout"); lay.Padding=UDim.new(0,6); lay.SortOrder=Enum.SortOrder.LayoutOrder; lay.Parent=body
     local function refreshCanvas()
         local h = lay.AbsoluteContentSize.Y + 36
@@ -9130,9 +9056,9 @@ function makeQuickPanel(t,size,pos) local f=Instance.new("Frame"); f.Size=size; 
     if not string.find(t, "Admin Command Panel") then makeResizable(f, UDim2.new(0, 150, 0, 150), t) end; return f,body end
 function makeSyncStateRow(parent,text,toggleName,callback,bindName)
     regToggle(toggleName,getToggle(toggleName))
-    local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,34); row.BackgroundTransparency=1; row.Parent=parent
-    local label=Instance.new("TextLabel"); label.Size=UDim2.new(1,(bindName and -140 or -84),1,0); label.Position=UDim2.new(0,4,0,0); label.BackgroundTransparency=1; label.Text=text; label.TextColor3=Theme.Text; label.Font=Enum.Font.GothamBlack; label.TextSize=12; label.TextXAlignment=Enum.TextXAlignment.Left; label.TextTruncate=Enum.TextTruncate.AtEnd; label.Parent=row
-    local btn=Instance.new("TextButton"); btn.Name="WhiteTextBtn"; btn.Size=UDim2.new(0,72,0,30); btn.Position=UDim2.new(1,-74,0.5,-15); btn.TextColor3=Color3.new(1,1,1); btn.Font=Enum.Font.GothamBlack; btn.TextSize=12; btn.AutoButtonColor=false; btn.Parent=row; corner(btn,6)
+    local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,34); row.BackgroundTransparency=1; row.ZIndex=6; row.Active=false; row.Parent=parent
+    local label=Instance.new("TextLabel"); label.Size=UDim2.new(1,(bindName and -140 or -84),1,0); label.Position=UDim2.new(0,4,0,0); label.BackgroundTransparency=1; label.Text=text; label.TextColor3=Color3.fromRGB(255,255,255); label.Font=Enum.Font.GothamBlack; label.TextSize=12; label.TextXAlignment=Enum.TextXAlignment.Left; label.TextTruncate=Enum.TextTruncate.AtEnd; label.ZIndex=6; label.Parent=row
+    local btn=Instance.new("TextButton"); btn.Name="WhiteTextBtn"; btn.Size=UDim2.new(0,72,0,30); btn.Position=UDim2.new(1,-74,0.5,-15); btn.TextColor3=Color3.fromRGB(255,255,255); btn.Font=Enum.Font.GothamBlack; btn.TextSize=12; btn.AutoButtonColor=false; btn.Active=true; btn.ZIndex=7; btn.Parent=row; corner(btn,6)
     local function refresh(val) btn.BackgroundColor3=val and Theme.Green or Theme.ToggleOff2; btn.Text=val and "ON" or "OFF" end
     refresh(getToggle(toggleName)); onToggleChanged(toggleName,function(val) refresh(val) end)
     btn.MouseButton1Click:Connect(function() local nv=not getToggle(toggleName); setToggle(toggleName,nv); if callback then callback(nv) end end)
@@ -9153,8 +9079,8 @@ function makeSyncStateRow(parent,text,toggleName,callback,bindName)
 end
 function makeSyncMainToggle(parent,text,toggleName,callback,bindName)
     regToggle(toggleName,getToggle(toggleName))
-    local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,31); row.BackgroundColor3=Theme.Panel; row.BackgroundTransparency=0.18; row.ZIndex=3; row.Parent=parent; corner(row,6)
-    local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,(bindName and -112 or -54),1,0); l.Position=UDim2.new(0,8,0,0); l.BackgroundTransparency=1; l.Text=text; l.TextColor3=Theme.Text; l.Font=Enum.Font.GothamBold; l.TextSize=10; l.TextXAlignment=Enum.TextXAlignment.Left; l.TextTruncate=Enum.TextTruncate.AtEnd; l.Parent=row
+    local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,31); row.BackgroundColor3=Theme.Panel; row.BackgroundTransparency=0.18; row.ZIndex=6; row.Active=false; row.Parent=parent; corner(row,6)
+    local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,(bindName and -112 or -54),1,0); l.Position=UDim2.new(0,8,0,0); l.BackgroundTransparency=1; l.Text=text; l.TextColor3=Color3.fromRGB(255,255,255); l.Font=Enum.Font.GothamBold; l.TextSize=10; l.TextXAlignment=Enum.TextXAlignment.Left; l.TextTruncate=Enum.TextTruncate.AtEnd; l.ZIndex=6; l.Parent=row
     if bindName then
         local kb=Instance.new("TextButton"); kb.Name="HeresyBind"; kb.Size=UDim2.new(0,56,0,21)
         kb.Position=UDim2.new(1,-104,0.5,-10.5); kb.BackgroundColor3=Theme.SoftButton
@@ -9168,8 +9094,8 @@ function makeSyncMainToggle(parent,text,toggleName,callback,bindName)
         rotulo()
         kb.MouseButton1Click:Connect(function() capturarBind(kb, bindName, rotulo) end)
     end
-    local toggle=Instance.new("TextButton"); toggle.Size=UDim2.new(0,38,0,21); toggle.Position=UDim2.new(1,-44,0.5,-10.5); toggle.Text=""; toggle.AutoButtonColor=false; toggle.Parent=row; corner(toggle,20)
-    local dot=Instance.new("Frame"); dot.Size=UDim2.new(0,16,0,16); dot.BackgroundColor3=Theme.InputBg; dot.Parent=toggle; corner(dot,20)
+    local toggle=Instance.new("TextButton"); toggle.Size=UDim2.new(0,38,0,21); toggle.Position=UDim2.new(1,-44,0.5,-10.5); toggle.Text=""; toggle.AutoButtonColor=false; toggle.Active=true; toggle.ZIndex=7; toggle.Parent=row; corner(toggle,20)
+    local dot=Instance.new("Frame"); dot.Size=UDim2.new(0,16,0,16); dot.BackgroundColor3=Theme.InputBg; dot.ZIndex=8; dot.Parent=toggle; corner(dot,20)
     local function refresh(val) tw(toggle,{BackgroundColor3=val and Theme.Green or Theme.ToggleOff},0.12); tw(dot,{Position=val and UDim2.new(1,-19,0.5,-8) or UDim2.new(0,3,0.5,-8)},0.12) end
     refresh(getToggle(toggleName)); dot.Position=getToggle(toggleName) and UDim2.new(1,-19,0.5,-8) or UDim2.new(0,3,0.5,-8)
     toggle.BackgroundColor3=getToggle(toggleName) and Theme.Green or Theme.ToggleOff
@@ -9178,7 +9104,7 @@ function makeSyncMainToggle(parent,text,toggleName,callback,bindName)
     BoundToggles[text]=function(ns,fire) if typeof(ns)=="boolean" then setToggle(toggleName,ns); if fire~=false and callback then callback(ns) end end end
     return BoundToggles[text]
 end
-function makeQuickButton(parent,text,callback,bg) local b=Instance.new("TextButton"); b.Size=UDim2.new(1,-4,0,36); b.BackgroundColor3=bg or Theme.SoftButton; b.BackgroundTransparency=0.02; b.Text=text; b.TextColor3=Theme.Text; b.Font=Enum.Font.GothamBold; b.TextSize=13; b.AutoButtonColor=false; b.Active=true; b.ZIndex=3; b.Parent=parent; corner(b,6)
+function makeQuickButton(parent,text,callback,bg) local b=Instance.new("TextButton"); b.Size=UDim2.new(1,-4,0,36); b.BackgroundColor3=bg or Theme.SoftButton; b.BackgroundTransparency=0.02; b.Text=text; b.TextColor3=Color3.fromRGB(255,255,255); b.Font=Enum.Font.GothamBold; b.TextSize=13; b.AutoButtonColor=false; b.Active=true; b.ZIndex=7; b.Parent=parent; corner(b,6)
     b.MouseEnter:Connect(function() tw(b,{BackgroundColor3=bg or Theme.SoftButtonHover},0.12) end); b.MouseLeave:Connect(function() tw(b,{BackgroundColor3=bg or Theme.SoftButton},0.12) end)
     b.MouseButton1Click:Connect(function() if callback then callback() end end); return b end
 function makeQuickSlider(parent,text,min,max,default,callback,suffix) local holder=Instance.new("Frame"); holder.Size=UDim2.new(1,-4,0,50); holder.BackgroundTransparency=1; holder.Parent=parent
@@ -9299,9 +9225,9 @@ function makeMainButton(parent,text,callback,color) local b=Instance.new("TextBu
     b.MouseEnter:Connect(function() tw(b,{BackgroundColor3=color or Theme.RowHover},0.12) end); b.MouseLeave:Connect(function() tw(b,{BackgroundColor3=color or Theme.Row},0.12) end)
     b.MouseButton1Click:Connect(function() if callback then callback() end end); return b end
 function makeMainToggle(parent,text,enabled,callback)
-    local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,31); row.BackgroundColor3=Theme.Panel; row.BackgroundTransparency=0.18; row.ZIndex=3; row.Parent=parent; corner(row,6)
-    local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,-54,1,0); l.Position=UDim2.new(0,8,0,0); l.BackgroundTransparency=1; l.Text=text; l.TextColor3=Theme.Text; l.Font=Enum.Font.GothamBold; l.TextSize=10; l.TextXAlignment=Enum.TextXAlignment.Left; l.TextTruncate=Enum.TextTruncate.AtEnd; l.Parent=row
-    local toggle=Instance.new("TextButton"); toggle.Size=UDim2.new(0,38,0,21); toggle.Position=UDim2.new(1,-44,0.5,-10.5); toggle.BackgroundColor3=enabled and Theme.Green or Theme.ToggleOff; toggle.Text=""; toggle.AutoButtonColor=false; toggle.Parent=row; corner(toggle,20)
+    local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,31); row.BackgroundColor3=Theme.Panel; row.BackgroundTransparency=0.18; row.ZIndex=6; row.Active=false; row.Parent=parent; corner(row,6)
+    local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,-54,1,0); l.Position=UDim2.new(0,8,0,0); l.BackgroundTransparency=1; l.Text=text; l.TextColor3=Color3.fromRGB(255,255,255); l.Font=Enum.Font.GothamBold; l.TextSize=10; l.TextXAlignment=Enum.TextXAlignment.Left; l.TextTruncate=Enum.TextTruncate.AtEnd; l.ZIndex=6; l.Parent=row
+    local toggle=Instance.new("TextButton"); toggle.Size=UDim2.new(0,38,0,21); toggle.Position=UDim2.new(1,-44,0.5,-10.5); toggle.BackgroundColor3=enabled and Theme.Green or Theme.ToggleOff; toggle.Text=""; toggle.AutoButtonColor=false; toggle.Active=true; toggle.ZIndex=7; toggle.Parent=row; corner(toggle,20)
     local dot=Instance.new("Frame"); dot.Size=UDim2.new(0,16,0,16); dot.Position=enabled and UDim2.new(1,-19,0.5,-8) or UDim2.new(0,3,0.5,-8); dot.BackgroundColor3=Theme.InputBg; dot.Parent=toggle; corner(dot,20)
     local state=enabled
     local function setState(ns,fire) state=ns; tw(toggle,{BackgroundColor3=state and Theme.Green or Theme.ToggleOff},0.12); tw(dot,{Position=state and UDim2.new(1,-19,0.5,-8) or UDim2.new(0,3,0.5,-8)},0.12); if fire~=false and callback then callback(state) end end
@@ -9427,7 +9353,7 @@ function rebuildTpSpeedSettings()
     clearBody(tpSpeedSettingsBody)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Fly TP Speed", 50, 300, Config.TpSettings.FlyTPSpeed or 160, function(v) Config.TpSettings.FlyTPSpeed=v; saveConfig() end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "100 Studs Base Speed", 20, 250, Config.TpSettings.FlyTPCloseSpeed or 75, function(v) Config.TpSettings.FlyTPCloseSpeed=v; saveConfig() end)
-    makeMainSliderWithInput(tpSpeedSettingsBody, "Grabble TP Speed", 50, 600, Config.TpSettings.GrabbleTPSpeed or 545, function(v) Config.TpSettings.GrabbleTPSpeed=v; saveConfig(); if _G.SXESetCarpetSpeed then pcall(_G.SXESetCarpetSpeed, v) end end)
+    makeMainSliderWithInput(tpSpeedSettingsBody, "Grabble TP Speed", 50, 600, Config.TpSettings.GrabbleTPSpeed or 475, function(v) Config.TpSettings.GrabbleTPSpeed=v; saveConfig(); if _G.SXESetCarpetSpeed then pcall(_G.SXESetCarpetSpeed, v) end end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Walk To Brainrot Speed", 50, 1000, Config.TpSettings.WalkTPSpeed or 260, function(v) Config.TpSettings.WalkTPSpeed=v; saveConfig() end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Clone Delay", 0, 2.0, Config.TpSettings.CloneDelayVal or 0, function(v) Config.TpSettings.CloneDelayVal=v; saveConfig() end, "s")
     makeQuickButton(tpSpeedSettingsBody, "Close", function() closeAnim(tpSpeedSettingsPanel) end, Theme.SoftAccentHover)
@@ -10974,7 +10900,7 @@ do
         end
     end
     _G.SXEFireGrapple = fireGrapple
-    local SXESpeed = { CARPET = 545, INBASE = 340 }
+    local SXESpeed = { CARPET = 475, INBASE = 340 }
     _G.SXESetCarpetSpeed = function(v) v = tonumber(v); if v and v > 0 then SXESpeed.CARPET = v end end
     _G.SXESetInbaseSpeed = function(v) v = tonumber(v); if v and v > 0 then SXESpeed.INBASE = v end end
     _G.SXEGetCarpetSpeed = function() return SXESpeed.CARPET end
@@ -11470,7 +11396,7 @@ local function carpetEngage()
         for _, wp in ipairs(waypoints) do line(prev, wp); dot(wp); prev = wp end
     end
     local SPEED = 200
-    local ARRIVE = 2.5
+    local ARRIVE = 3.5
     local MAX_CLIMB = 75
     local function vZero(hrp)
         if hrp then hrp.AssemblyLinearVelocity = Vector3.zero; hrp.AssemblyAngularVelocity = Vector3.zero end
@@ -11498,29 +11424,11 @@ local function carpetEngage()
             end)
         end
         local lastDist, stall = math.huge, 0
-        if quickStart then
-            local _hp = RaycastParams.new()
-            _hp.FilterType = Enum.RaycastFilterType.Exclude
-            _hp.IgnoreWater = true
-            local _skip = {}
-            for _, pl in ipairs(Players:GetPlayers()) do
-                if pl.Character then _skip[#_skip + 1] = pl.Character end
-            end
-            _hp.FilterDescendantsInstances = _skip
-            for _ = 1, 3 do
-                local target = waypoints[wpIdx]
-                if not target then break end
-                local flat = Vector3.new(target.X - hrp.Position.X, 0, target.Z - hrp.Position.Z)
-                local mag = flat.Magnitude
-                if mag < 1 then break end
-                local nextPos = hrp.Position + flat.Unit * math.min(20, mag)
-                local _hit = workspace:Raycast(hrp.Position, nextPos - hrp.Position, _hp)
-                if _hit and _hit.Instance and _hit.Instance.CanCollide then break end
-                hrp.CFrame = (hrp.CFrame - hrp.CFrame.Position) + nextPos
-                hrp.AssemblyLinearVelocity = Vector3.zero
-                hrp.AssemblyAngularVelocity = Vector3.zero
-                RunService.Heartbeat:Wait()
-                if not hrp or not hrp.Parent then return end
+        if quickStart and waypoints[1] then
+            local flat = Vector3.new(waypoints[1].X - hrp.Position.X, 0, waypoints[1].Z - hrp.Position.Z)
+            if flat.Magnitude > 2 then
+                local boost = hrp.Position + flat.Unit * math.min(28, flat.Magnitude * 0.35)
+                hrp.CFrame = (hrp.CFrame - hrp.CFrame.Position) + boost
             end
         end
         conn = RunService.Heartbeat:Connect(function()
@@ -11529,22 +11437,24 @@ local function carpetEngage()
             end
             equipCarpet()
             local target = waypoints[wpIdx]
+            if not target then finish(); return end
             local diff = target - hrp.Position
             local mag = diff.Magnitude
             while mag < ARRIVE and wpIdx < #waypoints do
                 wpIdx = wpIdx + 1
                 lastDist, stall = math.huge, 0
                 target = waypoints[wpIdx]
+                if not target then break end
                 diff = target - hrp.Position
                 mag = diff.Magnitude
             end
-            if mag < ARRIVE and wpIdx >= #waypoints then finish(); return end
-            if mag > lastDist - 0.02 then stall = stall + 1 else stall = 0 end
+            if (not target) or (mag < ARRIVE and wpIdx >= #waypoints) then finish(); return end
+            if mag > lastDist - 0.05 then stall = stall + 1 else stall = 0 end
             lastDist = mag
-            if stall >= 40 then finish(); return end
-            if mag >= 0.05 then
+            if stall >= 50 then finish(); return end
+            if mag >= 0.08 then
                 local dir = diff.Unit
-                if allowJump and diff.Y > 5 and wpIdx < #waypoints then
+                if allowJump and diff.Y > 4 and wpIdx < #waypoints then
                     local hum = hrp.Parent and hrp.Parent:FindFirstChildOfClass("Humanoid")
                     if hum then
                         local st = hum:GetState()
@@ -12143,7 +12053,7 @@ local function carpetEngage()
             if #semEsteira == 0 then isTeleporting = false; return end
             pet = _pickByMode(semEsteira) or semEsteira[1]
         end
-        local _tpSpd = (Config and Config.TpSettings and Config.TpSettings.GrabbleTPSpeed) or 545
+        local _tpSpd = (Config and Config.TpSettings and Config.TpSettings.GrabbleTPSpeed) or 475
         local _cloneDelay = (Config and Config.TpSettings and tonumber(Config.TpSettings.CloneDelayVal)) or 0
         local petPos = pet.position
         local petName = pet.name
