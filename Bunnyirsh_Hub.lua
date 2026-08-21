@@ -88,6 +88,9 @@ do
         end
     end)
 end
+pcall(function()
+    game:GetService("ReplicatedFirst"):RemoveDefaultLoadingScreen()
+end)
 if not game:IsLoaded() then game.Loaded:Wait() end
 _G.__LT = os.clock()
 _G.__LMARK = function(name) print(("[LOAD] %-22s %6.2fs"):format(name, os.clock() - _G.__LT)) end
@@ -1643,7 +1646,7 @@ Config = {
     SpamBaseOwnerCommands={balloon=true, inverse=true, jail=true, jumpscare=true, morph=true, nightvision=true, ragdoll=true, rocket=true, tiny=true},
     SpamBaseOwnerOrder={"balloon", "inverse", "jail", "jumpscare", "morph", "nightvision", "ragdoll", "rocket", "tiny"},
     SpamBaseOwnerSingleCommand=false,
-    ProximityAP=false, ShowJobJoiner=true, AntiBeeDisco=false, AntiEffects=false, AutoDestroySentry=false,
+    ProximityAP=false, ShowJobJoiner=true, AntiBeeDisco=false, AntiEffects=false, AutoDestroySentry=false, LaserWebAimbot=false, PaintballGunSpammer=false,
     RemoteSellEnabled=false, AdminPanelUI=true,
     StealHighest=false, StealPriority=true, StealNearest=false,
     AutoStealEnabled=true,
@@ -1935,6 +1938,10 @@ local function initToggles()
     setToggle("AntiEffects", Config.AntiEffects, true)
     setToggle("Auto Destroy Sentry", Config.AutoDestroySentry, true)
     setToggle("AutoDestroySentry", Config.AutoDestroySentry, true)
+    setToggle("Laser Web Aimbot", Config.LaserWebAimbot, true)
+    setToggle("LaserWebAimbot", Config.LaserWebAimbot, true)
+    setToggle("Paintball Gun Spammer", Config.PaintballGunSpammer, true)
+    setToggle("PaintballGunSpammer", Config.PaintballGunSpammer, true)
     setToggle("Admin Panel UI", Config.AdminPanelUI, true)
     setToggle("Auto Invis During Steal", Config.AutoInvisDuringSteal, true)
     setToggle("Auto TP Priority Mode", Config.AutoTPPriority, true)
@@ -7785,6 +7792,246 @@ do
         end)
     end
 end
+do
+    local LWA = {
+        running = false,
+        range = 100,
+        laserConn = nil,
+        webConn = nil,
+        charConn = nil,
+    }
+    local function getChar()
+        return LocalPlayer.Character
+    end
+    local function getHRP()
+        local c = getChar()
+        return c and c:FindFirstChild("HumanoidRootPart")
+    end
+    local function getNearestPlayer(maxRange)
+        maxRange = maxRange or LWA.range
+        local hrp = getHRP()
+        if not hrp then return nil end
+        local myPos = hrp.Position
+        local nearest, shortest = nil, maxRange
+        for _, pl in ipairs(Players:GetPlayers()) do
+            if pl ~= LocalPlayer and pl.Character then
+                local th = pl.Character:FindFirstChild("HumanoidRootPart")
+                if th then
+                    local d = (th.Position - myPos).Magnitude
+                    if d < shortest then
+                        shortest = d
+                        nearest = pl
+                    end
+                end
+            end
+        end
+        return nearest
+    end
+    local function findTool(name)
+        local char = getChar()
+        local bp = LocalPlayer:FindFirstChildOfClass("Backpack")
+        return (char and char:FindFirstChild(name)) or (bp and bp:FindFirstChild(name))
+    end
+    local function getUseItemRemote()
+        if _G.SXEResolveHashed then
+            local r = _G.SXEResolveHashed("UseItem", "RemoteEvent")
+            if r then return r end
+        end
+        if _G.Net and _G.Net.GetRemote then
+            local ok, r = pcall(function() return _G.Net:GetRemote("UseItem") end)
+            if ok and r then return r end
+        end
+        local netFolder = ReplicatedStorage:FindFirstChild("Packages")
+        netFolder = netFolder and netFolder:FindFirstChild("Net")
+        if netFolder then
+            local direct = netFolder:FindFirstChild("RE/UseItem")
+            if direct then return direct end
+        end
+        return nil
+    end
+    local function useLaserCape(targetPart)
+        if not targetPart then return end
+        local Event = getUseItemRemote()
+        if not Event then return end
+        pcall(function()
+            Event:FireServer(targetPart.Position, targetPart)
+        end)
+    end
+    local function useWebSlinger(targetPart)
+        if not targetPart then return end
+        local tool = findTool("Web Slinger")
+        if not tool then return end
+        local handle = tool:FindFirstChild("Handle")
+        if not handle then return end
+        local Event = getUseItemRemote()
+        if not Event then return end
+        pcall(function()
+            Event:FireServer(
+                Vector3.new(targetPart.Position.X, targetPart.Position.Y, targetPart.Position.Z),
+                targetPart,
+                handle
+            )
+        end)
+    end
+    local function setupLaserAim()
+        local laserTool = findTool("Laser Cape")
+        if not laserTool then return end
+        if LWA.laserConn then
+            pcall(function() LWA.laserConn:Disconnect() end)
+            LWA.laserConn = nil
+        end
+        LWA.laserConn = laserTool.Activated:Connect(function()
+            if not LWA.running or not Config.LaserWebAimbot then return end
+            local target = getNearestPlayer(LWA.range)
+            if target and target.Character then
+                local tp = target.Character:FindFirstChild("HumanoidRootPart")
+                if tp then useLaserCape(tp) end
+            end
+        end)
+    end
+    local function setupWebAim()
+        local webTool = findTool("Web Slinger")
+        if not webTool then
+            pcall(function()
+                local net = ReplicatedStorage:FindFirstChild("Packages")
+                net = net and net:FindFirstChild("Net")
+                local buy = net and net:FindFirstChild("RF/CoinsShopService/RequestBuy")
+                if buy then
+                    buy:InvokeServer("Web Slinger")
+                elseif _G.Net and _G.Net.FireServer then
+                    _G.Net:FireServer("CoinsShopService/RequestBuy", "Web Slinger")
+                end
+            end)
+            task.wait(1)
+            webTool = findTool("Web Slinger")
+        end
+        if not webTool then return end
+        if LWA.webConn then
+            pcall(function() LWA.webConn:Disconnect() end)
+            LWA.webConn = nil
+        end
+        LWA.webConn = webTool.Activated:Connect(function()
+            if not LWA.running or not Config.LaserWebAimbot then return end
+            local target = getNearestPlayer(LWA.range)
+            if target and target.Character then
+                local tp = target.Character:FindFirstChild("HumanoidRootPart")
+                if tp then useWebSlinger(tp) end
+            end
+        end)
+    end
+    local function disconnectAll()
+        if LWA.laserConn then pcall(function() LWA.laserConn:Disconnect() end); LWA.laserConn = nil end
+        if LWA.webConn then pcall(function() LWA.webConn:Disconnect() end); LWA.webConn = nil end
+    end
+    LWA.Enable = function()
+        if LWA.running then return end
+        LWA.running = true
+        setupLaserAim()
+        setupWebAim()
+        if not LWA.charConn then
+            LWA.charConn = LocalPlayer.CharacterAdded:Connect(function()
+                if not Config.LaserWebAimbot then return end
+                task.wait(1.5)
+                if LWA.running then
+                    setupLaserAim()
+                    setupWebAim()
+                end
+            end)
+        end
+    end
+    LWA.Disable = function()
+        if not LWA.running then return end
+        LWA.running = false
+        disconnectAll()
+    end
+    _G.LASER_WEB_AIMBOT = LWA
+    if Config.LaserWebAimbot then
+        task.delay(2, function()
+            if _G.LASER_WEB_AIMBOT and _G.LASER_WEB_AIMBOT.Enable then
+                _G.LASER_WEB_AIMBOT.Enable()
+            end
+        end)
+    end
+end
+do
+    local PGS = {
+        running = false,
+        connection = nil,
+        charConn = nil,
+    }
+    local function getUseItemRemote()
+        if _G.SXEResolveHashed then
+            local r = _G.SXEResolveHashed("UseItem", "RemoteEvent")
+            if r then return r end
+        end
+        if _G.Net and _G.Net.GetRemote then
+            local ok, r = pcall(function() return _G.Net:GetRemote("UseItem") end)
+            if ok and r then return r end
+        end
+        local netFolder = ReplicatedStorage:FindFirstChild("Packages")
+        netFolder = netFolder and netFolder:FindFirstChild("Net")
+        if netFolder then
+            local direct = netFolder:FindFirstChild("RE/UseItem")
+            if direct then return direct end
+        end
+        return nil
+    end
+    local function stopSpam()
+        if PGS.connection then
+            pcall(function() PGS.connection:Disconnect() end)
+            PGS.connection = nil
+        end
+    end
+    local function startSpam()
+        stopSpam()
+        PGS.connection = RunService.Heartbeat:Connect(function()
+            if not PGS.running or not Config.PaintballGunSpammer then return end
+            local backpack = LocalPlayer:FindFirstChildOfClass("Backpack")
+            if not backpack then return end
+            local gun = backpack:FindFirstChild("Paintball Gun")
+            local char = LocalPlayer.Character
+            if not char then return end
+            if not gun then
+                gun = char:FindFirstChild("Paintball Gun")
+            end
+            if not gun then return end
+            local humanoid = char:FindFirstChildOfClass("Humanoid")
+            if not humanoid then return end
+            if gun.Parent == backpack then
+                pcall(function() humanoid:EquipTool(gun) end)
+            end
+            local Event = getUseItemRemote()
+            if Event then
+                pcall(function() Event:FireServer() end)
+            end
+        end)
+    end
+    PGS.Enable = function()
+        if PGS.running then return end
+        PGS.running = true
+        startSpam()
+        if not PGS.charConn then
+            PGS.charConn = LocalPlayer.CharacterAdded:Connect(function()
+                if not Config.PaintballGunSpammer then return end
+                task.wait(0.8)
+                if PGS.running then startSpam() end
+            end)
+        end
+    end
+    PGS.Disable = function()
+        if not PGS.running then return end
+        PGS.running = false
+        stopSpam()
+    end
+    _G.PAINTBALL_GUN_SPAMMER = PGS
+    if Config.PaintballGunSpammer then
+        task.delay(2, function()
+            if _G.PAINTBALL_GUN_SPAMMER and _G.PAINTBALL_GUN_SPAMMER.Enable then
+                _G.PAINTBALL_GUN_SPAMMER.Enable()
+            end
+        end)
+    end
+end
 local toggleAutoBuy
 do
 local autoBuyActive = false
@@ -8663,15 +8910,25 @@ function makeHeader(f,t,isMain)
     return h
 end
 function makeMainPanel(t,size,pos) local f=Instance.new("Frame"); f.Size=size; f.Position=pos; f.BackgroundColor3=Theme.MainBackground; f.BackgroundTransparency=0.06; f.BorderSizePixel=0; f.ClipsDescendants=true; f.Parent=gui; corner(f,12); addOutline(f); makeHeader(f,t,true)
-    local body=Instance.new("ScrollingFrame"); body.Size=UDim2.new(1,-12,1,-82); body.Position=UDim2.new(0,6,0,76); body.BackgroundTransparency=1; body.BorderSizePixel=0; body.ScrollBarThickness=3; body.ScrollBarImageColor3=Theme.Accent; body.CanvasSize=UDim2.new(0,0,0,0); body.Active=true; body.Parent=f
-    local lay=Instance.new("UIListLayout"); lay.Padding=UDim.new(0,6); lay.Parent=body
-    lay:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() body.CanvasSize=UDim2.new(0,0,0,lay.AbsoluteContentSize.Y+10) end);
+    local body=Instance.new("ScrollingFrame"); body.Size=UDim2.new(1,-12,1,-82); body.Position=UDim2.new(0,6,0,76); body.BackgroundTransparency=1; body.BorderSizePixel=0; body.ScrollBarThickness=5; body.ScrollBarImageColor3=Theme.Accent; body.CanvasSize=UDim2.new(0,0,0,0); body.Active=true; body.ScrollingEnabled=true; body.ElasticBehavior=Enum.ElasticBehavior.Always; body.ScrollingDirection=Enum.ScrollingDirection.Y; body.AutomaticCanvasSize=Enum.AutomaticSize.Y; body.Parent=f
+    local lay=Instance.new("UIListLayout"); lay.Padding=UDim.new(0,6); lay.SortOrder=Enum.SortOrder.LayoutOrder; lay.Parent=body
+    local function refreshCanvas()
+        local h = lay.AbsoluteContentSize.Y + 48
+        body.CanvasSize = UDim2.new(0, 0, 0, math.max(h, body.AbsoluteSize.Y + 1))
+    end
+    lay:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(refreshCanvas)
+    body:GetPropertyChangedSignal("AbsoluteSize"):Connect(refreshCanvas)
     if Config.sizes and Config.sizes[t] then f.Size = UDim2.new(0, Config.sizes[t].x, 0, Config.sizes[t].y) end
     makeResizable(f, UDim2.new(0, 200, 0, 150), t); return f,body end
 function makeQuickPanel(t,size,pos) local f=Instance.new("Frame"); f.Size=size; f.Position=pos; f.BackgroundColor3=Theme.Background; f.BackgroundTransparency=0.04; f.BorderSizePixel=0; f.ClipsDescendants=true; f.Parent=gui; corner(f,12); addOutline(f); makeHeader(f,t,false)
-    local body=Instance.new("ScrollingFrame"); body.Size=UDim2.new(1,-12,1,-50); body.Position=UDim2.new(0,6,0,46); body.BackgroundTransparency=1; body.BorderSizePixel=0; body.ScrollBarThickness=3; body.ScrollBarImageColor3=Theme.Accent; body.CanvasSize=UDim2.new(0,0,0,0); body.Active=true; body.Parent=f
-    local lay=Instance.new("UIListLayout"); lay.Padding=UDim.new(0,6); lay.Parent=body
-    lay:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() body.CanvasSize=UDim2.new(0,0,0,lay.AbsoluteContentSize.Y+10) end);
+    local body=Instance.new("ScrollingFrame"); body.Size=UDim2.new(1,-12,1,-50); body.Position=UDim2.new(0,6,0,46); body.BackgroundTransparency=1; body.BorderSizePixel=0; body.ScrollBarThickness=5; body.ScrollBarImageColor3=Theme.Accent; body.CanvasSize=UDim2.new(0,0,0,0); body.Active=true; body.ScrollingEnabled=true; body.ElasticBehavior=Enum.ElasticBehavior.Always; body.ScrollingDirection=Enum.ScrollingDirection.Y; body.AutomaticCanvasSize=Enum.AutomaticSize.Y; body.Parent=f
+    local lay=Instance.new("UIListLayout"); lay.Padding=UDim.new(0,6); lay.SortOrder=Enum.SortOrder.LayoutOrder; lay.Parent=body
+    local function refreshCanvas()
+        local h = lay.AbsoluteContentSize.Y + 36
+        body.CanvasSize = UDim2.new(0, 0, 0, math.max(h, body.AbsoluteSize.Y + 1))
+    end
+    lay:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(refreshCanvas)
+    body:GetPropertyChangedSignal("AbsoluteSize"):Connect(refreshCanvas)
     if Config.sizes and Config.sizes[t] then f.Size = UDim2.new(0, Config.sizes[t].x, 0, Config.sizes[t].y) end
     if not string.find(t, "Admin Command Panel") then makeResizable(f, UDim2.new(0, 150, 0, 150), t) end; return f,body end
 function makeSyncStateRow(parent,text,toggleName,callback,bindName)
@@ -8874,7 +9131,7 @@ function makeKeybindRow(parent,nameText)
         local con; con=UIS.InputBegan:Connect(function(input,gp) if gp then return end; if input.UserInputType==Enum.UserInputType.Keyboard then Keybinds[nameText]=input.KeyCode.Name; Config.keybinds[nameText]=input.KeyCode.Name; saveConfig(); key.Text=input.KeyCode.Name; if nameText=="Open Menu" then UI.OpenMenuKey=input.KeyCode end; con:Disconnect(); if updateMovementPanelLabels then updateMovementPanelLabels() end end end)
     end)
 end
-main,mainBody=makeMainPanel("Bunnyirsh Hub",UDim2.new(0,375,0,480),UDim2.new(0.5,-187,0.5,-255))
+main,mainBody=makeMainPanel("Bunnyirsh Hub",UDim2.new(0,375,0,520),UDim2.new(0.5,-187,0.5,-275))
 if Config.AutoCloseOnExec then main.Visible = false end
 panels["Invisible Steal Panel"],panels["InvisStealBody"]=makeQuickPanel("Bunnyirsh Hub\nInvisible Steal",UDim2.new(0,230,0,375),UDim2.new(0,80,0.5,-220))
 panels["InvisStealBody"].ScrollBarThickness = 0
@@ -9810,22 +10067,96 @@ function loadTab(tabName)
         end)
         local lockBtn; lockBtn=makeMainButton(mainBody,UI.Locked and "Locked" or "Unlocked",function() UI.Locked=not UI.Locked; Config.locked=UI.Locked; saveConfig(); lockBtn.Text=UI.Locked and "Locked" or "Unlocked" end,Theme.SoftButton)
     elseif tabName=="Misc" then
-        if _G.HeresyExtras then
-            makeSyncMainToggle(mainBody,"Anti Collision (pass through players)","Anti Colisao",function(on) _G.HeresyExtras.setAntiColisao(on) end)
-            makeSyncMainToggle(mainBody,"Anti Flasher (remove accessories)","Anti Flasher",function(on) _G.HeresyExtras.setAntiFlasher(on) end)
-            makeSyncMainToggle(mainBody,"PS On Steal","PS On Steal",function(on) _G.HeresyExtras.setPs(on) end)
+        local function sectionLabel(txt)
+            local row = Instance.new("Frame")
+            row.Size = UDim2.new(1, -4, 0, 18)
+            row.BackgroundTransparency = 1
+            row.Parent = mainBody
+            local lbl = Instance.new("TextLabel")
+            lbl.Size = UDim2.new(1, 0, 1, 0)
+            lbl.BackgroundTransparency = 1
+            lbl.Text = txt
+            lbl.TextColor3 = Theme.Dim
+            lbl.Font = Enum.Font.GothamBold
+            lbl.TextSize = 10
+            lbl.TextXAlignment = Enum.TextXAlignment.Left
+            lbl.Parent = row
         end
+        sectionLabel("MOVEMENT")
+        makeSyncMainToggle(mainBody,"Infinite Jump","Infinite Jump",function(on) setInfiniteJump(on) end)
+        makeSyncMainToggle(mainBody,"Float","Float",function(on) setFloat(on) end)
+        makeSyncMainToggle(mainBody,"Carpet Speed","Carpet Speed",function(on) setCarpetSpeed(on) end)
+        makeSyncMainToggle(mainBody,"Unwalk","Unwalk",function(on) if _G.setUnwalk then _G.setUnwalk(on) end end)
         makeMainToggle(mainBody,"Instant Clone",true)
+        sectionLabel("STEAL / UTILITY")
+        makeSyncMainToggle(mainBody,"Invisible Steal","Invisible Steal",function(on) if _G.toggleInvisibleSteal then pcall(_G.toggleInvisibleSteal) end end)
         makeMainToggle(mainBody,"Auto Invisible During Steal",Config.AutoInvisDuringSteal,function(on) _G.AutoInvisDuringSteal=on; Config.AutoInvisDuringSteal=on; saveConfig() end)
         makeMainToggle(mainBody,"Auto Unlock During Steal",Config.AutoUnlockOnSteal,function(on) Config.AutoUnlockOnSteal=on; saveConfig() end)
         makeSyncMainToggle(mainBody,"Anti Ragdoll","Anti Ragdoll",function(on) if on then startAntiRagdoll() else stopAntiRagdoll() end end)
         makeSyncMainToggle(mainBody,"Auto Reset Balloon","Auto Reset Balloon",function(on) Config.AutoResetBalloon=on; saveConfig() end)
-        makeSyncMainToggle(mainBody,"Infinite Jump","Infinite Jump",function(on) setInfiniteJump(on) end)
         makeMainTextBox(mainBody,"Private Server Code",PrivateServerCode,"cole o link code aqui",function(v) PrivateServerCode=v; savePSCode() end)
-        makeSyncMainToggle(mainBody,"Unwalk","Unwalk",function(on) if _G.setUnwalk then _G.setUnwalk(on) end end)
-        makeSyncMainToggle(mainBody,"Invisible Steal","Invisible Steal",function(on) if _G.toggleInvisibleSteal then pcall(_G.toggleInvisibleSteal) end end)
-        makeSyncMainToggle(mainBody,"Float","Float",function(on) setFloat(on) end)
-        makeSyncMainToggle(mainBody,"Carpet Speed","Carpet Speed",function(on) setCarpetSpeed(on) end)
+        if _G.HeresyExtras then
+            makeSyncMainToggle(mainBody,"PS On Steal","PS On Steal",function(on) _G.HeresyExtras.setPs(on) end)
+        end
+        sectionLabel("PROTECTION")
+        if _G.HeresyExtras then
+            makeSyncMainToggle(mainBody,"Anti Collision (pass through players)","Anti Colisao",function(on) _G.HeresyExtras.setAntiColisao(on) end)
+            makeSyncMainToggle(mainBody,"Anti Flasher (remove accessories)","Anti Flasher",function(on) _G.HeresyExtras.setAntiFlasher(on) end)
+        end
+        makeSyncMainToggle(mainBody,"Laser / WebSlinger Aimbot","LaserWebAimbot",function(on)
+            Config.LaserWebAimbot = on
+            saveConfig()
+            if on then
+                if _G.LASER_WEB_AIMBOT and _G.LASER_WEB_AIMBOT.Enable then
+                    _G.LASER_WEB_AIMBOT.Enable()
+                end
+            else
+                if _G.LASER_WEB_AIMBOT and _G.LASER_WEB_AIMBOT.Disable then
+                    _G.LASER_WEB_AIMBOT.Disable()
+                end
+            end
+        end)
+        makeSyncMainToggle(mainBody,"Paintball Gun Spammer","PaintballGunSpammer",function(on)
+            Config.PaintballGunSpammer = on
+            saveConfig()
+            if on then
+                if _G.PAINTBALL_GUN_SPAMMER and _G.PAINTBALL_GUN_SPAMMER.Enable then
+                    _G.PAINTBALL_GUN_SPAMMER.Enable()
+                end
+            else
+                if _G.PAINTBALL_GUN_SPAMMER and _G.PAINTBALL_GUN_SPAMMER.Disable then
+                    _G.PAINTBALL_GUN_SPAMMER.Disable()
+                end
+            end
+        end)
+        makeSyncMainToggle(mainBody,"Anti-Bee & Anti-Disco","AntiBeeDisco",function(on)
+            Config.AntiBeeDisco = on
+            saveConfig()
+            if on then
+                if _G.ANTI_BEE_DISCO and _G.ANTI_BEE_DISCO.Enable then _G.ANTI_BEE_DISCO.Enable() end
+            else
+                if _G.ANTI_BEE_DISCO and _G.ANTI_BEE_DISCO.Disable then _G.ANTI_BEE_DISCO.Disable() end
+            end
+        end)
+        makeSyncMainToggle(mainBody,"Anti Effects","AntiEffects",function(on)
+            Config.AntiEffects = on
+            saveConfig()
+            if on then
+                if _G.ANTI_EFFECTS and _G.ANTI_EFFECTS.Enable then _G.ANTI_EFFECTS.Enable() end
+            else
+                if _G.ANTI_EFFECTS and _G.ANTI_EFFECTS.Disable then _G.ANTI_EFFECTS.Disable() end
+            end
+        end)
+        makeSyncMainToggle(mainBody,"Auto Destroy Sentry","AutoDestroySentry",function(on)
+            Config.AutoDestroySentry = on
+            saveConfig()
+            if on then
+                if _G.AUTO_DESTROY_SENTRY and _G.AUTO_DESTROY_SENTRY.Enable then _G.AUTO_DESTROY_SENTRY.Enable() end
+            else
+                if _G.AUTO_DESTROY_SENTRY and _G.AUTO_DESTROY_SENTRY.Disable then _G.AUTO_DESTROY_SENTRY.Disable() end
+            end
+        end)
+        sectionLabel("ADMIN PANEL")
         makeSyncMainToggle(mainBody,"Click to AP","ClickToAP",function(on) Config.ClickToAP=on; saveConfig() end)
         local function makeAPConfigPanel(panelKey, titleText, configTable, orderKey, onToggleCb)
             if panels[panelKey] then
@@ -10066,50 +10397,15 @@ function loadTab(tabName)
         makeMainButton(mainBody, "Spam Base Owner Commands", function()
             makeAPConfigPanel("SpamBaseOwnerCmds", "Spam Base Owner Commands", Config.SpamBaseOwnerCommands, "SpamBaseOwnerOrder")
         end)
-        makeSyncMainToggle(mainBody,"Anti-Bee & Anti-Disco","AntiBeeDisco",function(on)
-            Config.AntiBeeDisco = on
-            saveConfig()
-            if on then
-                if _G.ANTI_BEE_DISCO and _G.ANTI_BEE_DISCO.Enable then
-                    _G.ANTI_BEE_DISCO.Enable()
-                end
-            else
-                if _G.ANTI_BEE_DISCO and _G.ANTI_BEE_DISCO.Disable then
-                    _G.ANTI_BEE_DISCO.Disable()
-                end
-            end
-        end)
-        makeSyncMainToggle(mainBody,"Anti Effects","AntiEffects",function(on)
-            Config.AntiEffects = on
-            saveConfig()
-            if on then
-                if _G.ANTI_EFFECTS and _G.ANTI_EFFECTS.Enable then
-                    _G.ANTI_EFFECTS.Enable()
-                end
-            else
-                if _G.ANTI_EFFECTS and _G.ANTI_EFFECTS.Disable then
-                    _G.ANTI_EFFECTS.Disable()
-                end
-            end
-        end)
-        makeSyncMainToggle(mainBody,"Auto Destroy Sentry","AutoDestroySentry",function(on)
-            Config.AutoDestroySentry = on
-            saveConfig()
-            if on then
-                if _G.AUTO_DESTROY_SENTRY and _G.AUTO_DESTROY_SENTRY.Enable then
-                    _G.AUTO_DESTROY_SENTRY.Enable()
-                end
-            else
-                if _G.AUTO_DESTROY_SENTRY and _G.AUTO_DESTROY_SENTRY.Disable then
-                    _G.AUTO_DESTROY_SENTRY.Disable()
-                end
-            end
-        end)
         makeMainTextBox(mainBody,"Min Gen for Nearest Grab",Config.TpSettings.MinGenForGrab,"e.g. 10k, 500k, 1m",function(v)
             Config.TpSettings.MinGenForGrab = v
             saveConfig()
             ShowNotification("MIN GEN GRAB", v == "" and "No minimum" or "Min: " .. v)
         end)
+        local bottomPad = Instance.new("Frame")
+        bottomPad.Size = UDim2.new(1, 0, 0, 24)
+        bottomPad.BackgroundTransparency = 1
+        bottomPad.Parent = mainBody
     elseif tabName=="Priority" then
         makePriorityAddRow(); makePriorityRestoreRow(); for i=1,#priorityList do makePriorityRow(i) end
     elseif tabName=="Performance" then
