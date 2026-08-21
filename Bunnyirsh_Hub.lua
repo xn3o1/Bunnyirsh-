@@ -926,7 +926,7 @@ do
             pcall(function() ok = _G.SXEFireGrapple2(destino) and true or false end)
         end
         if _G.__LMARK then _G.__LMARK("hook na direcao da base: " .. tostring(ok)) end
-        local ESPERA_HOOK_TP = 0.12
+        local ESPERA_HOOK_TP = 0.04
         task.wait(ESPERA_HOOK_TP)
         if _G.SXEStartSideTP then
             task.spawn(_G.SXEStartSideTP)
@@ -1245,16 +1245,16 @@ Themes = {
         BlacklistHover=Color3.fromRGB(180,180,180), BlacklistLeave=Color3.fromRGB(225,225,225),
     },
     Dark = {
-        Background=Color3.fromRGB(12,12,12), MainBackground=Color3.fromRGB(0,0,0),
-        Panel=Color3.fromRGB(22,22,22), Row=Color3.fromRGB(28,28,28), RowHover=Color3.fromRGB(40,40,40),
-        Accent=Color3.fromRGB(255,255,255), AccentLight=Color3.fromRGB(200,200,200),
-        Green=Color3.fromRGB(220,220,220), Red=Color3.fromRGB(180,180,180), Red2=Color3.fromRGB(150,150,150),
-        Text=Color3.fromRGB(245,245,245), Dim=Color3.fromRGB(140,140,140), Stroke=Color3.fromRGB(60,60,60),
-        SoftButton=Color3.fromRGB(30,30,30), SoftButtonHover=Color3.fromRGB(45,45,45),
-        SoftAccent=Color3.fromRGB(30,30,30), SoftAccentHover=Color3.fromRGB(45,45,45),
-        ToggleOff=Color3.fromRGB(40,40,40), ToggleOff2=Color3.fromRGB(40,40,40),
-        InputBg=Color3.fromRGB(18,18,18), SliderBg=Color3.fromRGB(60,60,60),
-        BlacklistHover=Color3.fromRGB(50,50,50), BlacklistLeave=Color3.fromRGB(45,45,45),
+        Background=Color3.fromRGB(14,14,18), MainBackground=Color3.fromRGB(8,8,12),
+        Panel=Color3.fromRGB(20,20,26), Row=Color3.fromRGB(26,26,34), RowHover=Color3.fromRGB(38,38,48),
+        Accent=Color3.fromRGB(255,255,255), AccentLight=Color3.fromRGB(190,195,210),
+        Green=Color3.fromRGB(90,220,140), Red=Color3.fromRGB(230,90,90), Red2=Color3.fromRGB(180,70,70),
+        Text=Color3.fromRGB(245,246,250), Dim=Color3.fromRGB(130,135,150), Stroke=Color3.fromRGB(50,52,65),
+        SoftButton=Color3.fromRGB(28,28,36), SoftButtonHover=Color3.fromRGB(42,42,54),
+        SoftAccent=Color3.fromRGB(28,28,36), SoftAccentHover=Color3.fromRGB(42,42,54),
+        ToggleOff=Color3.fromRGB(36,36,46), ToggleOff2=Color3.fromRGB(36,36,46),
+        InputBg=Color3.fromRGB(16,16,22), SliderBg=Color3.fromRGB(55,55,70),
+        BlacklistHover=Color3.fromRGB(48,48,60), BlacklistLeave=Color3.fromRGB(42,42,54),
     }
 }
 HERESY = { NOME="Bunnyirsh Hub", GRAD_A=Color3.fromRGB(255,255,255), GRAD_B=Color3.fromRGB(180,180,180) }
@@ -1646,7 +1646,7 @@ Config = {
     SpamBaseOwnerCommands={balloon=true, inverse=true, jail=true, jumpscare=true, morph=true, nightvision=true, ragdoll=true, rocket=true, tiny=true},
     SpamBaseOwnerOrder={"balloon", "inverse", "jail", "jumpscare", "morph", "nightvision", "ragdoll", "rocket", "tiny"},
     SpamBaseOwnerSingleCommand=false,
-    ProximityAP=false, ShowJobJoiner=true, AntiBeeDisco=false, AntiEffects=false, AutoDestroySentry=false, LaserWebAimbot=false, PaintballGunSpammer=false,
+    ProximityAP=false, ShowJobJoiner=true, AntiBeeDisco=false, AntiEffects=false, AutoDestroySentry=false, LaserWebAimbot=false,
     RemoteSellEnabled=false, AdminPanelUI=true,
     StealHighest=false, StealPriority=true, StealNearest=false,
     AutoStealEnabled=true,
@@ -1661,7 +1661,7 @@ Config = {
     },
     TpSettings = {
         Tool="Flying Carpet", TpKey="T", CloneKey="V", CarpetSpeedKey="Q",
-        InfiniteJump=false, DelayVal=0.4, CloneDelayVal=0.1,
+        InfiniteJump=false, DelayVal=0.25, CloneDelayVal=0.05,
         RagdollTP=false, FPSWait=false, FlyTP=false, FlyTPSpeed=160, FlyTPCloseSpeed=75,
         GrabbleTP=false, GrabbleTPSpeed=500,
         TpOnLoad=false, MinGenForTp="", MinGenForGrab="",
@@ -1940,8 +1940,6 @@ local function initToggles()
     setToggle("AutoDestroySentry", Config.AutoDestroySentry, true)
     setToggle("Laser Web Aimbot", Config.LaserWebAimbot, true)
     setToggle("LaserWebAimbot", Config.LaserWebAimbot, true)
-    setToggle("Paintball Gun Spammer", Config.PaintballGunSpammer, true)
-    setToggle("PaintballGunSpammer", Config.PaintballGunSpammer, true)
     setToggle("Admin Panel UI", Config.AdminPanelUI, true)
     setToggle("Auto Invis During Steal", Config.AutoInvisDuringSteal, true)
     setToggle("Auto TP Priority Mode", Config.AutoTPPriority, true)
@@ -5677,7 +5675,7 @@ local function getPlotKey(plotName)
     return nil
 end
 local SPEED = 200
-local ARRIVE = 2.2
+local ARRIVE = 1.5
 local function vZero(hrp)
     if hrp then hrp.AssemblyLinearVelocity = Vector3.zero; hrp.AssemblyAngularVelocity = Vector3.zero end
 end
@@ -6139,7 +6137,7 @@ function runAutoSnipe()
             hrp.AssemblyLinearVelocity = Vector3.zero
             hrp.CFrame = hrp.CFrame * CFrame.new(0, 0, -2.5)
             hrp.AssemblyLinearVelocity = Vector3.zero
-            waitSecondsHeartbeat(Config.TpSettings.CloneDelayVal or 0.1)
+            waitSecondsHeartbeat(Config.TpSettings.CloneDelayVal or 0.05)
             local miniPos = hrp.Position
             waitSecondsHeartbeat(0.01)
             local stillAtMiniPos = waitUntilHeartbeat(function()
@@ -7682,7 +7680,7 @@ do
         running = false,
         connection = nil,
         target = nil,
-        DETECTION_DISTANCE = 60,
+        DETECTION_DISTANCE = 15,
         PULL_DISTANCE = -5,
     }
     local function getChar()
@@ -7949,85 +7947,6 @@ do
         task.delay(2, function()
             if _G.LASER_WEB_AIMBOT and _G.LASER_WEB_AIMBOT.Enable then
                 _G.LASER_WEB_AIMBOT.Enable()
-            end
-        end)
-    end
-end
-do
-    local PGS = {
-        running = false,
-        connection = nil,
-        charConn = nil,
-    }
-    local function getUseItemRemote()
-        if _G.SXEResolveHashed then
-            local r = _G.SXEResolveHashed("UseItem", "RemoteEvent")
-            if r then return r end
-        end
-        if _G.Net and _G.Net.GetRemote then
-            local ok, r = pcall(function() return _G.Net:GetRemote("UseItem") end)
-            if ok and r then return r end
-        end
-        local netFolder = ReplicatedStorage:FindFirstChild("Packages")
-        netFolder = netFolder and netFolder:FindFirstChild("Net")
-        if netFolder then
-            local direct = netFolder:FindFirstChild("RE/UseItem")
-            if direct then return direct end
-        end
-        return nil
-    end
-    local function stopSpam()
-        if PGS.connection then
-            pcall(function() PGS.connection:Disconnect() end)
-            PGS.connection = nil
-        end
-    end
-    local function startSpam()
-        stopSpam()
-        PGS.connection = RunService.Heartbeat:Connect(function()
-            if not PGS.running or not Config.PaintballGunSpammer then return end
-            local backpack = LocalPlayer:FindFirstChildOfClass("Backpack")
-            if not backpack then return end
-            local gun = backpack:FindFirstChild("Paintball Gun")
-            local char = LocalPlayer.Character
-            if not char then return end
-            if not gun then
-                gun = char:FindFirstChild("Paintball Gun")
-            end
-            if not gun then return end
-            local humanoid = char:FindFirstChildOfClass("Humanoid")
-            if not humanoid then return end
-            if gun.Parent == backpack then
-                pcall(function() humanoid:EquipTool(gun) end)
-            end
-            local Event = getUseItemRemote()
-            if Event then
-                pcall(function() Event:FireServer() end)
-            end
-        end)
-    end
-    PGS.Enable = function()
-        if PGS.running then return end
-        PGS.running = true
-        startSpam()
-        if not PGS.charConn then
-            PGS.charConn = LocalPlayer.CharacterAdded:Connect(function()
-                if not Config.PaintballGunSpammer then return end
-                task.wait(0.8)
-                if PGS.running then startSpam() end
-            end)
-        end
-    end
-    PGS.Disable = function()
-        if not PGS.running then return end
-        PGS.running = false
-        stopSpam()
-    end
-    _G.PAINTBALL_GUN_SPAMMER = PGS
-    if Config.PaintballGunSpammer then
-        task.delay(2, function()
-            if _G.PAINTBALL_GUN_SPAMMER and _G.PAINTBALL_GUN_SPAMMER.Enable then
-                _G.PAINTBALL_GUN_SPAMMER.Enable()
             end
         end)
     end
@@ -8742,7 +8661,7 @@ _G.HideStealProgressBar = function()
 end
 corner = function(o,r) local c=Instance.new("UICorner"); c.CornerRadius=UDim.new(0,r); c.Parent=o; return c end
 stroke = function(o,col,th,tr) local s=Instance.new("UIStroke"); s.Color=col or Theme.Stroke; s.Thickness=th or 1; s.Transparency=tr or 0; s.ApplyStrokeMode=Enum.ApplyStrokeMode.Border; s.Parent=o; return s end
-tw = function(o,p,t) TweenService:Create(o,TweenInfo.new(t or 0.14,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),p):Play() end
+tw = function(o,p,t) TweenService:Create(o,TweenInfo.new(t or 0.16,Enum.EasingStyle.Exponential,Enum.EasingDirection.Out),p):Play() end
 local _capAtiva = nil
 function cancelarCaptura()
     local c = _capAtiva
@@ -8791,8 +8710,8 @@ addOutline = function(f)
     local s = Instance.new("UIStroke")
     s.Name = "HeresyOutline"
     s.Color = Theme.Stroke
-    s.Thickness = 1
-    s.Transparency = 0.2
+    s.Thickness = 1.2
+    s.Transparency = 0.15
     s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     s.Parent = f
     return s
@@ -8808,12 +8727,11 @@ function openAnim(f)
     if baseTrans > 0.9 then baseTrans = 0.04 end
     f.Visible = true
     f.BackgroundTransparency = 1
-    us.Scale = 0.72
-    f.Position = UDim2.new(tgt.X.Scale, tgt.X.Offset, tgt.Y.Scale, tgt.Y.Offset + 48)
-    local ti = TweenInfo.new(0.42, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-    local ti2 = TweenInfo.new(0.38, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+    us.Scale = 0.88
+    f.Position = UDim2.new(tgt.X.Scale, tgt.X.Offset, tgt.Y.Scale, tgt.Y.Offset + 18)
+    local ti = TweenInfo.new(0.28, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
     TweenService:Create(us, ti, {Scale = 1}):Play()
-    TweenService:Create(f, ti2, {Position = tgt, BackgroundTransparency = baseTrans}):Play()
+    TweenService:Create(f, ti, {Position = tgt, BackgroundTransparency = baseTrans}):Play()
 end
 function closeAnim(f)
     if not f then return end
@@ -8823,15 +8741,20 @@ function closeAnim(f)
         return
     end
     local baseTrans = f.BackgroundTransparency
-    local ti = TweenInfo.new(0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
-    local tw1 = TweenService:Create(us, ti, {Scale = 0.78})
-    local tw2 = TweenService:Create(f, ti, {BackgroundTransparency = 1})
+    local tgt = f.Position
+    local ti = TweenInfo.new(0.18, Enum.EasingStyle.Exponential, Enum.EasingDirection.In)
+    local tw1 = TweenService:Create(us, ti, {Scale = 0.92})
+    local tw2 = TweenService:Create(f, ti, {
+        BackgroundTransparency = 1,
+        Position = UDim2.new(tgt.X.Scale, tgt.X.Offset, tgt.Y.Scale, tgt.Y.Offset + 12)
+    })
     tw1:Play()
     tw2:Play()
     tw1.Completed:Connect(function()
         f.Visible = false
         us.Scale = 1
         f.BackgroundTransparency = baseTrans
+        f.Position = tgt
     end)
 end
 makeDraggable = function(frame,handle,saveName) local dragging,dragStart,startPos=false,nil,nil
@@ -9230,7 +9153,7 @@ function rebuildTpSpeedSettings()
     makeMainSliderWithInput(tpSpeedSettingsBody, "100 Studs Base Speed", 20, 250, Config.TpSettings.FlyTPCloseSpeed or 75, function(v) Config.TpSettings.FlyTPCloseSpeed=v; saveConfig() end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Grabble TP Speed", 50, 600, Config.TpSettings.GrabbleTPSpeed or 500, function(v) Config.TpSettings.GrabbleTPSpeed=v; saveConfig(); if _G.SXESetCarpetSpeed then pcall(_G.SXESetCarpetSpeed, v) end end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Walk To Brainrot Speed", 50, 1000, Config.TpSettings.WalkTPSpeed or 260, function(v) Config.TpSettings.WalkTPSpeed=v; saveConfig() end)
-    makeMainSliderWithInput(tpSpeedSettingsBody, "Clone Delay", 0.05, 2.0, Config.TpSettings.CloneDelayVal or 0.1, function(v) Config.TpSettings.CloneDelayVal=v; saveConfig() end, "s")
+    makeMainSliderWithInput(tpSpeedSettingsBody, "Clone Delay", 0.05, 2.0, Config.TpSettings.CloneDelayVal or 0.05, function(v) Config.TpSettings.CloneDelayVal=v; saveConfig() end, "s")
     makeQuickButton(tpSpeedSettingsBody, "Close", function() closeAnim(tpSpeedSettingsPanel) end, Theme.SoftAccentHover)
 end
 do
@@ -10113,19 +10036,6 @@ function loadTab(tabName)
             else
                 if _G.LASER_WEB_AIMBOT and _G.LASER_WEB_AIMBOT.Disable then
                     _G.LASER_WEB_AIMBOT.Disable()
-                end
-            end
-        end)
-        makeSyncMainToggle(mainBody,"Paintball Gun Spammer","PaintballGunSpammer",function(on)
-            Config.PaintballGunSpammer = on
-            saveConfig()
-            if on then
-                if _G.PAINTBALL_GUN_SPAMMER and _G.PAINTBALL_GUN_SPAMMER.Enable then
-                    _G.PAINTBALL_GUN_SPAMMER.Enable()
-                end
-            else
-                if _G.PAINTBALL_GUN_SPAMMER and _G.PAINTBALL_GUN_SPAMMER.Disable then
-                    _G.PAINTBALL_GUN_SPAMMER.Disable()
                 end
             end
         end)
@@ -11266,7 +11176,7 @@ local function carpetEngage()
         for _, wp in ipairs(waypoints) do line(prev, wp); dot(wp); prev = wp end
     end
     local SPEED = 200
-    local ARRIVE = 2.2
+    local ARRIVE = 1.5
     local MAX_CLIMB = 75
     local function vZero(hrp)
         if hrp then hrp.AssemblyLinearVelocity = Vector3.zero; hrp.AssemblyAngularVelocity = Vector3.zero end
@@ -11940,7 +11850,7 @@ local function carpetEngage()
             pet = _pickByMode(semEsteira) or semEsteira[1]
         end
         local _tpSpd = (Config and Config.TpSettings and Config.TpSettings.GrabbleTPSpeed) or 500
-        local _cloneDelay = (Config and Config.TpSettings and Config.TpSettings.CloneDelayVal) or 0.35
+        local _cloneDelay = (Config and Config.TpSettings and Config.TpSettings.CloneDelayVal) or 0.05
         local petPos = pet.position
         local petName = pet.name
         local adjY = petPos.Y
@@ -12100,7 +12010,7 @@ local function carpetEngage()
         velMoveThrough(hrp, _stepped, _tpSpd, true, true)
         hrp.CFrame = CFrame.new(destPos, destPos + facingDir)
         vZero(hrp)
-        local syncFrames = 5
+        local syncFrames = 2
         local syncConn
         syncConn = RunService.Heartbeat:Connect(function()
             if not hrp or not hrp.Parent then syncConn:Disconnect(); return end
@@ -12110,8 +12020,8 @@ local function carpetEngage()
             hrp.AssemblyAngularVelocity = Vector3.zero
             if syncFrames <= 0 then syncConn:Disconnect() end
         end)
-        for _ = 1, 20 do
-            task.wait(0.05)
+        for _ = 1, 8 do
+            task.wait(0.03)
             if hum.FloorMaterial ~= Enum.Material.Air then break end
         end
         healConn:Disconnect()
@@ -12129,7 +12039,7 @@ local function carpetEngage()
             _ahrp.AssemblyLinearVelocity = Vector3.zero
             _ahrp.AssemblyAngularVelocity = Vector3.zero
             pcall(function() _ahrp.Anchored = true end)
-            task.delay(1, function()
+            task.delay(0.35, function()
                 if _ahrp and _ahrp.Parent then
                     pcall(function() _ahrp.Anchored = false end)
                 end
@@ -12141,7 +12051,7 @@ local function carpetEngage()
         local _cloneOk = doClone()
         if _clonePlat then pcall(function() _clonePlat:Destroy() end); _clonePlat = nil end
         if _cloneOk then
-            task.wait(0.3)
+            task.wait(0.12)
             local _cloneSucceeded = false
             do
                 local _c = LP.Character
