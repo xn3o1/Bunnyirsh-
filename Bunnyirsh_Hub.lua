@@ -78,13 +78,13 @@ do
     task.spawn(function()
         local Players = game:GetService("Players")
         local lp = Players.LocalPlayer
-        for _ = 1, 20 do
+        for _ = 1, 6 do
             pcall(function()
                 local c = lp and lp.Character
                 local h = c and c:FindFirstChild("HumanoidRootPart")
                 if h and h.Anchored then h.Anchored = false end
             end)
-            task.wait(0.25)
+            task.wait(0.08)
         end
     end)
 end
@@ -109,8 +109,8 @@ local _xchan
 local _lastTry, _attempts = 0, 0
 local _deepScans, _lastDeep = 0, 0
 local _mod
-local MAX_ATTEMPTS, RETRY_GAP = 12, 1.0
-local BOOT_T0, BOOT_BURST, BOOT_GAP = os.clock(), 3.0, 0.10
+local MAX_ATTEMPTS, RETRY_GAP = 8, 0.8
+local BOOT_T0, BOOT_BURST, BOOT_GAP = os.clock(), 1.5, 0.08
 local MAX_DEEP, DEEP_GAP = 1, 3.0
 local function _retryGap()
     if (os.clock() - BOOT_T0) < BOOT_BURST then return BOOT_GAP end
@@ -288,10 +288,10 @@ task.spawn(function()
     repeat
         plots = WS:FindFirstChild("Plots")
         if not plots then task.wait(0.05) end
-    until plots or (os.clock() - t0) > 25
+    until plots or (os.clock() - t0) > 8
     if not plots then return end
     local done, warmT0 = {}, os.clock()
-    while (os.clock() - warmT0) < 15 do
+    while (os.clock() - warmT0) < 4 do
         local kids = plots:GetChildren()
         local pending = false
         for _, plot in ipairs(kids) do
@@ -327,7 +327,7 @@ task.spawn(function()
     local plots
     local t0 = os.clock()
     repeat plots = WS:FindFirstChild("Plots"); if not plots then task.wait(0.1) end
-    until plots or (os.clock() - t0) > 25
+    until plots or (os.clock() - t0) > 8
     if not plots then return end
     local function plotPos(plot)
         local okp, pv = pcall(function() return plot:GetPivot().Position end)
@@ -923,8 +923,8 @@ do
             pcall(function() ok = _G.SXEFireGrapple2(destino) and true or false end)
         end
         if _G.__LMARK then _G.__LMARK("hook na direcao da base: " .. tostring(ok)) end
-        local ESPERA_HOOK_TP = 0.12
-        task.wait(ESPERA_HOOK_TP)
+        local ESPERA_HOOK_TP = 0.0
+        -- no delay
         if _G.SXEStartSideTP then
             task.spawn(_G.SXEStartSideTP)
         elseif _G.SXE_ExecuteManualTP then
@@ -945,9 +945,9 @@ task.defer(LPH_NO_VIRTUALIZE(function()
             local item = table.remove(_G.__SXELazyQ, 1)
             local ok, err = pcall(item.fn)
             if not ok then print("[SXE Lazy]", item.name, err) end
-            task.wait(0.08)
+            task.wait(0.03)
         else
-            task.wait(0.5)
+            task.wait(0.25)
         end
     end
 end))
@@ -971,7 +971,7 @@ _G.cancelLazyUI = function(element)
         end
     end
 end
-task.delay(4.0, function()
+task.delay(1.2, function()
     for _, item in ipairs(_G.lazyUIs) do
         if item.element and not item.cancelled then
             local vis
@@ -1143,7 +1143,7 @@ do
     nHub.Size = UDim2.new(0, 0, 0, 16)
     nHub.LayoutOrder = 1
     nHub.BackgroundTransparency = 1
-    nHub.Text = "Bunnyirsh"
+    nHub.Text = "Bunnyirsh Hub"
     nHub.Font = Enum.Font.GothamBlack
     nHub.TextSize = 13
     nHub.Parent = nome
@@ -1254,7 +1254,7 @@ Themes = {
         BlacklistHover=Color3.fromRGB(50,50,50), BlacklistLeave=Color3.fromRGB(45,45,45),
     }
 }
-HERESY = { NOME="Bunnyirsh", GRAD_A=Color3.fromRGB(255,255,255), GRAD_B=Color3.fromRGB(180,180,180) }
+HERESY = { NOME="Bunnyirsh Hub", GRAD_A=Color3.fromRGB(255,255,255), GRAD_B=Color3.fromRGB(180,180,180) }
 Theme = {}
 for k, v in pairs(Themes.Dark) do
     Theme[k] = v
@@ -1658,9 +1658,9 @@ Config = {
     },
     TpSettings = {
         Tool="Flying Carpet", TpKey="T", CloneKey="V", CarpetSpeedKey="Q",
-        InfiniteJump=false, DelayVal=0.4, CloneDelayVal=0.1,
+        InfiniteJump=false, DelayVal=0.0, CloneDelayVal=0.0,
         RagdollTP=false, FPSWait=false, FlyTP=false, FlyTPSpeed=160, FlyTPCloseSpeed=75,
-        GrabbleTP=false, GrabbleTPSpeed=230,
+        GrabbleTP=false, GrabbleTPSpeed=480,
         TpOnLoad=false, MinGenForTp="", MinGenForGrab="",
         BrainrotCarpet=false,
     },
@@ -5155,13 +5155,13 @@ local LOWER = {
 local UPPER_Y_THRESHOLD = 7
 local TALL_PETS = { ["La Secret Combinasion"]=true, ["La Jolly Grande"]=true }
 local TALL_OFFSET = 3
-local CARPET_SPEED = 230
+local CARPET_SPEED = 480
 local INBASE_SPEED = 230
 local function getCarpetSpeed()
-    return Config.TpSettings.FlyTPSpeed or 230
+    return Config.TpSettings.FlyTPSpeed or 480
 end
 local function getInBaseSpeed()
-    return Config.TpSettings.FlyTPCloseSpeed or 230
+    return Config.TpSettings.FlyTPCloseSpeed or 480
 end
 local SKY_CLONE_WAIT = 0.2
 local CARPET_NAMES = { "Flying Carpet", "Carpet", "Cloud", "Witch's Broom", "Cupid's Wings", "Santa's Sleigh", "Magic Carpet", "Waverider" }
@@ -5673,7 +5673,7 @@ end
 local MAX_CLIMB = 75
 local function velMoveThrough(hrp, waypoints, speedOverride, allowJump, quickStart)
     if not hrp or not hrp.Parent or #waypoints == 0 then return end
-    local _runSpeed = speedOverride or Config.TpSettings.GrabbleTPSpeed or (_G.SXECarpetSpeed or CARPET_SPEED or 230)
+    local _runSpeed = speedOverride or Config.TpSettings.GrabbleTPSpeed or (_G.SXECarpetSpeed or CARPET_SPEED or 480)
     vizPath(hrp.Position, waypoints)
     local _myVizGen = _G.__vizGen
     local wpIdx = 1
@@ -6128,7 +6128,7 @@ function runAutoSnipe()
             hrp.AssemblyLinearVelocity = Vector3.zero
             hrp.CFrame = hrp.CFrame * CFrame.new(0, 0, -2.5)
             hrp.AssemblyLinearVelocity = Vector3.zero
-            waitSecondsHeartbeat(Config.TpSettings.CloneDelayVal or 0.1)
+            waitSecondsHeartbeat(Config.TpSettings.CloneDelayVal or 0.0)
             local miniPos = hrp.Position
             waitSecondsHeartbeat(0.01)
             local stillAtMiniPos = waitUntilHeartbeat(function()
@@ -6164,7 +6164,7 @@ function runAutoSnipe()
                 task.wait(0.05)
                 equipTpToolAndWait(hum)
             end
-            local holdEnd = tick() + math.max(0.18, Config.TpSettings.DelayVal or 0.4)
+            local holdEnd = tick() + math.max(0.0, Config.TpSettings.DelayVal or 0.0)
             while tick() < holdEnd do
                 if not hrp.Parent then break end
                 if LocalPlayer:GetAttribute("Stealing") then break end
@@ -6389,7 +6389,7 @@ function tpToBrainrot()
             task.wait(0.05)
             hrp.AssemblyLinearVelocity = Vector3.zero
             hrp.AssemblyAngularVelocity = Vector3.zero
-            local holdEnd = tick() + math.max(0.18, Config.TpSettings.DelayVal or 0.4)
+            local holdEnd = tick() + math.max(0.0, Config.TpSettings.DelayVal or 0.0)
             while tick() < holdEnd do
                 if not hrp.Parent then
                     break
@@ -8368,14 +8368,12 @@ function openAnim(f)
     us.Name = "SXEScale"
     us.Parent = f
     local tgt = f.Position
-    local baseTrans = f.BackgroundTransparency
-    if baseTrans > 0.9 then baseTrans = 0.04 end
     f.Visible = true
-    us.Scale = 0.82
-    f.Position = UDim2.new(tgt.X.Scale, tgt.X.Offset, tgt.Y.Scale, tgt.Y.Offset + 32)
-    local ti = TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+    us.Scale = 0.78
+    f.Position = UDim2.new(tgt.X.Scale, tgt.X.Offset, tgt.Y.Scale, tgt.Y.Offset + 40)
+    local ti = TweenInfo.new(0.38, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
     TweenService:Create(us, ti, {Scale = 1}):Play()
-    TweenService:Create(f, ti, {Position = tgt}):Play()
+    TweenService:Create(f, TweenInfo.new(0.32, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position = tgt}):Play()
 end
 function closeAnim(f)
     if not f then return end
@@ -8384,8 +8382,8 @@ function closeAnim(f)
         f.Visible = false
         return
     end
-    local ti = TweenInfo.new(0.20, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
-    local tw1 = TweenService:Create(us, ti, {Scale = 0.88})
+    local ti = TweenInfo.new(0.18, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
+    local tw1 = TweenService:Create(us, ti, {Scale = 0.85})
     tw1:Play()
     tw1.Completed:Connect(function()
         f.Visible = false
@@ -8776,8 +8774,8 @@ function rebuildTpSpeedSettings()
     clearBody(tpSpeedSettingsBody)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Fly TP Speed", 50, 300, Config.TpSettings.FlyTPSpeed or 160, function(v) Config.TpSettings.FlyTPSpeed=v; saveConfig() end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "100 Studs Base Speed", 20, 250, Config.TpSettings.FlyTPCloseSpeed or 75, function(v) Config.TpSettings.FlyTPCloseSpeed=v; saveConfig() end)
-    makeMainSliderWithInput(tpSpeedSettingsBody, "Grabble TP Speed", 50, 600, Config.TpSettings.GrabbleTPSpeed or 230, function(v) Config.TpSettings.GrabbleTPSpeed=v; saveConfig(); if _G.SXESetCarpetSpeed then pcall(_G.SXESetCarpetSpeed, v) end end)
-    makeMainSliderWithInput(tpSpeedSettingsBody, "Walk To Brainrot Speed", 50, 1000, Config.TpSettings.WalkTPSpeed or 260, function(v) Config.TpSettings.WalkTPSpeed=v; saveConfig() end)
+    makeMainSliderWithInput(tpSpeedSettingsBody, "Grabble TP Speed", 50, 600, Config.TpSettings.GrabbleTPSpeed or 480, function(v) Config.TpSettings.GrabbleTPSpeed=v; saveConfig(); if _G.SXESetCarpetSpeed then pcall(_G.SXESetCarpetSpeed, v) end end)
+    makeMainSliderWithInput(tpSpeedSettingsBody, "Walk To Brainrot Speed", 50, 1000, Config.TpSettings.WalkTPSpeed or 230, function(v) Config.TpSettings.WalkTPSpeed=v; saveConfig() end)
     makeMainSliderWithInput(tpSpeedSettingsBody, "Clone Delay", 0.05, 2.0, Config.TpSettings.CloneDelayVal or 0.1, function(v) Config.TpSettings.CloneDelayVal=v; saveConfig() end, "s")
     makeQuickButton(tpSpeedSettingsBody, "Close", function() closeAnim(tpSpeedSettingsPanel) end, Theme.SoftAccentHover)
 end
@@ -10253,7 +10251,7 @@ do
         end
     end
     _G.SXEFireGrapple = fireGrapple
-    local SXESpeed = { CARPET = 520, INBASE = 340 }
+    local SXESpeed = { CARPET = 480, INBASE = 300 }
     _G.SXESetCarpetSpeed = function(v) v = tonumber(v); if v and v > 0 then SXESpeed.CARPET = v end end
     _G.SXESetInbaseSpeed = function(v) v = tonumber(v); if v and v > 0 then SXESpeed.INBASE = v end end
     _G.SXEGetCarpetSpeed = function() return SXESpeed.CARPET end
@@ -10991,7 +10989,7 @@ local function carpetEngage()
         if not hrp then return end
         pcall(function() hrp.Anchored = false end)
         pcall(equipCarpet)
-        local SPEED = (Config.TpSettings and (tonumber(Config.TpSettings.WalkTPSpeed) or tonumber(Config.TpSettings.GrabbleTPSpeed))) or 260
+        local SPEED = (Config.TpSettings and (tonumber(Config.TpSettings.WalkTPSpeed) or tonumber(Config.TpSettings.GrabbleTPSpeed))) or 480
         local FLOAT_OFFSET = (targetPos.Y > 20) and -4 or 0
         local goal = Vector3.new(targetPos.X, targetPos.Y + FLOAT_OFFSET, targetPos.Z)
         local t0 = os.clock()
@@ -11415,8 +11413,8 @@ local function carpetEngage()
             if #semEsteira == 0 then isTeleporting = false; return end
             pet = _pickByMode(semEsteira) or semEsteira[1]
         end
-        local _tpSpd = (Config and Config.TpSettings and Config.TpSettings.GrabbleTPSpeed) or 520
-        local _cloneDelay = (Config and Config.TpSettings and Config.TpSettings.CloneDelayVal) or 0.35
+        local _tpSpd = (Config and Config.TpSettings and Config.TpSettings.GrabbleTPSpeed) or 480
+        local _cloneDelay = (Config and Config.TpSettings and Config.TpSettings.CloneDelayVal) or 0.0
         local petPos = pet.position
         local petName = pet.name
         local adjY = petPos.Y
@@ -11761,6 +11759,7 @@ do
         if psStroke then psStroke.Color = on and Theme.Green or Theme.Stroke end
     end
     local function construirBotaoPs()
+        return
         if psBtn then return end
         psBtn = Instance.new("Frame")
         psBtn.Name = "HeresyPsButton"
@@ -12319,7 +12318,7 @@ do
     end)
     task.spawn(function()
         task.wait(2)
-        pcall(construirBotaoPs)
+        -- PS button removed
         if Config.FaceAway    then faceAwayLigar()    end
         if Config.PsOnSteal   then psLoop()           end
         if Config.AntiFlasher then antiFlasherLigar() end
