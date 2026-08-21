@@ -78,13 +78,13 @@ do
     task.spawn(function()
         local Players = game:GetService("Players")
         local lp = Players.LocalPlayer
-        for _ = 1, 6 do
+        for _ = 1, 20 do
             pcall(function()
                 local c = lp and lp.Character
                 local h = c and c:FindFirstChild("HumanoidRootPart")
                 if h and h.Anchored then h.Anchored = false end
             end)
-            task.wait(0.08)
+            task.wait(0.25)
         end
     end)
 end
@@ -109,8 +109,8 @@ local _xchan
 local _lastTry, _attempts = 0, 0
 local _deepScans, _lastDeep = 0, 0
 local _mod
-local MAX_ATTEMPTS, RETRY_GAP = 8, 0.8
-local BOOT_T0, BOOT_BURST, BOOT_GAP = os.clock(), 1.5, 0.08
+local MAX_ATTEMPTS, RETRY_GAP = 12, 1.0
+local BOOT_T0, BOOT_BURST, BOOT_GAP = os.clock(), 3.0, 0.10
 local MAX_DEEP, DEEP_GAP = 1, 3.0
 local function _retryGap()
     if (os.clock() - BOOT_T0) < BOOT_BURST then return BOOT_GAP end
@@ -288,10 +288,10 @@ task.spawn(function()
     repeat
         plots = WS:FindFirstChild("Plots")
         if not plots then task.wait(0.05) end
-    until plots or (os.clock() - t0) > 8
+    until plots or (os.clock() - t0) > 25
     if not plots then return end
     local done, warmT0 = {}, os.clock()
-    while (os.clock() - warmT0) < 4 do
+    while (os.clock() - warmT0) < 15 do
         local kids = plots:GetChildren()
         local pending = false
         for _, plot in ipairs(kids) do
@@ -327,7 +327,7 @@ task.spawn(function()
     local plots
     local t0 = os.clock()
     repeat plots = WS:FindFirstChild("Plots"); if not plots then task.wait(0.1) end
-    until plots or (os.clock() - t0) > 8
+    until plots or (os.clock() - t0) > 25
     if not plots then return end
     local function plotPos(plot)
         local okp, pv = pcall(function() return plot:GetPivot().Position end)
@@ -923,8 +923,8 @@ do
             pcall(function() ok = _G.SXEFireGrapple2(destino) and true or false end)
         end
         if _G.__LMARK then _G.__LMARK("hook na direcao da base: " .. tostring(ok)) end
-        local ESPERA_HOOK_TP = 0.0
-        -- no delay
+        local ESPERA_HOOK_TP = 0.12
+        task.wait(ESPERA_HOOK_TP)
         if _G.SXEStartSideTP then
             task.spawn(_G.SXEStartSideTP)
         elseif _G.SXE_ExecuteManualTP then
@@ -945,9 +945,9 @@ task.defer(LPH_NO_VIRTUALIZE(function()
             local item = table.remove(_G.__SXELazyQ, 1)
             local ok, err = pcall(item.fn)
             if not ok then print("[SXE Lazy]", item.name, err) end
-            task.wait(0.03)
+            task.wait(0.08)
         else
-            task.wait(0.25)
+            task.wait(0.5)
         end
     end
 end))
@@ -971,7 +971,7 @@ _G.cancelLazyUI = function(element)
         end
     end
 end
-task.delay(1.2, function()
+task.delay(4.0, function()
     for _, item in ipairs(_G.lazyUIs) do
         if item.element and not item.cancelled then
             local vis
@@ -1658,7 +1658,7 @@ Config = {
     },
     TpSettings = {
         Tool="Flying Carpet", TpKey="T", CloneKey="V", CarpetSpeedKey="Q",
-        InfiniteJump=false, DelayVal=0.0, CloneDelayVal=0.0,
+        InfiniteJump=false, DelayVal=0.4, CloneDelayVal=0.1,
         RagdollTP=false, FPSWait=false, FlyTP=false, FlyTPSpeed=160, FlyTPCloseSpeed=75,
         GrabbleTP=false, GrabbleTPSpeed=480,
         TpOnLoad=false, MinGenForTp="", MinGenForGrab="",
@@ -6128,7 +6128,7 @@ function runAutoSnipe()
             hrp.AssemblyLinearVelocity = Vector3.zero
             hrp.CFrame = hrp.CFrame * CFrame.new(0, 0, -2.5)
             hrp.AssemblyLinearVelocity = Vector3.zero
-            waitSecondsHeartbeat(Config.TpSettings.CloneDelayVal or 0.0)
+            waitSecondsHeartbeat(Config.TpSettings.CloneDelayVal or 0.1)
             local miniPos = hrp.Position
             waitSecondsHeartbeat(0.01)
             local stillAtMiniPos = waitUntilHeartbeat(function()
@@ -6164,7 +6164,7 @@ function runAutoSnipe()
                 task.wait(0.05)
                 equipTpToolAndWait(hum)
             end
-            local holdEnd = tick() + math.max(0.0, Config.TpSettings.DelayVal or 0.0)
+            local holdEnd = tick() + math.max(0.18, Config.TpSettings.DelayVal or 0.4)
             while tick() < holdEnd do
                 if not hrp.Parent then break end
                 if LocalPlayer:GetAttribute("Stealing") then break end
@@ -6389,7 +6389,7 @@ function tpToBrainrot()
             task.wait(0.05)
             hrp.AssemblyLinearVelocity = Vector3.zero
             hrp.AssemblyAngularVelocity = Vector3.zero
-            local holdEnd = tick() + math.max(0.0, Config.TpSettings.DelayVal or 0.0)
+            local holdEnd = tick() + math.max(0.18, Config.TpSettings.DelayVal or 0.4)
             while tick() < holdEnd do
                 if not hrp.Parent then
                     break
@@ -11414,7 +11414,7 @@ local function carpetEngage()
             pet = _pickByMode(semEsteira) or semEsteira[1]
         end
         local _tpSpd = (Config and Config.TpSettings and Config.TpSettings.GrabbleTPSpeed) or 480
-        local _cloneDelay = (Config and Config.TpSettings and Config.TpSettings.CloneDelayVal) or 0.0
+        local _cloneDelay = (Config and Config.TpSettings and Config.TpSettings.CloneDelayVal) or 0.35
         local petPos = pet.position
         local petName = pet.name
         local adjY = petPos.Y
